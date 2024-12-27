@@ -11,6 +11,7 @@ import {
     TouchableWithoutFeedback,
     BackHandler,
     ImageBackground,
+    Modal,
 } from "react-native";
 import HomeHeader from "../../components/home/HomeHeader";
 import ScreenBackground from "../../assets/home-background.png";
@@ -25,10 +26,10 @@ import FilterDropdown from "../../components/home/FilterDropdown";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ShareModal from "../../components/modals/ShareModal";
-import Share from "../../components/post/Share";
 import { SvgUri } from "react-native-svg";
 import baseUrl from "../../utils/api";
-import { greyDots } from "../../utils/icons";
+import { greyDots, shareIcon } from "../../utils/icons";
+import PinReport from "../../components/home/PinReport";
 
 const HomeScreen = () => {
     const [posts, setPosts] = useState([]);
@@ -39,6 +40,7 @@ const HomeScreen = () => {
     const [commentsVisible, setCommentsVisible] = useState(false); // State for modal visibility
     const [selectedPostId, setSelectedPostId] = useState(null); 
     const [isShareModalVisible, setShareModalVisible] = useState(false);
+    const [isPinReportVisible, setPinReportVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
     const navigation = useNavigation();
 
@@ -104,71 +106,7 @@ const HomeScreen = () => {
     const handleAttend = () => {
         navigation.navigate("CalendarScreen");
     };
-
-    const handleLikePress = async (postId) => {
-        try {
-            const token = await AsyncStorage.getItem('AccessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-        
-            const response = await fetch(`${baseUrl}/like/EV/${postId}/`, {
-                method: 'POST',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-                }
-            });
-        
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-            console.log(data.message);
-        
-            setLikeCounts((prevCounts) => ({
-                ...prevCounts,
-                [postId]: prevCounts[postId] + 1,
-            }));
-        } catch (error) {
-            console.error('Error handling like:', error);
-        }
-    };
     
-    const handleBookmarkPress = async (postId) => {
-        try {
-            const token = await AsyncStorage.getItem('AccessToken');
-        
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-            console.log(`Post ID to be shared: ${postId}`);
-            const response = await fetch(`${baseUrl}/bookmark/EV/${postId}/`, {
-                method: 'POST',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-                }
-            });
-        
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-            console.log(data.message);
-        
-            setBookmarkedPosts((prevBookmarks) => ({
-                ...prevBookmarks,
-                [postId]: !prevBookmarks[postId],
-            }));
-        } catch (error) {
-            console.error('Error handling bookmark:', error);
-        }
-    };
     
       const handleSharePress = useCallback(async (postId, postName) => {
         try {
@@ -178,7 +116,7 @@ const HomeScreen = () => {
                 console.error('No token found');
                 return;
             }
-            const link = `http://app.engageathon.com/event/${postName}`;
+            const link = `https://app.engageathon.com/event/${postName}`;
             console.log('share', link);
         
             setShareableLink(link);
@@ -250,7 +188,7 @@ const HomeScreen = () => {
                                     Organizer | {post.event_type}
                                     </Text>
                                 </View>
-                                <TouchableOpacity>
+                                <TouchableOpacity onPress={() => setPinReportVisible(true)}>
                                     <SvgUri uri={greyDots} />
                                 </TouchableOpacity>
                                 </View>
@@ -269,25 +207,21 @@ const HomeScreen = () => {
                         </View>
                         <View style={styles.postInteraction}>
                             <View style={styles.likeSection}>
-                            <TouchableOpacity onPress={() => handleLikePress(post.id)}>
-                                <Heart filled={false} />
-                            </TouchableOpacity>
-                            <Text style={styles.likeCountText}>
-                                {post.likes_count || 0}
-                            </Text>
+                                <Heart postId={post.id} like={post.liked}/>
+                                <Text style={styles.likeCountText}>
+                                    {post.likes_count ?? 0}
+                                </Text>
                             </View>
                             {post.event_type && (
-                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
-                            <Comment />
-                            </TouchableOpacity>
+                                <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
+                                    <Comment />
+                                </TouchableOpacity>
                             )}
-                            <TouchableOpacity style={styles.saveButton} onPress={() => handleBookmarkPress(post.id)}>
-                            <Save filled={false} />
-                            </TouchableOpacity>
+                            <Save postId={post.id} bookmark={post.bookmarked} />
                             <View style={styles.shareContainer}>                 
-                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleSharePress(post.id, post.name)}>
-                            <Share />
-                            </TouchableOpacity>
+                                <TouchableOpacity style={styles.interactionButton} onPress={() => handleSharePress(post.id, post.name)}>
+                                    <SvgUri width="16" height="14" uri={shareIcon} />
+                                </TouchableOpacity>
                             </View>
                         </View>
                         {post.caption && <Text style={styles.caption}>{post.caption}</Text>}
@@ -311,12 +245,16 @@ const HomeScreen = () => {
                 )}
                 <CommentsModal visible={commentsVisible} onClose={() => setCommentsVisible(false)} postId={selectedPostId} />
                 {isShareModalVisible && 
-                <ShareModal
-                    isVisible={isShareModalVisible}
-                    onClose={handleCloseModal}
-                    link={shareableLink}
-                />
+                    <ShareModal
+                        isVisible={isShareModalVisible}
+                        onClose={handleCloseModal}
+                        link={shareableLink}
+                    />
                 }
+                <PinReport 
+                    isModalVisible={isPinReportVisible} 
+                    setModalVisible={setPinReportVisible} 
+                />
             </View>
             </ImageBackground>
         </TouchableWithoutFeedback>

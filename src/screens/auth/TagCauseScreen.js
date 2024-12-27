@@ -15,6 +15,7 @@ import { backArrow } from '../../utils/icons';
 import baseUrl from '../../utils/api';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
 import { SvgUri } from "react-native-svg";
+import apiClient from '../../services/apiClient';
 
 const TagCause = () => {
     const [causeTypes, setCauseTypes] = useState({});
@@ -35,7 +36,7 @@ const TagCause = () => {
         // Fetch cause types and initialize pressedStates based on categoryIdPost
         const fetchCauseTypes = async () => {
             try {
-                const response = await fetch(`${baseUrl}/missions/categories/`);
+                const response = await apiClient.get(`${baseUrl}/missions/categories/`);
 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -164,7 +165,6 @@ const TagCause = () => {
                         />
                     ))}
                 </View>
-
             </ScrollView>
         </ImageBackground>
     );

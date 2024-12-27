@@ -9,7 +9,7 @@ import {
     ActivityIndicator,
     RefreshControl,
 } from 'react-native';  // Added RefreshControl here
-import axios from 'axios';
+import apiClient from '../../services/apiClient';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from '../../utils/api';
@@ -32,7 +32,7 @@ const LeaderboardScreen = () => {
                 console.error("No token found");
                 return;
             }
-            const response = await axios.get(`${baseUrl}/events/leaderboard/${userId}/`, {
+            const response = await apiClient.get(`${baseUrl}/events/leaderboard/${userId}/`, {
                 headers: {
                 'Authorization': `Bearer ${storedToken}`,
                 'Content-Type': 'application/json',

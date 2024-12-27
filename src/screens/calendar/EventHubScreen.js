@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigation, useRoute } from '@react-navigation/native';
 import {
     View,
     Text,
@@ -7,8 +8,6 @@ import {
     ImageBackground,
     ScrollView,
 } from 'react-native';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { Feather } from "@expo/vector-icons";
 import { Platform } from "react-native";
 import { backArrow, addCameraIcon } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
@@ -82,102 +81,102 @@ const EventHubScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  backgroundImage: {
-    flex: 1,
-    width: '100%',
-  },
-  container: {
-    flex: 1,
-    marginTop: '10%', 
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: '5%',
-    marginBottom: 20, 
-    marginTop: 5, 
-  },
-  backButton: {
-    marginTop: 15, 
-  },
-  headerText: {
-    color: '#FFE600',
-    fontSize: 32,
-    position: 'absolute',
-    left: '20%',
-    top: 10, 
-  },
-  contentContainer: {
-    padding: 20,
-    paddingTop: 0,
-    alignItems: 'center',
-  },
-  description: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    marginVertical: 10,
-    textAlign: 'center',
-  },
-  username: {
-    color: '#FFFFFF',
-    fontSize: 14,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  activitiesHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    alignItems: 'center',
-    marginBottom: 10,
-  },
-  activitiesTitle: {
-    color: '#FFE600',
-    fontSize: 24,
-  },
-  viewLeaderboard: {
-    color: '#FF8D00',
-    fontSize: 14,
-  },
-  totalPoints: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    marginBottom: 10,
-  },
-  activityContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 10,
-    padding: 15,
-    marginBottom: 10,
-    width: '100%',
-    borderWidth: 2,
-    borderColor: '#FF8D00',
-  },
-  activityText: {
-    color: '#000000',
-    fontSize: 18,
-  },
-  activityPoints: {
-    color: '#FF8D00',
-    fontSize: 18,
-  },
-  activityStatus: {
-    alignItems: 'flex-end',
-  },
-  cameraButtonContainer: {
-    marginTop: 20,
-  },
-  noActivitiesText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    textAlign: 'center',
-    marginVertical: 20,
-  },
+    backgroundImage: {
+        flex: 1,
+        width: '100%',
+    },
+    container: {
+        flex: 1,
+        marginTop: '10%', 
+    },
+    header: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        width: '100%',
+        paddingHorizontal: '5%',
+        marginBottom: 20, 
+        marginTop: 5, 
+    },
+    backButton: {
+        marginTop: 15, 
+    },
+    headerText: {
+        color: '#FFE600',
+        fontSize: 32,
+        position: 'absolute',
+        left: '20%',
+        top: 10, 
+    },
+    contentContainer: {
+        padding: 20,
+        paddingTop: 0,
+        alignItems: 'center',
+    },
+    description: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        marginVertical: 10,
+        textAlign: 'center',
+    },
+    username: {
+        color: '#FFFFFF',
+        fontSize: 14,
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    activitiesHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+        alignItems: 'center',
+        marginBottom: 10,
+    },
+    activitiesTitle: {
+        color: '#FFE600',
+        fontSize: 24,
+    },
+    viewLeaderboard: {
+        color: '#FF8D00',
+        fontSize: 14,
+    },
+    totalPoints: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        marginBottom: 10,
+    },
+    activityContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        borderRadius: 10,
+        padding: 15,
+        marginBottom: 10,
+        width: '100%',
+        borderWidth: 2,
+        borderColor: '#FF8D00',
+    },
+    activityText: {
+        color: '#000000',
+        fontSize: 18,
+    },
+    activityPoints: {
+        color: '#FF8D00',
+        fontSize: 18,
+    },
+    activityStatus: {
+        alignItems: 'flex-end',
+    },
+    cameraButtonContainer: {
+        marginTop: 20,
+    },
+    noActivitiesText: {
+        color: '#FFFFFF',
+        fontSize: 16,
+        textAlign: 'center',
+        marginVertical: 20,
+    },
 });
 
 export default EventHubScreen;

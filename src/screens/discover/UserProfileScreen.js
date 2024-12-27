@@ -15,6 +15,7 @@ import { SvgUri } from "react-native-svg";
 import baseUrl from "../../utils/api";
 import LinearGradient from "react-native-linear-gradient";
 import { backArrow } from "../../utils/icons";
+import apiClient from "../../services/apiClient";
 
 export default function UserProfileScreen({ route }) {
     const { userID } = route.params;
@@ -38,7 +39,7 @@ export default function UserProfileScreen({ route }) {
                 }
                 setToken(storedToken);
             
-                const response = await fetch(`${baseUrl}/user-content/${userID}/?content_types=event&content_types=post`, {
+                const response = await apiClient.get(`${baseUrl}/user-content/${userID}/?content_types=event&content_types=post`, {
                 headers: {
                     'Authorization': `Bearer ${storedToken}`,
                     'Content-Type': 'application/json',

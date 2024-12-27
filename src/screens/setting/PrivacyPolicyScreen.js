@@ -12,7 +12,9 @@ import { useWindowDimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from '../../utils/api';
 import { useNavigation } from "@react-navigation/native";
-import { backArrow } from '../../utils/icons';
+import { backArrow, gradientLine } from '../../utils/icons';
+import apiClient from '../../services/apiClient';
+
 const PrivacyPolicyScreen = () => {
     const navigation = useNavigation();
     const { width } = useWindowDimensions();
@@ -26,7 +28,7 @@ const PrivacyPolicyScreen = () => {
                     console.error("no token found");
                     return;
                 }
-                const response = await fetch(`${baseUrl}/auth/privacypolicy/`, {
+                const response = await apiClient.get(`${baseUrl}/auth/privacypolicy/`, {
                     headers: {
                         //"Authorization": `Token ${token}`,
                     },
@@ -71,7 +73,7 @@ const PrivacyPolicyScreen = () => {
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Privacy Policy</Text>
             </View>
-
+            <SvgUri uri={gradientLine} style={styles.gradientLine} />
             <ScrollView  
                 style={styles.scrollView}
                 contentContainerStyle={styles.scrollContentContainer}
@@ -119,6 +121,10 @@ const styles = StyleSheet.create({
         color: "#FFE600",
         fontSize: 28,
         fontFamily: 'poppins-Medium',
+    },
+    gradientLine: {
+        marginTop: 10,
+        alignSelf: "center",
     },
     policyContainer: {
         marginLeft: 30,

@@ -12,14 +12,29 @@ import {
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
-import authService from '../../services/authService';
+import { backArrow, gradientLine } from "../../utils/icons";
+import { SvgUri } from "react-native-svg";
+import apiClient from '../../services/apiClient';
 
-const InvitationScreen = ({ route }) => {
+const InviteContactScreen = () => {
     const navigation = useNavigation();
-    const { userEmail, userData } = route.params;
+
     const [email, setEmail] = useState("");
 
-    console.log("user data in invitation", userData);
+    const invite = async () => {
+        const token = await AsyncStorage.getItem('AccessToken');
+        try {
+            const response = await apiClient.post(`${baseUrl}/auth/invite/`, `invitee_email=${email}`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+            return response.data;
+        } catch (error) {
+            throw error;
+        }
+    };
+
     const handleInvite = async () => {
         try {
             if (!email) {
@@ -27,8 +42,8 @@ const InvitationScreen = ({ route }) => {
                 return;
             }
 
-            await authService.invite(userEmail, email);
-            console.log(`Invitation sent successfully from ${userEmail} to ${email}`);
+            await invite();
+            console.log(`Invitation sent successfully to ${email}`);
             Alert.alert("Invitation Sent.", "Thank you for inviting!");
         } catch (error) {
             console.error("Invitation failed:", error.message);
@@ -44,8 +59,17 @@ const InvitationScreen = ({ route }) => {
                 source={require("../../assets/main-background.png")}
                 style={styles.backgroundImage}
             >                
-
-            <View style={styles.invitationMainComponent}>
+                <View style={styles.header}>
+                    <TouchableOpacity
+                        style={styles.backButton}
+                        onPress={() => navigation.goBack()}
+                    >
+                        <SvgUri uri={backArrow} />
+                    </TouchableOpacity>
+                    <Text style={styles.headerText}>Invite Contacts</Text>
+                </View>
+                <SvgUri uri={gradientLine} />
+                <View style={styles.invitationMainComponent}>
                     <Text style={styles.invitationText}>Would you like to invite others to sign up and join ENGAGEATHON?</Text>
                     <Image
                         style={{ width: 127, height: 127, marginVertical: 45 }}
@@ -61,8 +85,9 @@ const InvitationScreen = ({ route }) => {
                         />
 
                         <LinearGradient
-                            colors={["#FF8D00", "#FFE600"]}
-                            start={{ x: 0, y: 0 }}
+                            colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                            locations={[0.72, 0.86, 1]}  
+                            start={{ x: 0, y: 0 }}      
                             end={{ x: 1, y: 0 }}
                             style={styles.inviteButtonGradient}
                         >
@@ -73,11 +98,7 @@ const InvitationScreen = ({ route }) => {
                                 <Text style={styles.submitText}>Send Invite</Text>
                             </TouchableOpacity>
                         </LinearGradient>
-
                     </View>
-                    <TouchableOpacity style={styles.skipButton} onPress={() => navigation.navigate('Tabs', { userData: userData })}>
-                        <Text style={styles.skipButtonText}>Skip for now</Text>
-                    </TouchableOpacity>
                 </View>
             </ImageBackground>
         </KeyboardAvoidingView>
@@ -94,12 +115,27 @@ const styles = StyleSheet.create({
         height: "100%",
         alignItems: "center",
     },
+    header: {
+        flexDirection: "row",
+        alignItems: "center",
+        width: "100%",
+        paddingHorizontal: "5%",
+        marginTop: "15%",
+        marginBottom: "4%",
+    },
+    headerText: {
+        color: "#FFE600",
+        fontSize: 24,
+        fontFamily: "Poppins-Medium",
+        paddingLeft: 15,
+    },
     invitationMainComponent: {
         height: "100%",
         width: "80%",
         textAlign: "center",
         alignItems: "center",
-        justifyContent: "center",
+        marginTop: 50,
+        //justifyContent: "center",
     },
     invitationText: {
         fontSize: 24,
@@ -121,8 +157,9 @@ const styles = StyleSheet.create({
         borderRadius: 8,
         borderWidth: 0.5,
         width: "70%",
-        paddingHorizontal: 12,
-
+        paddingHorizontal: 16,
+        fontSize: 15,
+        fontFamily: "Inter-Medium",
     },
     inviteButtonGradient: {
         borderRadius: 8,
@@ -137,7 +174,7 @@ const styles = StyleSheet.create({
     },
     submitText: {
         color: "white",
-        fontWeight: "bold",
+        fontFamily: "Inter-Bold",
     },
     skipButton: {
         marginTop: 24,
@@ -150,4 +187,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default InvitationScreen;
+export default InviteContactScreen;

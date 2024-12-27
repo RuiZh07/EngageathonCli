@@ -1,9 +1,19 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, View, Text, TouchableOpacity, TextInput, StyleSheet, FlatList, Image, KeyboardAvoidingView, Platform } from 'react-native';
-import axios from 'axios';
+import { 
+    Modal, 
+    View, 
+    Text, 
+    TouchableOpacity, 
+    TextInput,
+    StyleSheet, 
+    FlatList, 
+    Image, 
+    KeyboardAvoidingView, 
+    Platform } from 'react-native';
 import baseUrl from '../../utils/api';
 import { cancelGradient, sendGradient } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
+import apiClient from '../../services/apiClient';
 
 const CommentsModal = ({ postId, visible, onClose }) => {
     const [comments, setComments] = useState([]);
@@ -12,7 +22,7 @@ const CommentsModal = ({ postId, visible, onClose }) => {
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const response = await axios.get(`${baseUrl}/comments/EV/${postId}/`);
+                const response = await apiClient.get(`${baseUrl}/comments/EV/${postId}/`);
                 setComments(response.data);
             } catch (error) {
                 console.error('Error fetching comments:', error);
@@ -26,7 +36,7 @@ const CommentsModal = ({ postId, visible, onClose }) => {
 
     const handleAddComment = async () => {
         try {
-            await axios.post(`${baseUrl}/comments/`, {
+            await apiClient.post(`${baseUrl}/comments/`, {
                 postId,
                 text: newComment,
             });

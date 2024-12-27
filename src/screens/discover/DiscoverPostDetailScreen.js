@@ -19,7 +19,6 @@ import { backArrow } from "../../utils/icons";
 import { useNavigation } from "@react-navigation/native";
 import DiscoverPostHeader from "../../components/discover/DiscoverPostHeader";
 
-
 const DiscoverPostDetailScreen = ({ route }) => {
     const { event } = route.params;
     const navigation = useNavigation(); 
@@ -94,125 +93,123 @@ const DiscoverPostDetailScreen = ({ route }) => {
     );
 }
 
-    
-
 export default DiscoverPostDetailScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: '20%',
-  },
-  header: {
-    flexDirection: "row",
-  },
-  profileHeader: {
-    marginLeft: 20,
-    paddingHorizontal: 20,
-    paddingBottom: 14,
-    flex: 1,
-    flexDirection: "row",
-    gap: 10,
-    alignItems: "center",
-  },
-  userInfo: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    flex: 1,
-    alignItems: "center",
-  },
-  postInteraction: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 25,
-    marginBottom: 20,
-  },
-  likeSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginRight: 1,
-    marginTop: -4,
-  },
-  likeCountText: {
-    fontSize: 14,
-    fontFamily: "poppins-regular",
-    color: "#333",
-    marginLeft: 4,
-  },
-  interactionButton: {
-    paddingHorizontal: 10,
-  },
-  shareButton: {
-    marginTop: -7,
-    paddingHorizontal: 10,
-    marginLeft: 'auto',  
-  },
-  detailContainer: {
-    flex: 1,
-    backgroundColor: 'white',
-    marginHorizontal: 20,
-    marginVertical: 10,
-    borderRadius: 20,
-    paddingVertical: 20,
-    paddingHorizontal: 20,
-  },
-  postInteraction: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 20,
-  },
-  pfp: {
-    width: 50, 
-    height: 50, 
-    resizeMode: "cover",
-    borderRadius: 25,
-  },
-  userNameText: {
-    fontFamily: "poppins-regular",
-    fontSize: 17,
-    fontWeight: "500",
-    lineHeight: 26,
-    letterSpacing: 0.4,
-    textAlign: "left",
-  },
-  userDescriptionText: {
-    fontFamily: "inter",
-    fontSize: 13,
-    fontWeight: "400",
-    lineHeight: 16,
-    letterSpacing: 0,
-    textAlign: "left",
-    color: "rgba(163, 163, 163, 1);\n",
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 10,
-  },
-  date: {
-    fontSize: 16,
-    color: '#888',
-    marginBottom: 10,
-  },
-  location: {
-    fontSize: 16,
-    color: '#888',
-    marginBottom: 20,
-  },
-  eventNameText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  description: {
-    fontSize: 16,
-    lineHeight: 24,
-    paddingBottom: 20,
-  },   
+    container: {
+        flex: 1,
+        paddingTop: '20%',
+    },
+    header: {
+        flexDirection: "row",
+    },
+    profileHeader: {
+        marginLeft: 20,
+        paddingHorizontal: 20,
+        paddingBottom: 14,
+        flex: 1,
+        flexDirection: "row",
+        gap: 10,
+        alignItems: "center",
+    },
+    userInfo: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        flex: 1,
+        alignItems: "center",
+    },
+    postInteraction: {
+        flexDirection: "row",
+        alignItems: "center",
+        paddingHorizontal: 25,
+        marginBottom: 20,
+    },
+    likeSection: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginRight: 1,
+        marginTop: -4,
+    },
+    likeCountText: {
+        fontSize: 14,
+        fontFamily: "poppins-regular",
+        color: "#333",
+        marginLeft: 4,
+    },
+    interactionButton: {
+        paddingHorizontal: 10,
+    },
+    shareButton: {
+        marginTop: -7,
+        paddingHorizontal: 10,
+        marginLeft: 'auto',  
+    },
+    detailContainer: {
+        flex: 1,
+        backgroundColor: 'white',
+        marginHorizontal: 20,
+        marginVertical: 10,
+        borderRadius: 20,
+        paddingVertical: 20,
+        paddingHorizontal: 20,
+    },
+    postInteraction: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 20,
+    },
+    pfp: {
+        width: 50, 
+        height: 50, 
+        resizeMode: "cover",
+        borderRadius: 25,
+    },
+    userNameText: {
+        fontFamily: "poppins-regular",
+        fontSize: 17,
+        fontWeight: "500",
+        lineHeight: 26,
+        letterSpacing: 0.4,
+        textAlign: "left",
+    },
+    userDescriptionText: {
+        fontFamily: "inter",
+        fontSize: 13,
+        fontWeight: "400",
+        lineHeight: 16,
+        letterSpacing: 0,
+        textAlign: "left",
+        color: "rgba(163, 163, 163, 1);\n",
+    },
+    image: {
+        width: '100%',
+        height: 200,
+        borderRadius: 10,
+        marginBottom: 20,
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    date: {
+        fontSize: 16,
+        color: '#888',
+        marginBottom: 10,
+    },
+    location: {
+        fontSize: 16,
+        color: '#888',
+        marginBottom: 20,
+    },
+    eventNameText: {
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    description: {
+        fontSize: 16,
+        lineHeight: 24,
+        paddingBottom: 20,
+    },   
   
 });

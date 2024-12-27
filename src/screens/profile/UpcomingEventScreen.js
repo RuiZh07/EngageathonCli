@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-    StatusBar,
     StyleSheet,
     Image,
     Text,
@@ -13,7 +12,7 @@ import {
     ActivityIndicator,
     RefreshControl,
 } from "react-native";
-import axios from "axios";
+import apiClient from "../../services/apiClient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { backArrow } from "../../utils/icons";
 import { Platform } from "react-native";
@@ -30,13 +29,13 @@ const UpcomingEventScreen = ({ navigation }) => {
 
     const fetchEvents = async () => {
         try {
-            const storedToken = await AsyncStorage.getItem("authToken");
+            const storedToken = await AsyncStorage.getItem("AccessToken");
             if (!storedToken) {
                 console.error("No token found");
                 return;
             }
         
-            const response = await axios.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
+            const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
                 headers: {
                 'Authorization': `Bearer ${storedToken}`,
                 'Content-Type': 'application/json',

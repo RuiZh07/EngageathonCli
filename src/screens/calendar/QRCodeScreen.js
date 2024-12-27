@@ -5,7 +5,6 @@ import SvgQRCode from 'react-native-qrcode-svg';
 import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 
-
 const QRCodeScreen = () => {
     const navigation = useNavigation();
     const route = useRoute();

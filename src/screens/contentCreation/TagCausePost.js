@@ -16,7 +16,7 @@ import { backArrow } from '../../utils/icons';
 import baseUrl from '../../utils/api';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
 import { SvgUri } from "react-native-svg";
-
+import apiClient from '../../services/apiClient';
 
 const TagCausePost = () => {
     const { categoryIdPost, setCategoryIdPost } = useContext(CategoryContext);
@@ -36,7 +36,7 @@ const TagCausePost = () => {
                 return;
             }
             try {
-                const response = await fetch(`${baseUrl}/missions/categories/`, {
+                const response = await apiClient.get(`${baseUrl}/missions/categories/`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                     },

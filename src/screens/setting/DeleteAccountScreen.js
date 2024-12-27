@@ -1,17 +1,18 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, ImageBackground, Platform, Alert } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
 import { SvgUri } from "react-native-svg";
 import { backArrow } from '../../utils/icons';
 import baseUrl from "../../utils/api";
 import MainButton from '../../components/common/MainButton';
+import apiClient from '../../services/apiClient';
+
 export default function DeleteAccountScreen() {
     const navigation = useNavigation();
 
     const handleDeleteAccount = async () => {
         try {
-            const response = await axios.delete(`${baseUrl}/auth/delete/`);
+            const response = await apiClient.delete(`${baseUrl}/auth/delete/`);
             if (response.status === 200) {
                 Alert.alert('Success', 'Your account has been deleted.', [
                     { text: 'OK', onPress: () => navigation.navigate('Login') },

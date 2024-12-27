@@ -15,6 +15,7 @@ import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import MainButton from '../../components/common/MainButton';
 import authService from '../../services/authService';
+
 const RegisterScreen = () => {
     const [name, setName] = useState("");
     const [contact, setContact] = useState("");
@@ -146,7 +147,11 @@ const RegisterScreen = () => {
         const profileKey = profileKeyMapping[accountType];
     
         if (!accountInfo || !profileKey) return;
+        
     
+        const isValidWebsite = (url) => {
+
+        }
         try {
             // Prepare the data to be sent to the backend
             const profileData = accountInfo.profileData(name, type, general, contact);

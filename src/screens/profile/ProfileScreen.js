@@ -16,13 +16,13 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
 import { trophieIcon, hamburgerIcon, dollarIcon } from "../../utils/icons";
-import axios from "axios";
 import { SvgUri } from "react-native-svg";
 import authService from "../../services/authService";
 import baseUrl from "../../utils/api";
 import MainButton from "../../components/common/MainButton";
 import HamburgerBar from "../../components/profile/HamburgerBar";
 import LinearGradient from "react-native-linear-gradient";
+import apiClient from "../../services/apiClient";
 
 const { height } = Dimensions.get('window');
 
@@ -82,7 +82,7 @@ export default function ProfileScreen ({ userData }) {
 
     const fetchUserContent = async (token) => {
         try {
-            const response = await axios.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
+            const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
                 headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -108,7 +108,7 @@ export default function ProfileScreen ({ userData }) {
     };
     const fetchFollowers = async (token) => {
         try {
-            const response = await axios.get(`${baseUrl}/followers-user/`, {
+            const response = await apiClient.get(`${baseUrl}/followers-user/`, {
                 headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -122,7 +122,7 @@ export default function ProfileScreen ({ userData }) {
 
     const fetchFollowing = async (token) => {
         try {
-            const response = await axios.get(`${baseUrl}/following-user/`, {
+            const response = await apiClient.get(`${baseUrl}/following-user/`, {
                 headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -136,7 +136,7 @@ export default function ProfileScreen ({ userData }) {
 
     const fetchPoints = async (token) => {
         try {
-            const response = await axios.get(`${baseUrl}/points/`, {
+            const response = await apiClient.get(`${baseUrl}/points/`, {
                 headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
