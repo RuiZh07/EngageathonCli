@@ -1,22 +1,3 @@
-{/*
-import React from "react";
-import { SvgUri } from "react-native-svg";
-import { Dimensions, TouchableWithoutFeedback } from "react-native";
-import { background } from "../../utils/icons";
-
-
-const { width: screenWidth } = Dimensions.get("window");
-
-const Background = ({ style }) => {
-    return (
-        <SvgUri uri={background} width={screenWidth} style={style}/>
-    )
-};
-
-export default Background;
-*/}
-
-
 import React from "react";
 import { SvgUri } from "react-native-svg";
 import { Dimensions, TouchableWithoutFeedback, StyleSheet } from "react-native";

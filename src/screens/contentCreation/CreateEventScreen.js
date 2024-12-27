@@ -22,7 +22,6 @@ import { CategoryContext } from "../../components/contentCreation/CategoryContex
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import MainButton from "../../components/common/MainButton";
-import axios from "axios";
 import ProgressBar from "../../components/contentCreation/ProgressBar";
 import * as ImagePicker from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
@@ -31,6 +30,7 @@ import { SvgUri } from "react-native-svg";
 import { calendarEvent, cameraCancel, addCameraIcon, backArrow } from "../../utils/icons";
 import CameraModal from "../../components/common/CameraModal";
 import baseUrl from "../../utils/api";
+import apiClient from "../../services/apiClient";
 
 const CreateEventScreen = () => {
     const route = useRoute();
@@ -146,7 +146,7 @@ const CreateEventScreen = () => {
             return;
         }
         try {
-            const response = await axios.post(`${API_BASE_URL_EVENT_CREATE}`, eventData, {
+            const response = await apiClient.post(`${API_BASE_URL_EVENT_CREATE}`, eventData, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
@@ -555,13 +555,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "12%",
+        marginTop: "13%",
     },  
  
     headerText: {
         color: "#FFE600",
         fontSize: 26,
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-regular",
         paddingLeft: 20,
 
     },

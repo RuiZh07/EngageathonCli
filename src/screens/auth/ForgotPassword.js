@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import authService from "../../services/authService";
-//import EvilIcons from 'react-native-vector-icons/EvilIcons';
 import { Alert } from "react-native";
 import MainButton from "../../components/common/MainButton";
 import { userRoundedIcon } from "../../utils/icons";

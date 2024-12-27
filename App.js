@@ -31,7 +31,7 @@ import DeleteAccountScreen from "./src/screens/setting/DeleteAccountScreen";
 import DiscoverScreen from "./src/screens/discover/DiscoverScreen";
 import PrivacyPolicyScreen from "./src/screens/setting/PrivacyPolicyScreen";
 import ChangePasswordScreen from "./src/screens/setting/ChangePasswordScreen";
-
+import BecomeMemberScreen from "./src/screens/setting/BecomeMemberScreen";
 import CreateActivityScreen from "./src/screens/contentCreation/CreateActivityScreen";
 import CreateEventScreen from "./src/screens/contentCreation/CreateEventScreen";
 import CreatePostScreen from "./src/screens/contentCreation/CreatePostScreen";
@@ -46,6 +46,7 @@ import UserProfileScreen from "./src/screens/discover/UserProfileScreen";
 import PostDetailScreen from "./src/screens/profile/PostDetailScreen";
 import ShareModal from "./src/components/modals/ShareModal";
 import DiscoverPostDetailScreen from "./src/screens/discover/DiscoverPostDetailScreen";
+import InviteContactScreen from "./src/screens/setting/InviteContactScreen";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -64,8 +65,8 @@ const App = () => {
   return (
     <CategoryProvider>
     <NavigationContainer>
-  {/*
-      <Stack.Navigator initialRouteName="DiscoverScreen">
+{/*
+      <Stack.Navigator initialRouteName="InviteContactScreen">
        
       */}
        <Stack.Navigator initialRouteName={isLoggedIn ? "Tabs" : "OnboardTutorial"}>
@@ -111,6 +112,9 @@ const App = () => {
         <Stack.Screen name="DiscoverPostDetailScreen" component={DiscoverPostDetailScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ChangePasswordScreen" component={ChangePasswordScreen} options={{ headerShown: false }} />
         <Stack.Screen name="ImageSelectionScreen" component={ImageSelectionScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="InviteContactScreen" component={InviteContactScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="BecomeMemberScreen" component={BecomeMemberScreen} options={{ headerShown: false }} />
+        
       </Stack.Navigator>
     </NavigationContainer>
     </CategoryProvider>

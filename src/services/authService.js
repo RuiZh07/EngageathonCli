@@ -1,10 +1,10 @@
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { endpoints } from "./endPoints";
 import baseUrl from "../utils/api";
 import {
     Alert,
-  } from "react-native";
+} from "react-native";
+import apiClient from "./apiClient";
 
 const login = async (email, password) => {
     //console.log(baseUrl);
@@ -13,7 +13,7 @@ const login = async (email, password) => {
         password,
     };
     try {
-        const response = await axios.post(`${baseUrl}${endpoints.login}`, data, {
+        const response = await apiClient.post(`${baseUrl}${endpoints.login}`, data, {
             headers: {
                 "Content-Type": "application/json",
             },
@@ -48,16 +48,16 @@ const signup = async (userData) => {
     try {
         const isFormUrlEncoded = accountType === 'IN';
         const payload = isFormUrlEncoded
-            ? new URLSearchParams(userData).toString() 
+            ? new URLSearchParams(userData).toString()
             : data;
-        console.log("payload",payload);
+
         const headers = {
             "Content-Type": isFormUrlEncoded
                 ? "application/x-www-form-urlencoded"
                 : "application/json",
             };
 
-        const response = await axios.post(`${baseUrl}${endpoints.register}`, payload, {
+        const response = await apiClient.post(`${baseUrl}${endpoints.register}`, payload, {
             headers,
         });
         
@@ -81,7 +81,7 @@ const invite = async (user_email, invitee_email) => {
         invitee_email,
     };
     try {
-        const response = await axios.post(`${baseUrl}${endpoints.invite}`, data, {
+        const response = await apiClient.post(`${baseUrl}${endpoints.invite}`, data, {
         headers: {
             "Content-Type": "application/json",
         },
@@ -97,7 +97,7 @@ const resetPassword = async (user_email) => {
         email: user_email,
     };
     try {
-        const response = await axios.post(`${baseUrl}${endpoints.passwordReset}`, data, {
+        const response = await apiClient.post(`${baseUrl}${endpoints.passwordReset}`, data, {
             headers: {
                 "Content-Type": "application/json",
             },
@@ -115,7 +115,7 @@ const logout = async () => {
         const token = await AsyncStorage.getItem("AccessToken");
         const refreshToken = await AsyncStorage.getItem("RefreshToken")
         if (token) {
-            await axios.post(`${baseUrl}${endpoints.logout}`, `refresh=${refreshToken}`, {
+            await apiClient.post(`${baseUrl}${endpoints.logout}`, `refresh=${refreshToken}`, {
                 headers: { 
                     "Authorization": `Bearer ${token}`,
                     "Content-Type": "application/x-www-form-urlencoded", 

@@ -1,6 +1,6 @@
-import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import baseUrl from "../utils/api";
+import apiClient from "./apiClient";
 
 const fetchComments = async (postId) => {
     const token = await AsyncStorage.getItem("authToken");
@@ -9,7 +9,7 @@ const fetchComments = async (postId) => {
         return;
     }
     try {
-        const response = await axios.get(`${baseUrl}/comments/EV/${postId}/`, {
+        const response = await apiClient.get(`${baseUrl}/comments/EV/${postId}/`, {
             headers: {
                 'Authorization': `Token ${token}`,
                 'Content-Type': 'application/json',
@@ -29,7 +29,7 @@ const postComment = async (postId, content) => {
         return;
     }
     try {
-        const response = await axios.post(`${baseUrl}/comments/`, {
+        const response = await apiClient.post(`${baseUrl}/comments/`, {
             content_object_id: postId,
             content: content,
             content_type: "EV",

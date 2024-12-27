@@ -23,11 +23,12 @@ import LinearGradient from "react-native-linear-gradient";
 import { SvgUri } from "react-native-svg";
 import MainButton from "../../components/common/MainButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from "axios";
+import apiClient from "../../services/apiClient";
 import { CategoryContext } from "../../components/contentCreation/CategoryContext";
 import { addCameraIcon, backArrow } from "../../utils/icons";
 import CameraModal from "../../components/common/CameraModal";
 import baseUrl from "../../utils/api";
+
 const CreatePostScreen = () => {
     const { categoryIdPost, setCategoryIdPost } = useContext(CategoryContext);
     const { setSavePost } = useContext(CategoryContext);
@@ -115,7 +116,7 @@ const CreatePostScreen = () => {
         }
         try {
             //console.log("Creating post with data", postData);
-            const response = await axios.post(`${baseUrl}/posts/`, postData, {
+            const response = await apiClient.post(`${baseUrl}/posts/`, postData, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,
@@ -164,7 +165,7 @@ const CreatePostScreen = () => {
                 const url = new URL(`${baseUrl}/search/profiles/?`);
                 url.searchParams.append(searchKey, searchValue);
 
-                const response = await fetch(url.toString(), {
+                const response = await apiClient.get(url.toString(), {
                     method: 'GET',
                     headers: {
                         "Authorization": `Token ${token}`,
@@ -478,7 +479,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "12%",
+        marginTop: "13%",
     },  
     headerText: {
         color: "#FFE600",

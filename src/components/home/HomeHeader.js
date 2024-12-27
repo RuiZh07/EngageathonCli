@@ -11,7 +11,6 @@ const HomeHeader = ({ onFilterPress }) => {
     return (
         <View style={styles.container}>
             <SvgUri uri={engageathonIcon} />
-
             <View style={styles.settingsContainer}>
                 <TouchableOpacity onPress={onFilterPress}>
                     <SvgUri uri={settingsIcon} />

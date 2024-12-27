@@ -11,12 +11,12 @@ import {
     ImageBackground,
     Platform
 } from "react-native";
-import axios from "axios";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { backArrow  } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import baseUrl from "../../utils/api";
+import apiClient from "../../services/apiClient";
 
 const FollowersFollowingScreen = () => {
     const route = useRoute();
@@ -35,7 +35,7 @@ const FollowersFollowingScreen = () => {
                     console.error("No token found");
                     return;
                 }
-                const response = await axios.get(`${baseUrl}/${activeTab}-user/`, {
+                const response = await apiClient.get(`${baseUrl}/${activeTab}-user/`, {
                     headers: {
                         'Authorization': `Bearer ${storedToken}`,
                         'Content-Type': 'application/json',

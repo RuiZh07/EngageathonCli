@@ -16,7 +16,7 @@ import SearchResultPerson from '../../components/discover/SearchResultPerson';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { parseISO } from 'date-fns';
 import baseUrl from "../../utils/api";
-import axios from "axios";
+import apiClient from "../../services/apiClient";
 
 const DiscoverScreen = () => {
     const [isSearching, setSearch] = useState(false);
@@ -45,7 +45,7 @@ const DiscoverScreen = () => {
                     return;
                 }
         
-                const response = await axios.get(`${baseUrl}/events/recommend/`, {
+                const response = await apiClient.get(`${baseUrl}/events/recommend/`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                     },
@@ -70,7 +70,7 @@ const DiscoverScreen = () => {
                     return;
                 }
 
-                const response = await axios.get(`${baseUrl}/profiles/recommend/`, {
+                const response = await apiClient.get(`${baseUrl}/profiles/recommend/`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                     },
@@ -95,7 +95,7 @@ const DiscoverScreen = () => {
                     return;
                 }
   
-                const response = await axios.get(`${baseUrl}/events/search/?`, {
+                const response = await apiClient.get(`${baseUrl}/events/search/?`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         'Content-Type': 'application/json',
@@ -121,7 +121,7 @@ const DiscoverScreen = () => {
                     return;
                 }
 
-                const response = await axios.get(`${baseUrl}/search/profiles/?`, {
+                const response = await apiClient.get(`${baseUrl}/search/profiles/?`, {
                     headers: {
                         "Authorization": `Bearer ${token}`,
                         'Content-Type': 'application/json',

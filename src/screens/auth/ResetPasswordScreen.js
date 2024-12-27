@@ -9,12 +9,13 @@ import {
     ImageBackground,
     KeyboardAvoidingView
 } from "react-native";
-import axios from "axios";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import apiClient from "../../services/apiClient";
+import { useNavigation } from "@react-navigation/native";
 import baseUrl from "../../utils/api";
 import { eyeCloseIcon, eyeIcon, lockIcon } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 import MainButton from "../../components/common/MainButton";
+
 const ResetPasswordScreen = ({ route }) => {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
@@ -43,7 +44,7 @@ const ResetPasswordScreen = ({ route }) => {
             formData.append('new_password', password);
             formData.append('confirm_password', confirmPassword);
             formData.append('code', code)
-            const response = await axios.put(`${baseUrl}/auth/password/reset/`, formData.toString(),
+            const response = await apiClient.put(`${baseUrl}/auth/password/reset/`, formData.toString(),
             {
                 headers: 
                 {

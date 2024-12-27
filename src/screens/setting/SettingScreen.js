@@ -10,16 +10,17 @@ import {
     ImageBackground,
     Alert,
     Animated,
-    Platform
+    Platform,
+    TextInput,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
-import { backArrow } from "../../utils/icons";
-import axios from "axios";
 import { SvgUri } from "react-native-svg";
 import { 
     greenPencilIcon, 
+    backArrow,
+    checkmark,
     pencilIcon, 
     rightArrowIcon, 
     becomeMemberIcon, 
@@ -32,10 +33,84 @@ import baseUrl from "../../utils/api";
 import * as ImagePicker from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
+import { useRoute } from "@react-navigation/native";
+import apiClient from "../../services/apiClient";
 
 export default function SettingScreen () {
+    const [userData, setUserData] = useState("");
     const [profileImage, setProfileImage] = useState(null);
+    const [fullName, setFullName] = useState("");
+    const [isEditing, setIsEditing] = useState(false);
     const navigation = useNavigation();
+    const inputRef = useRef(null);
+
+    useEffect(() => {
+        const fetchUserData = async () => {
+            try {
+                const token = await AsyncStorage.getItem("AccessToken");
+                if(!token) {
+                    console.error("no token found");
+                    return;
+                }
+
+                const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+    
+                setUserData(response.data[0]);
+            } catch (error) {
+                console.error("error to fetch recommended users", error);
+            } finally {
+              setLoading(false); 
+            }
+        };
+          fetchUserData();
+    }, []);
+
+    const updateName = async () => {
+        try {
+            const token = await AsyncStorage.getItem("AccessToken");
+            if(!token) {
+                console.error("no token found");
+                return;
+            }
+            const [firstName='', lastName=''] = fullName.split(' ', 2);
+
+            const data = {
+                first_name: firstName.trim(),
+                last_name: lastName.trim(),
+            }
+            const response = await apiClient.put(`${baseUrl}/users/update_name/`, data, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            if (response.status === 200) {
+                console.log(response.data.message);
+            } else {
+                console.error("Failed to update name:", response.status);
+                Alert.alert("Error", "Failed to update name. Please try again.")
+            }
+        } catch (error) {
+            console.error("error to update name", error);
+        }
+    };
+
+    const handleEditStart = () => {
+        setIsEditing(true);
+        
+        setTimeout(() => {
+            inputRef.current?.focus();
+        }, 0);
+    };
+
+    const handleSave = () => {
+        updateName();
+        setIsEditing(false);
+    }
 
     const handleLogout = () => {
         Alert.alert(
@@ -77,14 +152,13 @@ export default function SettingScreen () {
             }
 
             const base64Image = await RNFS.readFile(uri, 'base64');
-        
-            const data = {
-                image: base64Image,
-            };
-            await axios.put(`${baseUrl}/profile_image/`, data, {
+            const urlEncodedImage = encodeURIComponent(base64Image);
+            //const data = {image: base64Image};
+
+            await apiClientBallapragada.put(`${baseUrl}/profile_image/`, `image=${urlEncodedImage}`, {
                 headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
         
@@ -145,7 +219,7 @@ export default function SettingScreen () {
                     <SvgUri uri={backArrow} /> 
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Settings</Text>
-
+                {/*
                 <View style={styles.headerRight}>
                     <LinearGradient
                         colors={["#FF8D00", "#FFBA00", "#FFE600"]}
@@ -161,6 +235,7 @@ export default function SettingScreen () {
                         </TouchableOpacity>
                     </LinearGradient>
                 </View>
+                */}
             </View>
 
             <TouchableOpacity onPress={handleImagePick} style={styles.circle}>
@@ -173,7 +248,24 @@ export default function SettingScreen () {
                     style={styles.greenPencilIcon} 
                 />
             </TouchableOpacity>
-            
+            <View style={styles.changeNameContainer}> 
+                {isEditing ? (
+                    <TextInput 
+                        ref={inputRef}
+                        style={styles.changeNameButtonText}
+                        value={fullName}
+                        onChangeText={setFullName}
+                        onBlur={handleSave}
+                    />
+                ) : (
+                    <Text style={styles.changeNameButtonText}>{`${userData.first_name} ${userData.last_name}`}</Text>
+                )}
+                
+                <TouchableOpacity style={styles.changePasswordButton} onPress={isEditing? handleSave : handleEditStart}>
+                    <SvgUri uri={isEditing? checkmark : pencilIcon} />
+                </TouchableOpacity>
+            </View>
+            <SvgUri uri={gradientLine} style={styles.gradientLine} /> 
             <TouchableOpacity style={styles.changePasswordButton} onPress={() => navigation.navigate('ChangePasswordScreen', { email: userData.email })}>
                 <Text style={styles.changePasswordButtonText}>Change Password</Text>
                 <SvgUri uri={pencilIcon} />
@@ -181,7 +273,7 @@ export default function SettingScreen () {
             <SvgUri uri={gradientLine} style={styles.gradientLine} /> 
 
             <View style={styles.actionContainer}>
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("InviteContactScreen")}>
                     <SvgUri uri={inviteIcon} width={28} />
                     <Text style={styles.actionButtonText}>Invite Contacts</Text>
                 </TouchableOpacity>
@@ -189,7 +281,7 @@ export default function SettingScreen () {
                     <SvgUri uri={privacyPolicyIcon} width={26}/>
                     <Text style={styles.actionButtonText}>Read Privacy Policy</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("BecomeMemberScreen")}>
                     <SvgUri uri={becomeMemberIcon} />
                     <Text style={styles.actionButtonText}>Become a Member</Text>
                 </TouchableOpacity>
@@ -263,7 +355,6 @@ const styles = StyleSheet.create({
         borderWidth: 3,
         borderColor: "#ABABAB",
         position: 'relative',
-        marginBottom: 25,
     },
     pfp: {
         width: '100%', 
@@ -271,10 +362,27 @@ const styles = StyleSheet.create({
         borderRadius: 50, 
         resizeMode: 'cover', 
     },
+
     greenPencilIcon: {
         position: 'absolute',
         bottom: -18,
         right: -5,
+    },
+    changeNameContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: "space-between",
+        marginLeft: 35,
+        paddingTop: 16,
+        paddingBottom: 8,
+        paddingHorizontal: 2,
+    },
+    changeNameButtonText: {
+        color: "#FFFFFF",
+        fontSize: 18,
+        fontFamily: "Inter-Regular",
+        paddingTop: 18,
     },
     changePasswordButton: {
         flexDirection: 'row',

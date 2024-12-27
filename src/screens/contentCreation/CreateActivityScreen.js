@@ -1,12 +1,12 @@
 import { React, useState, useContext, useEffect, act } from 'react';
 import { ImageBackground,
-         StyleSheet,
-         View,
-         Text,
-         TouchableOpacity,
-         TextInput,
-         Alert
-     } from 'react-native';
+    StyleSheet,
+    View,
+    Text,
+    TouchableOpacity,
+    TextInput,
+    Alert
+} from 'react-native';
 import Svg, { Path } from "react-native-svg";
 import MainButton from "../../components/common/MainButton";
 import { useNavigation } from "@react-navigation/native";

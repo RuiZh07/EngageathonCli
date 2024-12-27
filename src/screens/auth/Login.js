@@ -29,9 +29,9 @@ export default function Login(props) {
 
     useFocusEffect(
         React.useCallback(() => {
-        // Clear email and password fields when the screen is focused
-        setLoginInfo({ email: "", password: "" });
-        setLoading(false); // Ensure loading state is reset when screen is focused
+            // Clear email and password fields when the screen is focused
+            setLoginInfo({ email: "", password: "" });
+            setLoading(false); // Ensure loading state is reset when screen is focused
         }, [])
     );
 
@@ -106,16 +106,16 @@ export default function Login(props) {
                         height="22" 
                     />
                         <TextInput
-                        style={styles.input}
-                        onChangeText={(e) =>
-                            setLoginInfo((prevLoginInfo) => ({
-                            ...prevLoginInfo,
-                            email: e.toLowerCase(),
-                            }))
-                        }
-                        value={loginInfo.email}
-                        placeholder="Enter Phone or Email"
-                        placeholderTextColor="#ABABAB"
+                            style={styles.input}
+                            onChangeText={(e) =>
+                                setLoginInfo((prevLoginInfo) => ({
+                                ...prevLoginInfo,
+                                email: e.toLowerCase(),
+                                }))
+                            }
+                            value={loginInfo.email}
+                            placeholder="Enter Phone or Email"
+                            placeholderTextColor="#ABABAB"
                         />
                     </View>
                     <View style={styles.passwordContainer}>
@@ -164,9 +164,9 @@ export default function Login(props) {
                     <View style={styles.centeredContainer}>
                         <Text style={styles.subheadingCenter}>Don’t have an account? </Text>
                         <TouchableOpacity onPress={handleSignUp}>
-                        <Text style={[styles.subheadingCenter, { color: "#FF8D00" }]}>
-                            Sign up
-                        </Text>
+                            <Text style={[styles.subheadingCenter, { color: "#FF8D00" }]}>
+                                Sign up
+                            </Text>
                         </TouchableOpacity>
                     </View>
                 </View>

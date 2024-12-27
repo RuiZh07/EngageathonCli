@@ -1,4 +1,3 @@
-//need to fix
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
 import { Calendar } from 'react-native-calendars';

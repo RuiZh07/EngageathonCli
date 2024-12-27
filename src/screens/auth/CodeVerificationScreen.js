@@ -9,7 +9,7 @@ import {
     ImageBackground,
     KeyboardAvoidingView
 } from "react-native";
-import axios from "axios";
+import apiClient from "../../services/apiClient";
 import { useNavigation } from "@react-navigation/native";
 import MainButton from "../../components/common/MainButton";
 import baseUrl from "../../utils/api";
@@ -61,7 +61,7 @@ const CodeVerificationScreen = ({ route }) => {
             payload.append('verification_code', verificationCode);
 
 
-            const response = await axios.post(`${baseUrl}/auth/password/reset/verify/`, `verification_code=${verificationCode}`, {
+            const response = await apiClient.post(`${baseUrl}/auth/password/reset/verify/`, `verification_code=${verificationCode}`, {
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
                 },

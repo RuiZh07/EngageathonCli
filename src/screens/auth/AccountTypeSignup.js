@@ -9,7 +9,7 @@ import {
     KeyboardAvoidingView,
     Image,
     Modal,
-  } from "react-native";
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { backArrow, userRoundedIcon, cameraIcon, lockIcon } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
@@ -17,6 +17,7 @@ import MainButton from '../../components/common/MainButton';
 import CameraModal from '../../components/common/CameraModal';
 import ImagePickerModal from '../../components/common/ImagePickerModal';
 import authService from '../../services/authService';
+
 const AccountTypeSignup = () => {
     const [fname, setFname] = useState("");
     const [lname, setLname] = useState("");

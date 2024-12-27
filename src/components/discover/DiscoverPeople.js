@@ -8,8 +8,8 @@ import {
 } from "react-native";
 import DiscoverPeopleAddButton from "./DiscoverPeopleAddButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import axios from 'axios';
 import baseUrl from "../../utils/api";
+import apiClient from "../../services/apiClient";
 
 const DiscoverPeople = ({ profilePicture, userID, name, onPress }) => {
     const [clicked, setClicked] = useState(false);
@@ -36,7 +36,7 @@ const DiscoverPeople = ({ profilePicture, userID, name, onPress }) => {
         }
     
         try {
-            const response = await axios.post(`${baseUrl}/follow-user/${userID}/`, null, {
+            const response = await apiClient.post(`${baseUrl}/follow-user/${userID}/`, null, {
                 headers: {
                     "Content-Type": "application/json",
                     "Authorization": `Bearer ${token}`,

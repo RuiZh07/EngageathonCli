@@ -7,19 +7,18 @@ import {
     TouchableOpacity,
     Alert,
     ImageBackground,
-    Platform,
 } from 'react-native';
-import axios from 'axios';
-//import Feather from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
-import { backArrow, eyeIcon, eyeCloseIcon, lockIcon } from "../../utils/icons";
+import { backArrow, eyeIcon, eyeCloseIcon, lockIcon, gradientLine } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
+import MainButton from "../../components/common/MainButton";
+import apiClient from "../../services/apiClient";
 
 const ChangePasswordScreen = ({ route }) => {
-    const { email } = route.params;
+    //const { email } = route.params;
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -35,9 +34,8 @@ const ChangePasswordScreen = ({ route }) => {
         }
   
         try {
-            const token = await AsyncStorage.getItem('authToken');
-            const response = await axios.put(
-                `${baseUrl}/auth/password/change/`,
+            const token = await AsyncStorage.getItem('AccessToken');
+            const response = await apiClient.put(`${baseUrl}/auth/password/change/`,
                 { old: currentPassword, new: newPassword },
                 {
                     headers: {
@@ -67,28 +65,12 @@ const ChangePasswordScreen = ({ route }) => {
                 >
                     <SvgUri uri={backArrow} />
                 </TouchableOpacity>
-                <Text style={styles.headerText}>Settings</Text>
-                <View style={styles.headerRight}>
-                    <LinearGradient
-                        colors={["#FF8D00", "#FFBA00", "#FFE600"]}
-                        locations={[0.7204, 0.8602, 1]} 
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.updateButtonGradient}
-                    >
-                        <TouchableOpacity
-                            style={styles.updateButton}
-                            onPress={handleChangePassword}
-                        >
-                            <Text style={styles.updateButtonText}>Update</Text>
-                        </TouchableOpacity>
-                    </LinearGradient>
-                </View>
+                <Text style={styles.headerText}>Change Password</Text>
             </View>
-
+            
             <View style={styles.container}>
-                
-                <Text style={styles.emailText}>{email}</Text>
+            <SvgUri uri={gradientLine} />
+                {/*<Text style={styles.emailText}>{email}</Text>*/}
                 
                 <Text style={styles.passwordTitle}>Current Password</Text>
                 <View style={styles.inputContainer}>
@@ -156,7 +138,11 @@ const ChangePasswordScreen = ({ route }) => {
                         onPress={() => setShowConfirmPassword(!showConfirmPassword)}
                     />
                 </View>
-    
+                <MainButton
+                        style={styles.mainButton}
+                        onPress={handleChangePassword}
+                        title="Update"
+                    />
             </View>
         </ImageBackground>
     );
@@ -169,8 +155,8 @@ const styles = StyleSheet.create({
     },
     container: {
         flex: 1,
-       // justifyContent: 'center',
-        //alignItems: 'center',
+        //justifyContent: 'center',
+        alignItems: 'center',
         padding: 20,
     },
     emailText: {
@@ -190,8 +176,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: "5%",
         marginTop: "15%",
     },
-    headerRight: {
-        marginLeft: 'auto',
+    headerText: {
+        color: "#FFE600",
+        fontSize: 24,
+        fontFamily: "Poppins-Medium",
+        paddingLeft: 15,
     },
     passwordTitle: {
         color: "#FFFFFF",
@@ -200,7 +189,7 @@ const styles = StyleSheet.create({
         fontSize: 19,
         paddingVertical: 10,
         paddingLeft: 10,
-
+        width: "100%",
     },
     inputContainer: {
         flexDirection: 'row',
@@ -221,12 +210,7 @@ const styles = StyleSheet.create({
         padding: 10,
         fontFamily: "Inter-Medium",
     },
-    headerText: {
-        color: "#FFE600",
-        fontSize: 26,
-        fontFamily: "Poppins-Medium",
-        paddingLeft: 15,
-    },
+    
     updateButton: {
         backgroundColor: "#FF8D00",
         borderRadius: 10,
@@ -252,6 +236,10 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
         fontSize: 13,
         fontWeight: "600",
+    },
+    mainButton: {
+        marginTop: 30,
+        width: "75%",
     },
 });
   
