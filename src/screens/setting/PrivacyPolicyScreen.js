@@ -30,14 +30,15 @@ const PrivacyPolicyScreen = () => {
                 }
                 const response = await apiClient.get(`${baseUrl}/auth/privacypolicy/`, {
                     headers: {
-                        //"Authorization": `Token ${token}`,
+                        "Authorization": `Token ${token}`,
                     },
                 });
     
-                if (!response.ok) {
+                if (response.status < 200 || response.status >= 300) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                const privacyPolicyInfo = await response.text();
+
+                const privacyPolicyInfo = await response.data;
                // const plainText = privacyPolicyInfo.replace(/<\/?[^>]+(>|$)/g, "");
                 setPrivacyPolicyInfo(privacyPolicyInfo);
             } catch (error) {
@@ -50,7 +51,7 @@ const PrivacyPolicyScreen = () => {
     const tagsStyles = {
         h1: {
             color: 'white',
-            fontSize: 18,
+            fontSize: 20,
             fontFamily: 'inter',
         },
         p: {
@@ -119,7 +120,7 @@ const styles = StyleSheet.create({
     headerText: {
         marginLeft: 20,
         color: "#FFE600",
-        fontSize: 28,
+        fontSize: 24,
         fontFamily: 'poppins-Medium',
     },
     gradientLine: {
@@ -127,8 +128,8 @@ const styles = StyleSheet.create({
         alignSelf: "center",
     },
     policyContainer: {
-        marginLeft: 30,
-        marginRight: 30,
+        marginLeft: 20,
+        marginRight: 20,
     },
     policy: {
         color: 'white',
