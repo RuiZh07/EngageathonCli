@@ -22,7 +22,8 @@ export default MainButton;
   
 const styles = StyleSheet.create({
     buttonContainer: {
-        width: '100%',
+        alignSelf: 'center',
+        width: '90%',
     },
     button: {
         paddingVertical: 15,
@@ -30,7 +31,6 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-    
     },
     buttonText: {
         fontFamily: "Poppins-SemiBold",
