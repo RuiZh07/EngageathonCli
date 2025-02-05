@@ -4,6 +4,8 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import SvgQRCode from 'react-native-qrcode-svg';
 import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
+import LinearGradient from "react-native-linear-gradient";
+import MainButton from '../../components/common/MainButton';
 
 const QRCodeScreen = () => {
     const navigation = useNavigation();
@@ -22,18 +24,24 @@ const QRCodeScreen = () => {
                 <Text style={styles.headerText}>Great!</Text>
             </View>
             <View style={styles.container}>
-                <Text style={styles.instructions}>Show this QR code to the coordinator to check in.</Text>
+                <Text style={styles.instructions}>Show this QR code to the{"\n"}coordinator to check in.</Text>
                 <View style={styles.qrCodeContainer}>
-                <View style={styles.qrCodeOutline}>
-                    <SvgQRCode value={event.qr_code} size={200} />
+                    <LinearGradient
+                        colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                        locations={[0.72, 0.86, 1]}  
+                        start={{ x: 0, y: 0 }}      
+                        end={{ x: 1, y: 0 }}
+                        style={styles.qrCodeLinearGradient}
+                    >
+                        <View style={styles.qrCodeOutline}>
+                            <SvgQRCode value={event.qr_code} size={250} />
+                        </View>
+                    </LinearGradient>
                 </View>
-                </View>
-                <TouchableOpacity 
-                    style={styles.eventHubButton} 
+                <MainButton 
                     onPress={() => navigation.navigate('EventHubScreen', { event })}
-                >
-                <Text style={styles.eventHubButtonText}>Event Hub</Text>
-                </TouchableOpacity>
+                    title="Event Hub"
+                />
             </View>
         </ImageBackground>
     );
@@ -45,27 +53,23 @@ const styles = StyleSheet.create({
         width: '100%',
     },
     header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
+        flexDirection: "row",
+        alignItems: "center",
         width: '100%',
         paddingHorizontal: '5%',
+        marginTop: 20, 
+        marginBottom: 20,
         marginTop: '15%',
-    },
-    backButton: {
-        marginTop: '-1%',
     },
     headerText: {
         color: '#FFE600',
-        fontSize: 32,
-        position: 'absolute',
-        left: '20%',
+        fontSize: 24,
+        fontFamily: "Poppins-Medium",
+        marginLeft: 20,
     },
     container: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        marginTop: -85,
     },
     instructions: {
         color: '#FFFFFF',
@@ -73,16 +77,21 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         textAlign: 'left',
         paddingHorizontal: 45,
+        width: "100%",
+        fontFamily: "Poppins-Medium",
     },
     qrCodeContainer: {
-        marginVertical: 20,
+        marginTop: 60,
+        marginBottom: 40,
     },
     qrCodeOutline: {
-        padding: 10,
-        borderWidth: 2,
-        borderColor: '#FF8D00',
-        borderRadius: 10,
+        padding: 20,
+        borderRadius: 20,
         backgroundColor: '#FFFFFF',
+    },
+    qrCodeLinearGradient: {
+        borderRadius: 20,
+        padding: 4,
     },
     eventHubButton: {
         backgroundColor: '#FF8D00',
