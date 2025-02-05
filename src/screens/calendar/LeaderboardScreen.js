@@ -15,6 +15,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from '../../utils/api';
 import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
+import LinearGradient from "react-native-linear-gradient";
 
 const LeaderboardScreen = () => {
     const route = useRoute();
@@ -22,38 +23,47 @@ const LeaderboardScreen = () => {
     const [leaderboardData, setLeaderboardData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
-    const { userId } = route.params;
-  
+    const { eventId } = route.params;
+
     useEffect(() => {
-      const fetchLeaderboard = async () => {
-        try {
-            const storedToken = await AsyncStorage.getItem("authToken");
-            if (!storedToken) {
-                console.error("No token found");
-                return;
-            }
-            const response = await apiClient.get(`${baseUrl}/events/leaderboard/${userId}/`, {
-                headers: {
-                'Authorization': `Bearer ${storedToken}`,
-                'Content-Type': 'application/json',
-                },
-            });
-                setLeaderboardData(response.data);
-            } catch (error) {
-                console.error("Error fetching leaderboard data", error);
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
-            }
-        };
+        const fetchLeaderboard = async () => {
+            try {
+                const storedToken = await AsyncStorage.getItem("AccessToken");
+                if (!storedToken) {
+                    console.error("No token found");
+                    return;
+                }
+                const response = await apiClient.get(`${baseUrl}/events/leaderboard/${eventId}/`, {
+                    headers: {
+                        'Authorization': `Bearer ${storedToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                    setLeaderboardData(response.data);
+                } catch (error) {
+                    console.error("Error fetching leaderboard data", error);
+                } finally {
+                    setLoading(false);
+                    setRefreshing(false);
+                }
+            };
   
         fetchLeaderboard();
-    }, [userId]);
+    }, [eventId]);
   
+    // Sort by score first in descending order, and by username if scores are tied
+    const sortedLeaderBoard = leaderboardData.sort((a,b) => {
+        if (b.points === a.points) {
+            return a.user.localeCompare(b.user);
+        }
+        return b.points - a.points;
+    });
+
     const onRefresh = () => {
         setRefreshing(true);
         fetchLeaderboard();
     };
+
   
     return (
         <ImageBackground
@@ -82,11 +92,22 @@ const LeaderboardScreen = () => {
                         <Text style={styles.loadingText}>Loading...</Text>
                     </View>
                 ) : (
-                    leaderboardData.map((item, index) => (
+                    sortedLeaderBoard.map((item, index) => (
                         <View key={index} style={styles.eventCard}>
-                            <Text style={styles.eventName}>{item.user}</Text>
-                            <Text style={styles.eventOrg}>{item.event}</Text>
-                            <Text style={styles.points}>Points: {item.points}</Text>
+                            <LinearGradient
+                                colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                                locations={[0.72, 0.86, 1]}  
+                                start={{ x: 0, y: 0 }}      
+                                end={{ x: 1, y: 0 }}
+                                style={styles.rankContainer}
+                            >
+                                <Text style={styles.ranking}>{index+1}</Text>
+                            </LinearGradient>
+                            <View style={styles.namePointContainer}>
+                                <Text style={styles.eventName}>{item.user}</Text>
+                                {/*<Text style={styles.eventOrg}>{item.event}</Text>*/}
+                                <Text style={styles.points}>{item.points} Points Redeemed</Text>
+                            </View>
                         </View>
                     ))
                 )}
@@ -103,6 +124,7 @@ const styles = StyleSheet.create({
     scrollView: {
         flex: 1,
         width: "100%",
+        marginTop: '10%',
     },
     scrollContentContainer: {
         flexGrow: 1,
@@ -112,39 +134,53 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         alignItems: "center",
-        justifyContent: "space-between",
-        width: "100%",
-        paddingHorizontal: "5%",
-        marginTop: "15%",
+        width: '100%',
+        paddingHorizontal: '5%',
+        marginTop: 20, 
+        marginBottom: 20,
     },
     headerText: {
-        color: "#FFE600",
-        fontSize: 28,
-        position: 'absolute',
-        left: '20%',
+        color: '#FFE600',
+        fontSize: 24,
+        fontFamily: "Poppins-Medium",
+        marginLeft: 20,
     },
     eventCard: {
-        flexDirection: "row",
         backgroundColor: "#FFFFFF",
         borderRadius: 10,
         padding: 10,
         marginVertical: 5,
-        marginTop:'15%',
         alignItems: "center",
-        width: "90%",
-        justifyContent: "space-between",
+        width: "85%",
+        flexDirection: 'row',
+        //backgroundColor: "#464646"
+    },
+    rankContainer: {
+        width: 40,
+        height: 40,
+        //paddingHorizontal: 16,
+        //paddingVertical: 8,
+        borderRadius: 20,
+        marginRight: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    ranking: {
+        fontSize: 17,
+        fontFamily: "Poppins-Medium",
     },
     eventName: {
-        fontSize: 18,
-        fontWeight: "bold",
+        fontSize: 17,
+        fontFamily: "Poppins-Medium",
     },
     eventOrg: {
         fontSize: 14,
         color: "#555",
     },
     points: {
-        fontSize: 16,
-        color: '#000000',
+        fontSize: 14,
+        color: '#747474',
+        fontFamily: "Inter-Regular"
     },
     loadingOverlay: {
         position: 'absolute',
