@@ -6,7 +6,7 @@ const DiscoverPeopleAddButton = ({ onPress, title, clicked }) => {
     return (
         <TouchableOpacity onPress={onPress} style={styles.buttonContainer}>
             <LinearGradient
-                colors={clicked ? ["#2BAB47"] : ["#FF8D00", "#FFB900", "#FFE600"]}
+                colors={clicked ? ["#2BAB47", "#2BAB47"] : ["#FF8D00", "#FFB900", "#FFE600"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.button}
