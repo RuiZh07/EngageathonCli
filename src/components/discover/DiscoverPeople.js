@@ -98,15 +98,21 @@ const styles = StyleSheet.create({
         alignItems: 'center',
     },
     postHeader: {
-        paddingHorizontal: 20,
         alignItems: "center",
+        borderColor: '#2BAB47',
+        borderWidth: 2,
+        borderRadius: 40,
+        paddingHorizontal: 2,
+        paddingVertical: 2,
     },
     pfp: { 
-        width: 60, 
-        height: 60, 
-        borderRadius: 30,
+        width: 44, 
+        height: 44, 
+        borderRadius: 22,
         resizeMode: "cover",
         overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#2BAB47',
     },
     postUser: {
         alignItems: "center",
@@ -116,7 +122,7 @@ const styles = StyleSheet.create({
     },
     userNameText: {
         fontSize: 16,
-        fontFamily: 'Poppins-Semibold',
+        fontFamily: 'Poppins-Medium',
         lineHeight: 19,
     },
   })
