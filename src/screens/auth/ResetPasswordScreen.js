@@ -15,6 +15,7 @@ import baseUrl from "../../utils/api";
 import { eyeCloseIcon, eyeIcon, lockIcon } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 import MainButton from "../../components/common/MainButton";
+import axios from 'axios';
 
 const ResetPasswordScreen = ({ route }) => {
     const [password, setPassword] = useState("");
@@ -44,7 +45,7 @@ const ResetPasswordScreen = ({ route }) => {
             formData.append('new_password', password);
             formData.append('confirm_password', confirmPassword);
             formData.append('code', code)
-            const response = await apiClient.put(`${baseUrl}/auth/password/reset/`, formData.toString(),
+            const response = await axios.put(`${baseUrl}/auth/password/reset/`, formData.toString(),
             {
                 headers: 
                 {

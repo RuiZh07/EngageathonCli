@@ -1,9 +1,4 @@
-import React, { useEffect, useState } from "react";
-import Heart from "../../components/post/Heart";
-import Comment from "../../components/post/Comment";
-import Save from "../../components/post/Save";
-import Share from "../../components/post/Share";
-import MainButton from "../../components/common/MainButton";
+import React from "react";
 import {
     View,
     Text,
@@ -11,7 +6,6 @@ import {
     Image,
     ScrollView,
     TouchableOpacity,
-    StatusBar,
     ImageBackground,
 } from "react-native";
 import { SvgUri } from "react-native-svg";
@@ -22,11 +16,6 @@ import DiscoverPostHeader from "../../components/discover/DiscoverPostHeader";
 const DiscoverPostDetailScreen = ({ route }) => {
     const { event } = route.params;
     const navigation = useNavigation(); 
-    const postId = event?.id;
-
-    const handleAttend = () => {
-      navigation.navigate("CalendarEvent");
-    };
 
     return (
         <ImageBackground
@@ -35,59 +24,60 @@ const DiscoverPostDetailScreen = ({ route }) => {
         >
             <DiscoverPostHeader />
             <ScrollView style={{ flex: 1 }}>
-            <View style={styles.detailContainer}>
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => {navigation.goBack();}}
-                    >
-                    <View style={{ position: 'absolute', top: 10 }}>
-                        <SvgUri uri={backArrow} />
-                    </View>
-                    </TouchableOpacity>
-                    <View style={styles.profileHeader}>
-                        <Image
-                            source={event?.profile_photo_url 
-                                ? { uri: `data:image/jpeg;base64,${event.profile_photo_url}` } 
-                                : require("../../assets/default_profile.png")
-                            }
-                            style={styles.pfp}
-                        />
-                        <View style={styles.userInfo}>
-                            <View>
-                                <Text style={styles.userNameText}>{event.username}</Text>
-                                <Text style={styles.userDescriptionText}>organizer | {event.event_type}</Text>
+                <View style={styles.detailContainer}>
+                    <View style={styles.header}>
+                        <TouchableOpacity
+                            style={styles.backButton}
+                            onPress={() => {navigation.goBack();}}
+                        >
+                        <View style={{ position: 'absolute', top: 10 }}>
+                            <SvgUri uri={backArrow} />
+                        </View>
+                        </TouchableOpacity>
+                        <View style={styles.profileHeader}>
+                            <Image
+                                source={event?.profile_photo_url 
+                                    ? { uri: event.profile_photo_url } 
+                                    : require("../../assets/default_profile.png")
+                                }
+                                style={styles.pfp}
+                            />
+                            <View style={styles.userInfo}>
+                                <View>
+                                    <Text style={styles.userNameText}>{event.username}</Text>
+                                    <Text style={styles.userDescriptionText}>organizer | {event.event_type}</Text>
+                                </View>
                             </View>
                         </View>
                     </View>
-                </View>
 
-                <Image style={styles.image} source={{ uri: `data:image/jpeg;base64,${event.image_urls[0].image_url}` }} />
-                <View style={styles.postInteraction}>
-                    <View style={styles.likeSection}>
-                      <TouchableOpacity onPress={() => handleLikePress(post.id)}>
-                        <Heart filled={false} />
-                      </TouchableOpacity>
-                      <Text style={styles.likeCountText}>
-                        {event.likes_count || 0}
-                      </Text>
-                    </View>
-                      <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
-                        <Comment />
-                      </TouchableOpacity>
-                      <TouchableOpacity style={styles.saveButton} onPress={() => handleBookmarkPress(post.id)}>
-                        <Save filled={false} />
-                      </TouchableOpacity>
-                      <TouchableOpacity
-                        style={styles.shareButton}
-                      >
-                      <Share />
-                    </TouchableOpacity>    
-              </View> 
-                <Text style={styles.eventNameText}>{event.name}</Text>
-                <Text style={styles.description}>{event.description}</Text>
-               <MainButton onPress={handleAttend} title="Attend" />
-            </View>
+                    <Image style={styles.image} source={{ uri: event.image_urls[0].image_url }} />
+                    {/*
+                    <View style={styles.postInteraction}>
+                        <View style={styles.likeSection}>
+                            <Heart postId={event.id} like={event.liked}/>
+                            <Text style={styles.likeCountText}>
+                                {event.likes_count ?? 0}
+                            </Text>
+                        </View>
+                        {event.event_type && (
+                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(event.id)}>
+                                <Comment />
+                            </TouchableOpacity>
+                        )}
+
+                        <Save postId={event.id} bookmark={event.bookmarked} />
+
+                        <TouchableOpacity style={styles.shareButton}>
+                            <Share />
+                        </TouchableOpacity>    
+                    </View> 
+                    */}
+                    <Text style={styles.eventNameText}>{event.name}</Text>
+                    <Text style={styles.description}>{event.description}</Text>
+
+                {/*<MainButton onPress={handleAttend} title="Attend" />*/}
+                </View>
             </ScrollView>
         </ImageBackground>
     );
@@ -104,7 +94,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
     },
     profileHeader: {
-        marginLeft: 20,
+        marginLeft: 5,
         paddingHorizontal: 20,
         paddingBottom: 14,
         flex: 1,
@@ -159,10 +149,10 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     pfp: {
-        width: 50, 
-        height: 50, 
+        width: 32, 
+        height: 32, 
         resizeMode: "cover",
-        borderRadius: 25,
+        borderRadius: 16,
     },
     userNameText: {
         fontFamily: "poppins-regular",

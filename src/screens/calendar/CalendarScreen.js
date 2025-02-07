@@ -1,77 +1,205 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import homeService from '../../services/homeService';
 import { useNavigation } from '@react-navigation/native';
 import { Platform } from "react-native";
 import moment from 'moment';
-import { backArrow } from '../../utils/icons';
+import { accountPrivacyIcon, backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiClient from '../../services/apiClient';
+import baseUrl from '../../utils/api';
 
-const CalendarScreen = () => {
+const CalendarScreen = ({ route }) => {
     const navigation = useNavigation();
-    const [events, setEvents] = useState([]);
+    const [attendEvents, setAttendEvents] = useState([]);
     const [selectedDate, setSelectedDate] = useState('');
     const [markedDates, setMarkedDates] = useState({});
+    const [upcomingEvents, setUpcomingEvents] = useState([]);
+    const [calendarData, setCalendarData] = useState([]);
     const today = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
 
+    const { post } = route.params || {};
+
     useEffect(() => {
-        fetchEvents();
+        setSelectedDate(today); // Automatically select the current date when navigating to the calendar
+    }, []);
+    
+    // Mark current date with a grey circle
+    const markCurrentDate = () => {
+        setMarkedDates({ 
+            [today]: { 
+                selected: true, 
+                selectedColor: '#A9A9A9', 
+                selectedTextColor: '#FFFFFF' 
+            } 
+        });
+    };
+
+    // Fetch the events in the calendar
+    useEffect(() => {
+        const fetchCalendarEvents = async () => {
+            try {
+                const token = await AsyncStorage.getItem("AccessToken");
+                if(!token) {
+                    console.error("no token found");
+                    return;
+                }
+
+                const response = await apiClient.get(`${baseUrl}/events/calendar/`, {
+                    headers: {
+                        "Authorization": `Bearer ${token}`,
+                    },
+                });
+                const data = response.data.slice(0,-1);
+                setCalendarData(data);
+            } catch (error) {
+                console.error('Error to fetch calendar events', error);
+            }
+        };
+        fetchCalendarEvents();
+    }, []);
+    
+    // Add the post to the attendEvents list
+    useEffect(() => {
+        if (post) {
+            handleAddPost(post); 
+        }
+    }, [post]);
+
+    // Handle adding post to the list
+    const handleAddPost = (newPost) => {
+        // Check if the newPost exists in calendarData
+        const postExistsInCalendarData = calendarData.some(
+            (existingEvent) => existingEvent.id === newPost.id
+        );
+    
+        // If it's not in calendarData, check if it's already in attendEvents
+        if (!postExistsInCalendarData) {
+            const postExistsInAttendEvents = attendEvents.some(
+                (existingPost) => existingPost.id === newPost.id
+            );
+    
+            // If it's not in attendEvents, add it to attendEvents
+            if (!postExistsInAttendEvents) {
+                const updatedAttend = [...attendEvents, newPost];
+                setAttendEvents(updatedAttend);
+    
+                // Save the updated list to AsyncStorage
+                saveAttendListToStorage(updatedAttend);
+            } else {
+                console.log('Post already exists in attendEvents.');
+            }
+        } else {
+            console.log('Post already exists in calendarData.');
+        }
+    };
+    
+
+    // Combine the events in the calendar and attend events
+    const combinedEvents = [
+        ...attendEvents.filter((event) => !calendarData.some((e) => e.id === event.id)),
+        ...calendarData,
+    ];
+    console.log(combinedEvents);
+
+    const saveAttendListToStorage = async (updatedAttendList) => {
+        try {
+            await AsyncStorage.setItem('attendList', JSON.stringify(updatedAttendList));
+        } catch (error) {
+            console.error('Error saving attend list to AsyncStorage', error);
+        }
+    };
+    // Function to load attend events from AsyncStorage
+    useEffect(() => {
+        const loadAttendList = async () => {
+            try {
+                const storedAttend = await AsyncStorage.getItem('attendList');
+                if (storedAttend) {
+                    setAttendEvents(JSON.parse(storedAttend));
+                }
+            } catch (error) {
+                console.error('Error loading attend list from AsyncStorage');
+            }
+        };
+        loadAttendList();
     }, []);
 
-    const fetchEvents = async () => {
-        try {
-            const response = await homeService.getUserEvents();
-            console.log('eventcal', response);
-        
-            const eventsData = response.data;
-            setEvents(eventsData);
-        
-            // Create the markedDates object with full-day highlight for event dates
-            const dates = eventsData.reduce((acc, event) => {
-                const date = event.datetime_start.split('T')[0]; // Use UTC date directly
-                acc[date] = { marked: true, dotColor: '#FF8D00', selected: true, selectedColor: '#FF8D00' };
-                return acc;
-            }, {});
-        
-            // Highlight selected date
-            if (selectedDate && !dates[selectedDate]) {
-                dates[selectedDate] = { selected: true, selectedColor: '#FF8D00' };
+
+
+    // Mark events with yellow dots and handle selection
+    const markUpcomingEvents = () => {
+        let updatedMarkedDates = { ...markedDates };
+
+        // Mark the dates for all upcoming events with a yellow dot
+        combinedEvents.forEach(event => {
+            console.log("Event datetime_start:", event.datetime_start);
+            // Check if datetime_start is a valid string
+            if (event.datetime_start && typeof event.datetime_start === 'string') {
+                const eventDate = event.datetime_start.split('T')[0]; // Get the date (YYYY-MM-DD)
+                updatedMarkedDates[eventDate] = { marked: true, dotColor: '#FF8D00' };
             }
-        
-            // Highlight today's date in grey color
-            dates[today] = { selected: true, selectedColor: '#A9A9A9', selectedTextColor: '#FFFFFF' };
-        
-            setMarkedDates(dates);
-        } catch (error) {
-            console.error('Error fetching events:', error);
-        }
-    };
-    
-    useEffect(() => {
+        });
+
+        // If a date is selected, mark it with a yellow circle and remove any previous yellow circle
         if (selectedDate) {
-            fetchEvents();
+            // Remove previous yellow circle from any other date
+            Object.keys(updatedMarkedDates).forEach(date => {
+                if (updatedMarkedDates[date].selected) {
+                    updatedMarkedDates[date].selected = false;  // Unselect the previous yellow circle
+                }
+            });
+
+            // Mark the selected date with a yellow circle
+            updatedMarkedDates[selectedDate] = {
+                selected: true,
+                selectedColor: '#FF8D00',
+                selectedTextColor: '#FFFFFF',
+            };
         }
-    }, [selectedDate]);
-    
-    const handleDayPress = (day) => {
-        setSelectedDate(day.dateString);
+
+        // Set the updated marked dates
+        setMarkedDates(updatedMarkedDates);
     };
+
+    // Handle day press
+    const handleDayPress = (day) => {
+        if (day.dateString !== selectedDate) {
+            setSelectedDate(day.dateString); // Update the selected date only if it's different
+        }
+    };
+
+    // Filter out events that are today or in the future
+    useEffect(() => {        
+        const uniqueEvents = Array.from(new Set(combinedEvents.map(event => event.id)))
+            .map(id => combinedEvents.find(event => event.id === id));
+        // Filter out events that are today or in the future
+        const filteredUpcomingEvents = uniqueEvents.filter(event => {
+            const eventDate = event.datetime_start ? event.datetime_start.split('T')[0] : ''; // Get the event date
+            return new Date(eventDate) >= new Date(today); // Check if the event is today or in the future
+        });
+        
+        // Set the filtered upcoming events
+        setUpcomingEvents(filteredUpcomingEvents);
+    }, [attendEvents, calendarData, selectedDate]);
+    
     
     const handleEventPress = (event) => {
-        console.log('Navigating to QRCodeScreen with event:', event);
         navigation.navigate('QRCodeScreen', { event });
     };
     
-    const filteredEvents = events.filter(event => {
-        const eventDate = event.datetime_start.split('T')[0]; // Compare using UTC date
+    // Filter events based on selected date
+    const filteredEvents = combinedEvents.filter(event => {
+        const eventDate = event.datetime_start?.split('T')[0];
         return eventDate === selectedDate;
     });
-    
-    const upcomingEvents = events.filter(event => {
-        const eventDate = event.datetime_start.split('T')[0];
-        return new Date(eventDate) >= new Date(today);
-    });
+
+    useEffect(() => {
+        // Mark the current date and upcoming events whenever the selected date or attendEvents change
+        markCurrentDate();
+        markUpcomingEvents();
+    }, [selectedDate, attendEvents]);
     
     let date = moment(new Date()).format('MM/DD/YYYY');
 
@@ -109,47 +237,81 @@ const CalendarScreen = () => {
                     }}
                 />
                 <Text style={styles.todayText}>Today: {date}</Text>
-                {selectedDate ? (
-                filteredEvents.length > 0 ? (
-                    <FlatList
-                    data={filteredEvents}
-                    keyExtractor={(item) => item.event.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => handleEventPress(item)}>
-                        <View style={styles.eventItem}>
-                            <Text style={styles.eventName}>{item.name}</Text>
-                            <Text style={styles.eventDate}>
-                            {new Date(item.datetime_start).toLocaleString('en-GB', { timeZone: 'UTC' })}
-                            </Text>
-                        </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={<Text style={styles.noEvents}>No events for selected date</Text>}
-                    />
+                {selectedDate === today ? (
+                    // If today's date is selected, show today's events and upcoming events
+                    upcomingEvents.length > 0 ? (
+                        <>
+                            <Text style={styles.upcomingEvents}>Upcoming Events</Text>
+                            <FlatList
+                                data={upcomingEvents}
+                                keyExtractor={(item) => item.id.toString()}
+                                renderItem={({ item }) => (
+                                    <TouchableOpacity onPress={() => handleEventPress(item)}>
+                                        <View style={styles.eventItem}>
+                                            <View style={styles.circle}>
+                                                <Image
+                                                    source={item?.profile_photo_url ? { uri: item.profile_photo_url } : require("../../assets/default_white_profile.png")}
+                                                    style={styles.pfp}
+                                                />
+                                            </View>
+                                            <View style={styles.eventNameContainer}>
+                                                <Text style={styles.eventName}>{item.name}</Text>
+                                                <Text style={styles.userName}>{item.username}</Text> 
+                                            </View>
+                                                
+                                            <View style={styles.dateTimeContainer}>
+                                                <Text style={styles.eventDate}>
+                                                    {new Date(item.datetime_start).toLocaleString('en-GB', { timeZone: 'UTC' }).split(', ').map((line, index) => (
+                                                        <Text key={index}>{line}{index === 0 ? '\n' : null}</Text> // Add a line break after the first part
+                                                    ))}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                )}
+                                ListEmptyComponent={<Text style={styles.noEvents}>No upcoming events for today</Text>}
+                            />
+                        </>
+                    ) : (
+                        <Text style={styles.noUpcomingEvents}>No upcoming events for today</Text>
+                    )
                 ) : (
-                    <Text style={styles.noUpcomingEvents}>No events for selected date</Text>
-                )
-                ) : (
-                upcomingEvents.length > 0 ? (
-                    <FlatList
-                    data={upcomingEvents}
-                    keyExtractor={(item) => item.event.toString()}
-                    renderItem={({ item }) => (
-                        <TouchableOpacity onPress={() => handleEventPress(item)}>
-                        <View style={styles.eventItem}>
-                            <Text style={styles.eventName}>{item.name}</Text>
-                            <Text style={styles.eventDate}>
-                            {new Date(item.datetime_start).toLocaleString('en-GB', { timeZone: 'UTC' })}
-                            </Text>
-                        </View>
-                        </TouchableOpacity>
-                    )}
-                    ListEmptyComponent={<Text style={styles.noEvents}>No events for selected date</Text>}
-                    />
-                ) : (
-                    <Text style={styles.noUpcomingEvents}>No upcoming events</Text>
-                )
+                    // If a specific date is selected (not today), show events for that date only
+                    filteredEvents.length > 0 ? (
+                        <FlatList
+                            data={filteredEvents}
+                            keyExtractor={(item) => item.id.toString()}
+                            renderItem={({ item }) => (
+                                <TouchableOpacity onPress={() => handleEventPress(item)}>
+                                    <View style={styles.eventItem}>
+                                            <View style={styles.circle}>
+                                                <Image
+                                                    source={item?.profile_photo_url ? { uri: item.profile_photo_url } : require("../../assets/default_white_profile.png")}
+                                                    style={styles.pfp}
+                                                />
+                                            </View>
+                                            <View style={styles.eventNameContainer}>
+                                                <Text style={styles.eventName}>{item.name}</Text>
+                                                <Text style={styles.userName}>{item.username}</Text> 
+                                            </View>
+                                                
+                                            <View style={styles.dateTimeContainer}>
+                                                <Text style={styles.eventDate}>
+                                                    {new Date(item.datetime_start).toLocaleString('en-GB', { timeZone: 'UTC' }).split(', ').map((line, index) => (
+                                                        <Text key={index}>{line}{index === 0 ? '\n' : null}</Text> // Add a line break after the first part
+                                                    ))}
+                                                </Text>
+                                            </View>
+                                        </View>
+                                </TouchableOpacity>
+                            )}
+                            ListEmptyComponent={<Text style={styles.noEvents}>No events for selected date</Text>}
+                        />
+                    ) : (
+                        <Text style={styles.noUpcomingEvents}>No events for selected date</Text>
+                    )
                 )}
+
             </View>
         </ImageBackground>
     );
@@ -189,21 +351,33 @@ const styles = StyleSheet.create({
         fontFamily: "Poppins-Medium",
     },
     eventItem: {
-        backgroundColor: '#1f1f1e',
-        padding: 15,
-        marginVertical: 5,
-        borderRadius: 10,
+        //backgroundColor: '#1f1f1e',
+        backgroundColor: 'white',
+        padding: 10,
+        marginVertical: 4,
+        marginHorizontal: 16,
+        borderRadius: 16,
         borderWidth: 1,
         borderColor: '#FF8D00',
+        flexDirection: 'row',
     },
     eventName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: '#FFE600',
+        fontSize: 15,
+        fontFamily: 'Poppins-Medium',
+        //color: '#FFE600',
+        color: 'black',
+        paddingBottom: 1,
+    },
+    userName: {
+        fontSize: 14,
+        fontFamily: 'Poppins-Regular',
+        //color: '#FFE600',
+        color: 'black',
     },
     eventDate: {
         fontSize: 14,
-        color: '#F5F4F4',
+        //color: '#F5F4F4',
+        color: 'black',
     },
     noEvents: {
         fontSize: 17,
@@ -219,6 +393,43 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         fontFamily: "Inter-Medium",
     },
+    upcomingEvents: {
+        fontSize: 17,
+        color: '#F5F4F4',
+        textAlign: 'left',
+        fontFamily: "Inter-Medium",
+        marginLeft: 20,
+        marginTop: 15,
+        marginBottom: 5,
+    },
+    circle: {
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        borderWidth: 1,
+        borderColor: "#2BAB47", // Set border color to green
+        alignItems: "center",
+        justifyContent: "center",
+        position: 'relative',
+        paddingHorizontal: 2,
+        paddingVertical: 2,
+    },
+    pfp: {
+        width: '100%', 
+        height: '100%', 
+        borderRadius: 20, 
+        resizeMode: 'cover',
+        borderWidth: 1,
+        borderColor: '#2BAB47',
+    },
+    eventNameContainer: {
+        marginLeft: 10,
+    },
+    dateTimeContainer: {
+        marginLeft:'auto',
+        alignItems: 'center',
+    },
 });
+
     
 export default CalendarScreen;

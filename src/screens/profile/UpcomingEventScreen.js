@@ -37,12 +37,12 @@ const UpcomingEventScreen = ({ navigation }) => {
         
             const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
                 headers: {
-                'Authorization': `Bearer ${storedToken}`,
-                'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${storedToken}`,
+                    'Content-Type': 'application/json',
                 },
             });
         
-            setEvents(response.data);
+            setEvents(response.data.slice(3));
             setError(null);
         } catch (error) {
             console.error("Error fetching events data", error);
@@ -62,24 +62,37 @@ const UpcomingEventScreen = ({ navigation }) => {
         fetchEvents();
     };
 
-    const getCoverImageUrl = (imageUrls) => {
-        const coverImage = imageUrls.find(image => image.cover_image);
-        return coverImage ? coverImage.image_url : "default_image_url";
-    };
-
     const groupEventsByMonth = (events) => {
+        const now = moment();
         return events.reduce((groups, event) => {
-            const month = moment(event.datetime_start).format('MMMM');
-            if (!groups[month]) {
-                groups[month] = [];
+            const eventStartDate = moment(event.datetime_start);
+            const month = eventStartDate.format('MMMM');
+
+            // Check if it is a past event
+            if(eventStartDate.isBefore(now)) {
+                groups.pastEvents.push(event); // Add past events to pastEvents array
+            } else {
+                if (!groups.futureEvents[month]) {
+                    groups.futureEvents[month] = [];
+                }
+                groups.futureEvents[month].push(event); // Add the event to the month
             }
-            groups[month].push(event);
+
             return groups;
-        }, {});
+        }, {pastEvents: [], futureEvents:{}});
     };
 
     const eventGroups = groupEventsByMonth(events);
 
+    // Sort the future events months in chronological order
+    const sortedFutureMonths = Object.keys(eventGroups.futureEvents).sort((a, b) => 
+        moment(a, 'MMMM').isBefore(moment(b, 'MMMM')) ? -1 : 1
+    );
+
+    eventGroups.pastEvents.sort((a, b) => moment(b.datetime_start).isBefore(moment(a.datetime_start)) ? -1 : 1);
+
+    console.log('Sorted Past Events:', eventGroups.pastEvents);
+    console.log('Sorted Future Months:', sortedFutureMonths);
     return (
         <ImageBackground
             source={require("../../assets/main-background.png")}
@@ -107,18 +120,19 @@ const UpcomingEventScreen = ({ navigation }) => {
     
                 {error ? (
                     <Text style={styles.errorText}>{error}</Text>
-                    ) : (
-                        Object.keys(eventGroups).map((month, index) => (
+                ) : (
+                    sortedFutureMonths > 0 ? (
+                        sortedFutureMonths.map((month, index) => (
                             <View key={index} style={styles.monthSection}>
                                 <Text style={styles.monthHeader}>{month}</Text>
-                                {eventGroups[month].map((event, idx) => (
+                                    {eventGroups.futureEvents[month].map((event, index) => (
                                     <TouchableOpacity
-                                        key={idx}
+                                        key={index}
                                         style={styles.eventCard}
                                         onPress={() => navigation.navigate('QRCodeScreen', { event })}
                                     >
                                         <Image
-                                            source={{ uri: `data:image/png;base64,${getCoverImageUrl(event.image_urls)}` }}
+                                            source={{ uri: event.image_urls[0]?.image_url || "" }}
                                             style={styles.eventImage}
                                         />
                                         <View style={styles.eventDetails}>
@@ -133,8 +147,36 @@ const UpcomingEventScreen = ({ navigation }) => {
                                 ))}
                             </View>
                         ))
-                    )
-                }
+                    ) : (
+                        <Text style={styles.noFutureText}>No future events yet...</Text>
+                    ) 
+                )}
+
+                {eventGroups.pastEvents.length > 0 && (
+                    <View style={styles.pastEventSection}>
+                        <Text style={styles.pastEventsText}>Past Events</Text>
+                        {eventGroups.pastEvents.map((event, index) => (
+                            <TouchableOpacity
+                                key={index}
+                                style={styles.eventCard}
+                                onPress={() => navigation.navigate('QRCodeScreen', { event })}
+                            >
+                                <Image
+                                    source={{ uri: event.image_urls[0]?.image_url || "" }}
+                                    style={styles.eventImage}
+                                />
+                                <View style={styles.eventDetails}>
+                                    <Text style={styles.eventName}>{event.name}</Text>
+                                    <Text style={styles.eventOrg}>Organization</Text>
+                                    <View style={styles.eventDateTime}>
+                                        <Text style={styles.eventDate}>{moment(event.datetime_start).format('MM/DD/YY')}</Text>
+                                        <Text style={styles.eventTime}>{moment(event.datetime_start).format('h:mm A')} EST</Text>
+                                    </View>
+                                </View>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+                )}
             </ScrollView>
             {loading && (
                 <View style={styles.loadingOverlay}>
@@ -194,18 +236,21 @@ const styles = StyleSheet.create({
         marginVertical: 10,
     },
     monthHeader: {
-        fontSize: 24,
+        fontSize: 20,
         color: "#FFFFFF",
-        marginBottom: 10,
+        marginBottom: 5,
+        fontFamily: "Poppins-Medium"
     },
     eventCard: {
         flexDirection: "row",
         backgroundColor: "#FFFFFF",
         borderRadius: 10,
         padding: 10,
-        marginVertical: 5,
+        marginVertical: 7,
         alignItems: "center",
         justifyContent: "space-between",
+        marginHorizontal: 14,
+        width: '90%',
     },
     eventImage: {
         width: 60,
@@ -257,6 +302,21 @@ const styles = StyleSheet.create({
         marginTop: 10,
         color: '#FFE600',
         fontSize: 16,
+    },
+    pastEventSection: {
+        marginTop: 20,
+    },
+    pastEventsText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        textAlign: 'left',
+        paddingLeft: 20,
+        fontFamily: "Poppins-Medium",
+    },
+    noFutureText: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        fontFamily: "Poppins-Medium",
     },
 });
 

@@ -20,13 +20,10 @@ import apiClient from "../../services/apiClient";
 
 const DiscoverScreen = () => {
     const [isSearching, setSearch] = useState(false);
-    const [viewingUser, setViewUser] = useState(false);
-    const [token, setToken] = useState(null);
     const [recommendedEvent, setRecommendedEvent] = useState(null);
     const [currentTab, setCurrentTab] = useState('events');
     const [recommendedUser, setRecommendedUser] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
     const [searchEvent, setSearchEvent] = useState([]);
     const [searchProfile, setSearchProfile] = useState([]);
     const [searchInput, setSearchInput] = useState('');
@@ -217,7 +214,7 @@ const DiscoverScreen = () => {
                                                     key={`${data.username}-${index}`}
                                                     profilePicture={
                                                         data?.profile_photo 
-                                                            ? { uri: `data:image/jpeg;base64,${data.image_url}` } 
+                                                            ? { uri: data.image_url } 
                                                             : require("../../assets/default_white_profile.png")
                                                     } 
                                                     name={data.username} 
@@ -235,7 +232,7 @@ const DiscoverScreen = () => {
                                                     eventName={data.name}
                                                     profilePicture={
                                                         data?.profile_photo_url 
-                                                        ? { uri: `data:image/jpeg;base64,${data.profile_photo_url}` } 
+                                                        ? { uri: data.profile_photo_url } 
                                                         : require("../../assets/default_profile.png")
                                                     }  
                                                     userID={data.organizer} 
@@ -244,7 +241,7 @@ const DiscoverScreen = () => {
                                                     description={data.description}
                                                     location={data.location}
                                                     //date={formattedDate}
-                                                    coverImageUrl={{ uri: `data:image/jpeg;base64,${data.image_urls[0].image_url}` }}
+                                                    coverImageUrl={{ uri: data.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                                                     isFullView={false}
                                                     onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event: data })}
                                                     post={data}
@@ -270,54 +267,62 @@ const DiscoverScreen = () => {
                         {loading ? (
                             <Text style={styles.loadingText}>Loading...</Text>
                         ) : currentTab === 'events' ? ( 
-                            recommendedEvent && recommendedEvent.map((event, index) => {
-                                //const formattedDate = formatEventDate(event.datetime_start);
-                                return (  
-                                    <DiscoverPost 
-                                        key={event.id}
-                                        eventName={event.name}
-                                        profilePicture={
-                                            event?.profile_photo_url 
-                                            ? { uri: `data:image/jpeg;base64,${event.profile_photo_url}` } 
-                                            : require("../../assets/default_profile.png")
-                                        }  
-                                        userID={event.organizer} 
-                                        name={event.username} 
-                                        title={event.event_type}
-                                        description={event.description}
-                                        location={event.location}
-                                        //date={formattedDate}
-                                        coverImageUrl={{ uri: `data:image/jpeg;base64,${event.image_urls[0].image_url}` }}
-                                        onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event })}
-                                        post={event}
-                                    />
-                                );
-                            })
-                        ) : (
-                            Object.entries(recommendedUser ?? {}).map(([category, users], index) => (
-                                users.length > 0 && (
-                                    <View key={index} style={styles.categorySection}>
-                                        <Text style={styles.categoryText}>{category}</Text>
-                                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.userScroll}>
-                                            {users.map((user, userIndex) => (
-                                                <DiscoverPeople
-                                                    key={userIndex}
-                                                    category={category}
-                                                    profilePicture={
-                                                        user?.profile_photo_url 
-                                                        ? { uri: `data:image/jpeg;base64,${user.profile_photo_url}` } 
-                                                        : require("../../assets/default_profile.png")
-                                                    } 
-                                                    userID={user.owner} 
-                                                    name={`${user.first_name} ${user.last_name}`}
-                                                    isFullView={false}
-                                                    onPress={()=>navigation.navigate('UserProfileScreen', { userID: user.owner })}
-                                                />
-                                            ))}
-                                        </ScrollView>
-                                    </View>
+                            recommendedEvent && recommendedEvent.length > 0 ? 
+                                (recommendedEvent.map((event, index) => {
+                                    //const formattedDate = formatEventDate(event.datetime_start);
+                                    return (  
+                                        <DiscoverPost 
+                                            key={event.id}
+                                            eventName={event.name}
+                                            profilePicture={
+                                                event?.profile_photo_url 
+                                                ? { uri: event.profile_photo_url } 
+                                                : require("../../assets/default_profile.png")
+                                            }  
+                                            userID={event.organizer} 
+                                            name={event.username} 
+                                            title={event.event_type}
+                                            description={event.description}
+                                            location={event.location}
+                                            //date={formattedDate}
+                                            coverImageUrl={{ uri: event.image_urls[0].image_url }}
+                                            onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event })}
+                                            post={event}
+                                        />
+                                    );
+                                })
+                                ) : (
+                                    <Text style={styles.noResultsText}>No recommended events found.</Text>
                                 )
-                            ))
+                            ) : (
+                                Object.entries(recommendedUser ?? {}).length > 0 ? (
+                                    Object.entries(recommendedUser ?? {}).map(([category, users], index) => (
+                                    users.length > 0 && (
+                                        <View key={index} style={styles.categorySection}>
+                                            <Text style={styles.categoryText}>{category}</Text>
+                                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.userScroll}>
+                                                {users.map((user, userIndex) => (
+                                                    <DiscoverPeople
+                                                        key={userIndex}
+                                                        category={category}
+                                                        profilePicture={
+                                                            user?.profile_photo_url 
+                                                            ? { uri: `data:image/jpeg;base64,${user.profile_photo_url}` } 
+                                                            : require("../../assets/default_profile.png")
+                                                        } 
+                                                        userID={user.owner} 
+                                                        name={`${user.first_name} ${user.last_name}`}
+                                                        isFullView={false}
+                                                        onPress={()=>navigation.navigate('UserProfileScreen', { userID: user.owner })}
+                                                    />
+                                                ))}
+                                            </ScrollView>
+                                        </View>
+                                    )
+                                ))
+                            ) : (
+                                <Text style={styles.noResultsText}>No recommended users found.</Text>
+                            )
                         )}
                     </ScrollView>
                 </>
@@ -327,7 +332,6 @@ const DiscoverScreen = () => {
     );
 };
 
-
 export default DiscoverScreen;
 
 const styles = StyleSheet.create({
@@ -336,9 +340,10 @@ const styles = StyleSheet.create({
         width: "100%",
     },
     container: {
-        flex: 1,
+        flexGrow: 1,
         position: "relative",
         paddingTop: "20%",
+        paddingBottom: 150,
     },
     text: {
         fontSize: 20,

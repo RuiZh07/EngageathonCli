@@ -37,8 +37,10 @@ export default function ProfileScreen ({ userData }) {
     const navigation = useNavigation();
     const [userContent, setUserContent] = useState([]);
 
+    const [eventList, setEventList] = useState([]);
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
     const sidebarAnimation = useRef(new Animated.Value(-300)).current;
+    
     const toggleSidebar = () => {
         if (isSidebarVisible) {
             // Slide out to the left
@@ -89,14 +91,16 @@ export default function ProfileScreen ({ userData }) {
                 },
             });
             // Log the response for debugging
-            //console.log('User Content Response:', response);
-            
+            //console.log('User Content Response:', response.data);
+            setProfileImage(response.data[0].profile_photo);
             // Check if response.data is defined and is an array
             if (response.data && Array.isArray(response.data)) {
                 setUserContent(response.data);
                 // Extract categories from userContent
                 const categories = response.data[1] ? response.data[1] : [];
                 setCategories(categories);
+                const eventList = response.data.slice(3) ? response.data.slice(3) : [];
+                setEventList(eventList);
             } else {
                 console.warn('Unexpected response format for user content:', response.data);
                 setUserContent([]);
@@ -106,6 +110,8 @@ export default function ProfileScreen ({ userData }) {
             setUserContent([]);
         }
     };
+    console.log('profile', profileImage);
+    //console.log("eventList", eventList);
     const fetchFollowers = async (token) => {
         try {
             const response = await apiClient.get(`${baseUrl}/followers-user/`, {
@@ -148,13 +154,7 @@ export default function ProfileScreen ({ userData }) {
             console.error("Error fetching points data", error);
         }
     };
-
-        userContent.map((content) => {
-            console.log("contnet", content);
-            console.log("conten-id", content.id);
-        })
     
-
     const handleCalendar = () => {
         navigation.navigate("CalendarScreen");
     };
@@ -204,16 +204,9 @@ export default function ProfileScreen ({ userData }) {
             )}
                 <View style={styles.circle}>
                     <Image
-                        source={userData.profile_photo ? { uri: profile_photo } : require("../../assets/default_profile.png")}
+                        source={profileImage ? { uri: profileImage } : require("../../assets/default_profile.png")}
                         style={styles.pfp}
                     />
-                    {/*
-                    <TouchableOpacity style={styles.cameraIcon} onPress={handleImagePick}>
-                        
-                        <Ionicons name="camera" size={24} color="#FFFFFF" />
-                    
-                    </TouchableOpacity>
-                    */}
                 </View>
         
                 <Text style={styles.nameText}>{`${userData?.first_name ?? ''} ${userData?.last_name ?? ''}`}</Text>
@@ -271,17 +264,16 @@ export default function ProfileScreen ({ userData }) {
                 </View>
 
                 <View style={styles.gridContainer}>
-                    {userContent && userContent.length ? (
-                        userContent.map((content) => (
+                    {eventList && eventList.length ? (
+                        eventList.map((content) => (
                             <TouchableOpacity
-                                key={content.id}
-                                //key={`${content.image_url}-${content.id}`}
+                                key={`${content.id}`}
                                 style={styles.imageItem}
                                 onPress={() => handleImageClick(content)}
                             >
                                 <Image
-                                //source={{ uri: `data:image/jpeg;base64,${content.image_urls ? content.image_urls[0].image_url : ''}` }}
-                                    source={{ uri: `data:image/jpeg;base64,${content.image_urls ? content.image_url : ''}` }}
+                                    source={{ uri: content?.image_urls?.[0]?.image_url || "/mnt/data/Media (7).jpg" }}
+                                   // source={{ uri: `data:image/jpeg;base64,${content.image_urls ? content.image_url : ''}` }}
                                     style={styles.gridImage}
                                 />
                             </TouchableOpacity>
@@ -361,22 +353,28 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         paddingHorizontal: '5%',
+        flex: 1,
     },
     imageItem: {
         width: '48%', // Adjust width for two images per row, or use '30%' for three images per row
+        height: 150,
         marginBottom: 10,
+        justifyContent: 'center', 
+        alignItems: 'center',      
+        overflow: 'hidden',  
+        //flex: 1,
     },
     gridImage: {
         width: '100%',
-        height: 150, // Adjust height as needed
+        height: '100%', // Adjust height as needed
         resizeMode: 'cover',
         borderRadius: 10, // Optional: Add border radius for rounded corners
     },
       
     circle: {
         marginTop: "7%",
-        width: 150,
-        height: 150,
+        width: 130,
+        height: 130,
         borderRadius: 75,
         borderWidth: 3,
         borderColor: "#2BAB47",
@@ -388,7 +386,7 @@ const styles = StyleSheet.create({
     pfp: {
         width: '100%', // Make sure the image fills the circle
         height: '100%', // Make sure the image fills the circle
-        borderRadius: 90, // Make sure the image is rounded
+        borderRadius: 75, // Make sure the image is rounded
         resizeMode: 'cover', // Cover the circle properly
     },
     
@@ -464,6 +462,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#F5F4F4",
         alignItems: "center",
         justifyContent: "space-between",
+        marginBottom: 20,
     },
     statContainer: {
         //alignItems: "center",

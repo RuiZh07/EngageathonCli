@@ -44,6 +44,7 @@ const HomeScreen = () => {
     const [shareableLink, setShareableLink] = useState('');
     const navigation = useNavigation();
 
+    console.log("posts",posts);
     useEffect(() => {
         const handleBackButtonPress = () => {
             if (showFilterDropdown) {
@@ -98,17 +99,21 @@ const HomeScreen = () => {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        console.log("Posts updated:", posts);
+    }, [posts]);
     
     const handleFilterPress = () => {
         setShowFilterDropdown(!showFilterDropdown);
     };
     
-    const handleAttend = () => {
-        navigation.navigate("CalendarScreen");
+    // Pass the post details and event's date
+    const handleAttend = (post) => {
+        navigation.navigate("CalendarScreen", { post });
     };
     
-    
-      const handleSharePress = useCallback(async (postId, postName) => {
+    const handleSharePress = useCallback(async (postId, postName) => {
         try {
             const token = await AsyncStorage.getItem('AccessToken');
             
@@ -157,11 +162,11 @@ const HomeScreen = () => {
                 <HomeHeader onFilterPress={handleFilterPress} />
         
                 {showFilterDropdown && (
-                <FilterDropdown
-                    selectedFilters={filters}
-                    onToggleFilter={handleSelectFilter}
-                    onClose={() => setShowFilterDropdown(false)}
-                />
+                    <FilterDropdown
+                        selectedFilters={filters}
+                        onToggleFilter={handleSelectFilter}
+                        onClose={() => setShowFilterDropdown(false)}
+                    />
                 )}
         
                 {loading ? (
@@ -176,10 +181,26 @@ const HomeScreen = () => {
                     
                     <TouchableWithoutFeedback key={`${post.id}-${post.name}`} onPress={() => setShowFilterDropdown(false)}>
                         <View style={styles.post}>
-                            <View style={styles.postHeader}>
+                            {post.caption ? (
+                                <View style={styles.postHeader}>
+                                    <Image
+                                        source={{ uri: post?.profile_photo_url ? post.profile_photo_url : "/mnt/data/Media (7).jpg" }}
+                                        style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
+                                    />
+                                    <View style={styles.postUser}>
+                                        <View>
+                                            <Text style={styles.userNameText}>{post.username}</Text>
+                                        </View>
+                                    <TouchableOpacity onPress={() => setPinReportVisible(true)}>
+                                        <SvgUri uri={greyDots} />
+                                    </TouchableOpacity>
+                                    </View>
+                                </View>
+                            ) : (
+                                <View style={styles.postHeader}>
                                 <Image
                                     source={{ uri: post?.profile_photo_url ? post.profile_photo_url : "/mnt/data/Media (7).jpg" }}
-                                    style={{ width: 34, height: 36, resizeMode: "contain" }}
+                                    style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
                                 />
                                 <View style={styles.postUser}>
                                 <View>
@@ -193,6 +214,7 @@ const HomeScreen = () => {
                                 </TouchableOpacity>
                                 </View>
                             </View>
+                            )}
                         {post.location && <Text style={styles.location}>{post.location}</Text>}
                         <View style={styles.postTags}>
                         {post.event_type && (
@@ -201,8 +223,8 @@ const HomeScreen = () => {
                         </View>
                         <View style={styles.postImageContainer}>
                             <Image
-                            style={styles.postImage}
-                            source={{ uri: post.image_urls[0]?.image_url ? `data:image/jpeg;base64,${post.image_urls[0].image_url}` : "/mnt/data/Media (7).jpg" }}
+                                style={styles.postImage}
+                                source={{ uri: post.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                             />
                         </View>
                         <View style={styles.postInteraction}>
@@ -227,7 +249,7 @@ const HomeScreen = () => {
                         {post.caption && <Text style={styles.caption}>{post.caption}</Text>}
                         {post.tagged_users && (
                             <Text style={styles.taggedUsers}>
-                            {post.tagged_users.map(user => `User ${user.user}`).join(', ')}
+                                {post.tagged_users.map(user => `@${user.username}`).join('  ')}
                             </Text>
                         )}
                         <View style={styles.postDescription}>
@@ -236,7 +258,7 @@ const HomeScreen = () => {
                             </Text>
                         </View>
                         {post.event_type && (
-                        <MainButton title="Attend" onPress={handleAttend} />
+                            <MainButton title="Attend" onPress={() => handleAttend(post)} />
                         )}
                         </View>
                     </TouchableWithoutFeedback>
@@ -266,15 +288,17 @@ export default HomeScreen;
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
+        flexGrow: 1,
         position: "relative",
-        paddingTop: "20%",
+        paddingTop: "15%",
+        paddingBottom: 140,
     },
     backgroundImage: {
         flex: 1,
         width: "100%",
     },
     eventContainer: {
+        flexGrow: 1,
         paddingHorizontal: 16,
         marginTop: 20,
     },
@@ -286,13 +310,15 @@ const styles = StyleSheet.create({
     caption: {
         fontSize: 14,
         marginVertical: 5,
-        marginLeft:'5%'
+        marginLeft:'5%',
+        fontFamily: "poppins-Medium",
     },
     taggedUsers: {
         fontSize: 12,
         color: '#555',
         marginVertical: 5,
-        marginLeft:'5%'
+        marginLeft:'5%',
+        fontFamily: "Inter-Medium",
     },
     post: {
         backgroundColor: "#f5f4f4",
@@ -335,7 +361,7 @@ const styles = StyleSheet.create({
     },
     postImageContainer: {
         flex: 1,
-        marginHorizontal: 10,
+       // marginHorizontal: 5,
         marginBottom: 10,
     },
     postImage: {

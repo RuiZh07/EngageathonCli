@@ -18,6 +18,8 @@ import baseUrl from '../../utils/api';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
 import { SvgUri } from "react-native-svg";
 import apiClient from '../../services/apiClient';
+import { CategoryContext } from '../../components/contentCreation/CategoryContext';
+import axios from 'axios';
 
 const TagCauseEvent = () => {
     const { categoryId, setCategoryId } = useContext(CategoryContext);
@@ -31,23 +33,14 @@ const TagCauseEvent = () => {
     useEffect(() => {
         // Fetch cause types and initialize pressedStates based on categoryIdPost
         const fetchCauseTypes = async () => {
-            const token = await AsyncStorage.getItem("AccessToken");
-            if (!token) {
-                console.error("No token found");
-                return;
-            }
             try {
-                const response = await apiClient.get(`${baseUrl}/missions/categories/`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
+                const response = await apiClient.get(`${baseUrl}/missions/categories/`);
 
-                if (!response.ok) {
+                if (response.status < 200 || response.status >= 300) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
+                const data = await response.data;
 
                 // Categorize causes
                 const categorized = data.reduce((acc, cause) => {
@@ -121,6 +114,7 @@ const TagCauseEvent = () => {
             }
         if (typeof saveEvent === 'function') {
             await saveEvent();
+            Alert.alert("Event created successfully");
             navigation.navigate('Home');
 
         } else {
@@ -146,11 +140,11 @@ const TagCauseEvent = () => {
                     {/* Left header objects */}
                     <View style={styles.headerLeft}>
                         <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.goBack()}
-            >
-                <SvgUri uri={backArrow} />
-            </TouchableOpacity>
+                            style={styles.button}
+                            onPress={() => navigation.goBack()}
+                        >
+                            <SvgUri uri={backArrow} />
+                        </TouchableOpacity>
                         <View style={styles.innerContainer}>
                             <Text style={styles.heading}>Tag A Cause</Text>
                         </View>
@@ -252,11 +246,9 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
-        margin: 25,
-        marginBottom: 15,
-        marginTop: 45,
+        paddingHorizontal: "5%",
+        marginTop: "13%",
     },
-
     // Header component, left side
     headerLeft: {
         flexDirection: "row",
@@ -268,16 +260,16 @@ const styles = StyleSheet.create({
         marginLeft: 10,
     },
     heading: {
-        fontSize: 24,
-        fontWeight: "500",
         color: "#FFE600",
+        fontSize: 26,
+        fontFamily: "Poppins-regular",
+        paddingLeft: 20,
     },
     subHeading: {
         fontSize: 14,
         fontWeight: "400",
         color: "#FFFFFF",
     },
-
     // Header component, right side
     headerRight: {
         alignItems: "center",

@@ -7,9 +7,10 @@ import {
     TouchableOpacity,
     ImageBackground,
     ScrollView,
+    Alert,
 } from 'react-native';
 import { Platform } from "react-native";
-import { backArrow, addCameraIcon } from '../../utils/icons';
+import { backArrow, addCameraIcon, circleCheckmark, blackCircle } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 
 const EventHubScreen = () => {
@@ -18,8 +19,12 @@ const EventHubScreen = () => {
     const { event } = route.params;
 
     const handleViewLeaderboard = () => {
-        // Pass the user ID as a parameter to the leaderboard screen
-        navigation.navigate('LeaderboardScreen', { userId: 4 });
+        if (event.activities.length === 0) {
+            Alert.alert("Leaderboard is not available for this event");
+        } else {
+            // Pass the user ID as a parameter to the leaderboard screen
+            navigation.navigate('LeaderboardScreen', { eventId: event.id });
+        }  
     };
 
     return (
@@ -32,18 +37,23 @@ const EventHubScreen = () => {
                     >
                         <SvgUri uri={backArrow} />
                     </TouchableOpacity>
-                    <Text style={styles.headerText}>{event.name}</Text>
+                    <Text style={styles.headerText} 
+                        numberOfLines={1} 
+                        ellipsizeMode="tail"
+                    >
+                        {event.name}
+                    </Text>
                 </View>
                 <ScrollView contentContainerStyle={styles.contentContainer}>
                     <Text style={styles.description}>{event.description}</Text>
-                    <Text style={styles.username}>{event.organizer}</Text>
+                    <Text style={styles.username}>@ {event.username}</Text>
                     <View style={styles.activitiesHeader}>
                         <Text style={styles.activitiesTitle}>Activities</Text>
                         <TouchableOpacity onPress={handleViewLeaderboard}>
                             <Text style={styles.viewLeaderboard}>View Leaderboard</Text>
                         </TouchableOpacity>
                     </View>
-                    <Text style={styles.totalPoints}>Total Points Earned: {event.totalPoints}</Text>
+                    {/*<Text style={styles.totalPoints}>Total Points Earned: {event.totalPoints}</Text>*/}
                     {event.activities.length === 0 ? (
                         <Text style={styles.noActivitiesText}>No activities available for this event.</Text>
                     ) : (
@@ -52,28 +62,25 @@ const EventHubScreen = () => {
                             <Text style={styles.activityText}>{activity.name}</Text>
                             <Text style={styles.activityPoints}>{activity.points}</Text>
                             <View style={styles.activityStatus}>
-                                {/*
-                            <Feather
-                                name="check-circle"
-                                size={24}
-                                color={activity.completed ? "#FF8D00" : "#CCCCCC"}
-                            />
-                            */}
+                                <SvgUri
+                                    uri={activity.completed ? blackCircle : circleCheckmark} 
+                                />
                             </View>
                         </View>
                         ))
                     )}
-                    <View style={styles.cameraButtonContainer}>
-                        <TouchableOpacity onPress={() => console.log('Camera pressed')} disabled={event.activities.length === 0}>
-                             {/*
-                        <Feather
-                            name="camera"
-                            size={40}
-                            color={event.activities.length === 0 ? "#CCCCCC" : "#FFFFFF"}
-                        />
-                        */}
-                        </TouchableOpacity>
-                    </View>
+                    {event.activities.length !== 0 && 
+                        <View style={styles.cameraButtonContainer}>
+                            <TouchableOpacity onPress={() => console.log('Camera pressed')} disabled={event.activities.length === 0}>
+                                <SvgUri 
+                                    uri={addCameraIcon} 
+                                    width="40"
+                                    height="40"
+                                />
+                            </TouchableOpacity>
+                        </View>
+                    }
+                    
                 </ScrollView>
             </View>
         </ImageBackground>
@@ -92,38 +99,40 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        width: '100%',
+        width: '95%',
         paddingHorizontal: '5%',
-        marginBottom: 20, 
-        marginTop: 5, 
+        marginTop: 20, 
     },
     backButton: {
-        marginTop: 15, 
+        //marginTop: 15, 
     },
     headerText: {
         color: '#FFE600',
-        fontSize: 32,
-        position: 'absolute',
-        left: '20%',
-        top: 10, 
+        fontSize: 24,
+        fontFamily: "Poppins-Medium",
+        marginLeft: 20,
+        overflow: 'hidden',    
     },
     contentContainer: {
         padding: 20,
         paddingTop: 0,
-        alignItems: 'center',
+        alignItems:'center',
     },
     description: {
         color: '#FFFFFF',
         fontSize: 14,
         marginVertical: 10,
-        textAlign: 'center',
+        lineHeight: 20,
+        fontFamily: "Inter-Regular",
+        alignSelf:'left',
     },
     username: {
         color: '#FFFFFF',
         fontSize: 14,
+        marginTop: 10,
         marginBottom: 20,
-        textAlign: 'center',
+        fontFamily: "Poppins-Medium",
+        width: '100%',
     },
     activitiesHeader: {
         flexDirection: 'row',
@@ -135,41 +144,58 @@ const styles = StyleSheet.create({
     activitiesTitle: {
         color: '#FFE600',
         fontSize: 24,
+        fontFamily: "Poppins-Medium",
     },
     viewLeaderboard: {
         color: '#FF8D00',
-        fontSize: 14,
+        fontSize: 16,
+        fontFamily: "Poppins-Medium",
     },
     totalPoints: {
         color: '#FFFFFF',
-        fontSize: 18,
+        fontSize: 16,
         marginBottom: 10,
+        textAlign: 'left',
+        fontFamily: "Poppins-Medium",
+        width: '100%',
     },
     activityContainer: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         backgroundColor: '#FFFFFF',
-        borderRadius: 10,
-        padding: 15,
+        borderRadius: 20,
+        paddingHorizontal: 15,
+        paddingVertical: 10,
         marginBottom: 10,
         width: '100%',
         borderWidth: 2,
         borderColor: '#FF8D00',
+        flexWrap: 'wrap',
     },
     activityText: {
-        color: '#000000',
-        fontSize: 18,
+        color: '#404040B8',
+        fontSize: 17,
+        fontFamily: "Poppins-Medium",
+        flexWrap: 'wrap',
+        maxWidth: '75%',
     },
     activityPoints: {
         color: '#FF8D00',
-        fontSize: 18,
+        fontSize: 20,
+        marginLeft: 'auto',
+        fontFamily: "Poppins-Medium",
     },
     activityStatus: {
         alignItems: 'flex-end',
+        marginLeft: 10,
     },
     cameraButtonContainer: {
-        marginTop: 20,
+        marginTop: 15,
+        marginBottom: 15,
+        backgroundColor: '#FFFFFF',
+        padding: 20,
+        borderRadius: 50,
     },
     noActivitiesText: {
         color: '#FFFFFF',

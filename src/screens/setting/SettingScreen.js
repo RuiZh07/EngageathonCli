@@ -41,6 +41,7 @@ export default function SettingScreen () {
     const [profileImage, setProfileImage] = useState(null);
     const [fullName, setFullName] = useState("");
     const [isEditing, setIsEditing] = useState(false);
+    const [isLoading, setLoading] = useState(false);
     const navigation = useNavigation();
     const inputRef = useRef(null);
 
@@ -118,13 +119,13 @@ export default function SettingScreen () {
             "Are you sure you want to log out?",
             [
                 {
-                text: "Cancel",
-                style: "cancel",
+                    text: "Cancel",
+                    style: "cancel",
                 },
                 {
-                text: "Logout",
-                style: "destructive",
-                onPress: performLogout,
+                    text: "Logout",
+                    style: "destructive",
+                    onPress: performLogout,
                 },
             ],
             { cancelable: false }
@@ -151,11 +152,11 @@ export default function SettingScreen () {
                 return;
             }
 
-            const base64Image = await RNFS.readFile(uri, 'base64');
-            const urlEncodedImage = encodeURIComponent(base64Image);
+            //const base64Image = await RNFS.readFile(uri, 'base64');
+            //const urlEncodedImage = encodeURIComponent(base64Image);
             //const data = {image: base64Image};
 
-            await apiClientBallapragada.put(`${baseUrl}/profile_image/`, `image=${urlEncodedImage}`, {
+            await apiClient.put(`${baseUrl}/profile_image/`, `image=${profileImage}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -195,8 +196,9 @@ export default function SettingScreen () {
                                 'JPEG',
                                 80 
                             );
-                            setProfileImage(resizedImage.uri);
-                            await uploadProfileImage(resizedImage.uri);
+                            const base64Image = await RNFS.readFile(resizedImage.uri, 'base64');
+                            setProfileImage(base64Image);
+                            await uploadProfileImage(base64Image);
 
                         } else {
                             console.error('No URI found in the selected asset');
@@ -240,7 +242,7 @@ export default function SettingScreen () {
 
             <TouchableOpacity onPress={handleImagePick} style={styles.circle}>
                 <Image
-                    source={profileImage ? { uri: profileImage } : require("../../assets/default_profile.png")}
+                    source={userData.profile_photo ? { uri: userData.profile_photo } : require("../../assets/default_profile.png")}
                     style={styles.pfp}
                 />
                 <Image 
