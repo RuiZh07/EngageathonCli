@@ -3,7 +3,7 @@ import baseUrl from "../utils/api";
 import apiClient from "./apiClient";
 
 const fetchComments = async (postId) => {
-    const token = await AsyncStorage.getItem("authToken");
+    const token = await AsyncStorage.getItem("AccessToken");
     if (!token) {
         console.error("No token found");
         return;
@@ -23,7 +23,7 @@ const fetchComments = async (postId) => {
 };
 
 const postComment = async (postId, content) => {
-    const token = await AsyncStorage.getItem("authToken");
+    const token = await AsyncStorage.getItem("AccessToken");
     if (!token) {
         console.error("No token found");
         return;

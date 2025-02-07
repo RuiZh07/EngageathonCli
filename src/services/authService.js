@@ -5,6 +5,7 @@ import {
     Alert,
 } from "react-native";
 import apiClient from "./apiClient";
+import axios from 'axios';
 
 const login = async (email, password) => {
     //console.log(baseUrl);
@@ -13,21 +14,22 @@ const login = async (email, password) => {
         password,
     };
     try {
-        const response = await apiClient.post(`${baseUrl}${endpoints.login}`, data, {
+        const response = await axios.post(`${baseUrl}${endpoints.login}`, data, {
             headers: {
                 "Content-Type": "application/json",
             },
         });
         console.log("Login successful:", response.data);
-        const { account_type, email, first_name, last_name, id, access, refresh } = response.data;
+        const { account_type, email, first_name, last_name, id, profile_photo, access, refresh } = response.data;
         //console.log("Login successful:", response.data);
         await AsyncStorage.setItem("AccessToken", access);
         await AsyncStorage.setItem("RefreshToken", refresh);
         const storedAccessToken = await AsyncStorage.getItem("AccessToken");
         const storedRefreshToken = await AsyncStorage.getItem("RefreshToken");
-        
+        await updateUserMission(storedAccessToken);
+
         return {
-            userData: { account_type, email, first_name, last_name, id },
+            userData: { account_type, email, first_name, last_name, id, profile_photo },
             accessToken: storedAccessToken,
             refreshToken: storedRefreshToken,
         };
@@ -45,6 +47,9 @@ const signup = async (userData) => {
         ...userData,
     };
 
+    console.log('data', data);
+    console.log("profile_photo", userData.profile_photo);
+
     try {
         const isFormUrlEncoded = accountType === 'IN';
         const payload = isFormUrlEncoded
@@ -56,8 +61,9 @@ const signup = async (userData) => {
                 ? "application/x-www-form-urlencoded"
                 : "application/json",
             };
+        console.log(payload);
 
-        const response = await apiClient.post(`${baseUrl}${endpoints.register}`, payload, {
+        const response = await axios.post(`${baseUrl}${endpoints.register}`, payload, {
             headers,
         });
         
@@ -82,9 +88,9 @@ const invite = async (user_email, invitee_email) => {
     };
     try {
         const response = await apiClient.post(`${baseUrl}${endpoints.invite}`, data, {
-        headers: {
-            "Content-Type": "application/json",
-        },
+            headers: {
+                "Content-Type": "application/json",
+            },
         });
         return response.data;
     } catch (error) {
@@ -97,7 +103,7 @@ const resetPassword = async (user_email) => {
         email: user_email,
     };
     try {
-        const response = await apiClient.post(`${baseUrl}${endpoints.passwordReset}`, data, {
+        const response = await axios.post(`${baseUrl}${endpoints.passwordReset}`, data, {
             headers: {
                 "Content-Type": "application/json",
             },
@@ -122,9 +128,36 @@ const logout = async () => {
                 },
             });
             await AsyncStorage.removeItem("AccessToken"); 
+            await AsyncStorage.removeItem("RefreshToken");
         }
     } catch (error) {
         throw error;
+    }
+};
+
+const updateUserMission = async (token) => {
+    try {
+        const causesString = await AsyncStorage.getItem('selectedCauses');
+        if (!causesString) {
+            console.log('No selected causes found.');
+            return;
+        }
+
+        const selectedCauseIds = JSON.parse(causesString);
+
+        const data = {
+            "categories": selectedCauseIds,
+        }
+        const response = await axios.put(`${baseUrl}/missions/categories/user/`, data, {
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        console.log('Successfully updated user missions:', response.data);
+
+    } catch (error) {
+        console.error("Error updating the mission categories:", error.message);
     }
 };
 
@@ -134,4 +167,5 @@ export default {
     invite,
     resetPassword,
     logout,
+
 };

@@ -29,24 +29,25 @@ export default function UserProfileScreen({ route }) {
     const [isPrivate, setIsPrivate] = useState(false);
     const navigation = useNavigation();
 
+    console.log(userID);
     useEffect(() => {
         const fetchUserData = async() => {
             try{
                 const storedToken = await AsyncStorage.getItem("AccessToken");
                 if (!storedToken) {
-                console.error("No token found");
-                return;
+                    console.error("No token found");
+                    return;
                 }
                 setToken(storedToken);
             
                 const response = await apiClient.get(`${baseUrl}/user-content/${userID}/?content_types=event&content_types=post`, {
-                headers: {
-                    'Authorization': `Bearer ${storedToken}`,
-                    'Content-Type': 'application/json',
-                },
+                    headers: {
+                        'Authorization': `Bearer ${storedToken}`,
+                        'Content-Type': 'application/json',
+                    },
                 });
         
-                const userData = await response.json();
+                const userData = await response.data;
                 setUserData(userData);
         
                 const [userInfo, categories, rankInfo, privacySettings, ...eventList] = userData;
@@ -55,13 +56,13 @@ export default function UserProfileScreen({ route }) {
                 setRank(rankInfo.rank);
         
                 if (privacySettings && privacySettings.is_private) {
-                if (privacySettings.is_following) {
-                    setEventList(eventList);
-                    setIsPrivate(false);
-                } else {
-                    setEventList([]);
-                    setIsPrivate(true);
-                }
+                    if (privacySettings.is_following) {
+                        setEventList(eventList);
+                        setIsPrivate(false);
+                    } else {
+                        setEventList([]);
+                        setIsPrivate(true);
+                    }
                 } else {
                 setEventList(eventList);
                 setIsPrivate(false);
@@ -76,6 +77,8 @@ export default function UserProfileScreen({ route }) {
         fetchUserData();
     }, [userID]);
     
+    console.log(userData);
+    console.log(eventList);
     const handleImageClick = (postDetails) => {
         navigation.navigate('PostDetailScreen', { postDetails });
     };
@@ -108,7 +111,7 @@ export default function UserProfileScreen({ route }) {
                     <>
                     <View style={styles.circle}>
                     <Image
-                        source={userInfo?.profile_photo ? { uri: `data:image/jpeg;base64,${userInfo.image_url}` } : require("../../assets/default_profile.png")}
+                        source={userInfo?.profile_photo ? { uri: userInfo.profile_photo } : require("../../assets/default_white_profile.png")}
                         style={styles.pfp}
                     />
                     </View>
@@ -142,8 +145,9 @@ export default function UserProfileScreen({ route }) {
                         {categories.map((category) => (
                             <View key={category.id}>
                             <LinearGradient
-                                colors={["#FF8D00", "#FFE600"]}
-                                start={{ x: 0, y: 0 }}
+                                colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                                locations={[0.72, 0.86, 1]}  
+                                start={{ x: 0, y: 0 }}      
                                 end={{ x: 1, y: 0 }}
                                 style={styles.categoryTextContainer}
                             >
@@ -168,17 +172,17 @@ export default function UserProfileScreen({ route }) {
                     <View style={styles.gridContainer}>
                     {eventList && eventList.length > 0 ? (
                         eventList.map((content) => {
-                        const imageUrl = content.image_urls && content.image_urls[0] ? content.image_urls[0].image_url : '';
+                        const imageUrl = content.image_urls && content.image_urls[0] ? content.image_urls[0].image_url : null;
                         return (
                             <TouchableOpacity
-                            key={content.id}
-                            style={styles.imageItem}
-                            onPress={() => handleImageClick(content)}
+                                key={content.id}
+                                style={styles.imageItem}
+                                onPress={() => handleImageClick(content)}
                             >
-                            <Image
-                                source={{ uri: `data:image/jpeg;base64,${imageUrl}` }}
-                                style={styles.gridImage}
-                            />
+                                <Image
+                                    source={{ uri: imageUrl }}
+                                    style={styles.gridImage}
+                                />
                             </TouchableOpacity>
                         );
                         })

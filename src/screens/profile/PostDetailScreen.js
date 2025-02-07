@@ -9,7 +9,7 @@ import { backArrow, greyDots } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 
 const PostDetailScreen = ({ route }) => {
-    const { postDetails } = route.params;
+    const { postDetails } = route.params || {};
     const navigation = useNavigation();
 
     return (
@@ -33,31 +33,52 @@ const PostDetailScreen = ({ route }) => {
                 <View style={styles.container}>
                     <View style={styles.post}>
                         <View style={styles.postHeader}>
-                            <Image
-                                source={{ uri: postDetails.image_urls[0]?.image_url ? `data:image/jpeg;base64,${postDetails.image_urls[0].image_url}` : "/mnt/data/Media (7).jpg" }}
-                                style={styles.profileImage}
-                            />
-                            <View style={styles.postUser}>
+                            {postDetails.caption ? (
+                                <View style={styles.postHeader}>
+                                    <Image
+                                        source={{ uri: postDetails?.profile_photo_url ? postDetails.profile_photo_url : "/mnt/data/Media (7).jpg" }}
+                                        style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
+                                    />
+                                    <View style={styles.postUser}>
+                                        <View>
+                                            <Text style={styles.userNameText}>{postDetails.username}</Text>
+                                        </View>
+                                    <TouchableOpacity>
+                                        <SvgUri uri={greyDots} />
+                                    </TouchableOpacity>
+                                    </View>
+                                </View>
+                            ) : (
+                                <View style={styles.postHeader}>
+                                <Image
+                                    source={{ uri: postDetails?.profile_photo_url ? postDetails.profile_photo_url : "/mnt/data/Media (7).jpg" }}
+                                    style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
+                                />
+                                <View style={styles.postUser}>
                                 <View>
                                     <Text style={styles.userNameText}>{postDetails.name}</Text>
                                     <Text style={styles.userDescriptionText}>
-                                        Organizer | {postDetails.event_type}
+                                    Organizer | {postDetails.event_type}
                                     </Text>
                                 </View>
                                 <TouchableOpacity>
-                                   <SvgUri uri={greyDots} />
+                                    <SvgUri uri={greyDots} />
                                 </TouchableOpacity>
+                                </View>
                             </View>
+                            )}
                         </View>
                         {postDetails.location && <Text style={styles.location}>{postDetails.location}</Text>}
+                        {/*
                         <View style={styles.postTags}>
                             <Chip label={postDetails.event_type} />
                         </View>
+                        */}
                         <View style={styles.postImageContainer}>
                             {postDetails.image_urls.map((image, index) => (
                                 <Image
                                     key={index}
-                                    source={{ uri: `data:image/jpeg;base64,${image.image_url}` }}
+                                    source={{ uri: postDetails.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                                     style={styles.postImage}
                                 />
                             ))}
@@ -78,13 +99,13 @@ const PostDetailScreen = ({ route }) => {
                                 <Save filled={false} />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.interactionButton}>
-                                <Share />
+                                
                             </TouchableOpacity>
                         </View>
                         {postDetails.caption && <Text style={styles.caption}>{postDetails.caption}</Text>}
                         {postDetails.tagged_users && (
                             <Text style={styles.taggedUsers}>
-                                {postDetails.tagged_users.map(user => `User ${user.user}`).join(', ')}
+                                {postDetails.tagged_users.map(user => `@${user.username}`).join('  ')}
                             </Text>
                         )}
                         <View style={styles.postDescription}>
@@ -92,7 +113,7 @@ const PostDetailScreen = ({ route }) => {
                                 {postDetails.description}
                             </Text>
                         </View>
-                        {postDetails.activities.length > 0 && (
+                        {postDetails.activities && postDetails.activities.length > 0 && (
                             <View style={styles.activitiesContainer}>
                                 <Text style={styles.activitiesTitle}>Activities</Text>
                                 {postDetails.activities.map((activity, index) => (
@@ -182,7 +203,6 @@ const styles = StyleSheet.create({
     postTags: {
         flexDirection: "row",
         gap: 4,
-        marginVertical: 12,
     },
     postImageContainer: {
         marginVertical: 10,
@@ -203,7 +223,7 @@ const styles = StyleSheet.create({
     likeSection: {
         flexDirection: "row",
         alignItems: "center",
-        marginRight: 10,
+        marginRight: 12,
     },
     likeCountText: {
         fontSize: 14,
@@ -212,14 +232,16 @@ const styles = StyleSheet.create({
         marginLeft: 4,
     },
     interactionButton: {
-        paddingHorizontal: 10,
+        marginHorizontal: 12,
     },
     saveButton: {
-        marginRight: 10,
+        marginLeft: 12,
     },
     caption: {
         fontSize: 14,
         marginVertical: 5,
+        fontFamily: "poppins-medium",
+        marginLeft: 5,
     },
     taggedUsers: {
         fontSize: 12,
@@ -231,8 +253,9 @@ const styles = StyleSheet.create({
     },
     postDescriptionText: {
         fontSize: 14,
-        fontFamily: "poppins-regular",
+        fontFamily: "poppins-medium",
         color: "#333",
+        marginLeft: 5,
     },
     activitiesContainer: {
         marginVertical: 10,

@@ -7,7 +7,6 @@ import {
     ImageBackground,
     ScrollView,
     Alert,
-    Animated,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -17,36 +16,28 @@ import baseUrl from '../../utils/api';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
 import { SvgUri } from "react-native-svg";
 import apiClient from '../../services/apiClient';
+import { CategoryContext } from '../../components/contentCreation/CategoryContext';
 
 const TagCausePost = () => {
     const { categoryIdPost, setCategoryIdPost } = useContext(CategoryContext);
     const { savePost } = useContext(CategoryContext);
     const [causeTypes, setCauseTypes] = useState({});
     const [selectedCauseIds, setSelectedCauseIds] = useState(categoryIdPost || []);
-    const [pressedStatesPost, setPressedStatesPost] = useState({});
+    const [pressedStates, setPressedStates] = useState({});
     const navigation = useNavigation();
 
     // effect to fetch data from the API 
     useEffect(() => {
         // Fetch cause types and initialize pressedStates based on categoryIdPost
         const fetchCauseTypes = async () => {
-            const token = await AsyncStorage.getItem("AccessToken");
-            if (!token) {
-                console.error("No token found");
-                return;
-            }
             try {
-                const response = await apiClient.get(`${baseUrl}/missions/categories/`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
+                const response = await apiClient.get(`${baseUrl}/missions/categories/`);
 
-                if (!response.ok) {
+                if (response.status < 200 || response.status >= 300) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
+                const data = await response.data;
 
                 // Categorize causes
                 const categorized = data.reduce((acc, cause) => {
@@ -66,7 +57,7 @@ const TagCausePost = () => {
                     });
                     return acc;
                 }, {});
-                updatePressedStatesPost(initialPressedStates);
+                updatePressedStates(initialPressedStates);
 
             } catch (error) {
                 console.error('Error fetching cause types:', error);
@@ -79,7 +70,7 @@ const TagCausePost = () => {
         const causeName = cause.name;
         const causeId = cause.id;
     
-        setPressedStatesPost((prevState) => ({
+        setPressedStates((prevState) => ({
             ...prevState,
             [causeName]: !prevState[causeName],
         }));
@@ -101,8 +92,8 @@ const TagCausePost = () => {
         updateCategoryIdPost(selectedCauseIds);
     }, [selectedCauseIds]);
 
-    const updatePressedStatesPost = (states) => {
-        setPressedStatesPost(states);
+    const updatePressedStates = (states) => {
+        setPressedStates(states);
     };
 
     useEffect(() => {
@@ -120,8 +111,8 @@ const TagCausePost = () => {
             }
         if (typeof savePost === 'function') {
             await savePost();
+            Alert.alert("Post created successfully");
             navigation.navigate('Home');
-
         } else {
             console.error("savePost is not a function");
         }
@@ -183,7 +174,7 @@ const TagCausePost = () => {
                             title={classificationName}
                             data={causes}
                             onPressItem={handleCauseButtonPress}
-                            pressedStatesPost={pressedStatesPost}
+                            pressedStates={pressedStates}
                         />
                     ))}
                 </View>

@@ -72,11 +72,11 @@ const PinReport = ({ isModalVisible, setModalVisible }) => {
                         <TouchableWithoutFeedback>
                         <View style={styles.mainModalContent}>
                             <TouchableOpacity>
-                                <Text>Pin Event</Text>
+                                <Text style={styles.pinText}>Pin Event</Text>
                             </TouchableOpacity>
                             <View style={styles.separator} />
                             <TouchableOpacity onPress={handleOpenReportForm}>
-                                <Text>Report Event</Text>
+                                <Text style={styles.pinText}>Report Event</Text>
                             </TouchableOpacity>
                         </View>
                         </TouchableWithoutFeedback>
@@ -161,7 +161,6 @@ const styles= StyleSheet.create({
         borderRadius: 25,
         borderWidth: 1,
         borderColor: "#FF8D00",
-        paddingHorizontal: 25,
         paddingVertical: 15,
         width: '35%',
     },
@@ -177,8 +176,13 @@ const styles= StyleSheet.create({
     flatListContainer:{
         maxHeight: 250,
     },
+    pinText: {
+        fontFamily: "Poppins-medium",
+        fontSize: 15,
+        textAlign: "center",
+    },
     separator: {
-        height: 1,
+        height: 2,
         width: '100%',
         alignSelf: "center",
         backgroundColor: "#EEE7E7",

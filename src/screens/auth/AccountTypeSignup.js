@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     Text,
@@ -25,6 +25,7 @@ const AccountTypeSignup = () => {
     const [password, setPassword] = useState("");
     const [cPassword, setCPassword] = useState("");
     const navigation = useNavigation();
+    
     const route = useRoute();
     const { typeInput } = route.params || {};
 
@@ -41,8 +42,10 @@ const AccountTypeSignup = () => {
     };
 
     const handlePictureTaken = (image) => {
-        setCapturedImage(image);
-        console.log('Captured Image:', image);
+        const { uri, base64 } = image;
+        setSelectedImage(base64);
+        setCameraVisible(false);
+        console.log('Captured Image:', base64);
     };
 
     const openImagePicker = () => {
@@ -58,14 +61,16 @@ const AccountTypeSignup = () => {
     const closeImagePicker = () => {
         setImagePickerVisible(false);
     };
+
     const userData = {
         "account_type": typeInput,
         email,
         "first_name": fname,
         "last_name": lname,
         password,
+        "profile_photo": selectedImage,
     };
-
+    
     const handleNext = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -83,7 +88,7 @@ const AccountTypeSignup = () => {
             alert("Passwords do not match.");
             return;
         }
-        console.log("userData", userData)
+        console.log("userData", userData);
         if (typeInput === 'IN') {
             const response = await authService.signup(
                 userData
@@ -124,11 +129,15 @@ const AccountTypeSignup = () => {
                 break;
         }
 
-        return { title, placeholder};
+        return { title, placeholder };
     }
 
     const { title, placeholder } = renderAccountType();
 
+    useEffect(() => {
+        console.log('Camera modal visibility:', cameraVisible);
+      }, [cameraVisible]);
+      
     return (
         <KeyboardAvoidingView
         style={styles.avoidView}
@@ -149,33 +158,32 @@ const AccountTypeSignup = () => {
             <Text style={styles.title}>{title}</Text>
 
             <TouchableOpacity style={styles.pfpContainer} onPress={openCamera}>
-                <SvgUri 
-                    uri={userRoundedIcon} 
-                    width="50"
-                    height="50" 
-                />
+                {selectedImage ? (
+                    <Image 
+                        source={{uri: `data:image/png;base64, ${selectedImage}`}}
+                        style={styles.profileImage}
+                    />
+                ) : (
+                    <SvgUri 
+                        uri={userRoundedIcon} 
+                        width="50"
+                        height="50" 
+                    />
+                )}
                 <View style={styles.cameraIcon}>
                     <SvgUri uri={cameraIcon} 
                         width="24"
                         height="24"
                     />
                 </View>
+                
             </TouchableOpacity>
 
-            
             <CameraModal
                 isVisible={cameraVisible}
                 onClose={() => setCameraVisible(false)}
-                onPictureTaken={handlePictureTaken}
+                onPhotoConfirmed={handlePictureTaken}
             />
-            
-
-            {selectedImage && (
-                <Image
-                    source={{ uri: `data:image/jpeg;base64,${selectedImage}` }}
-                    style={styles.image}
-                />
-            )}
 
             {/* Render the modal conditionally */}
             <Modal visible={imagePickerVisible} animationType="slide" transparent={true}>
@@ -245,7 +253,10 @@ const AccountTypeSignup = () => {
                         placeholderTextColor="#ABABAB"
                     />
             </View>
-            <MainButton onPress={handleNext} title="Next" style={styles.mainButton} />
+            <MainButton 
+                onPress={handleNext} 
+                title={typeInput === 'IN' ? "Register" : "Next"}
+                style={styles.mainButton} />
         </View>
         </ImageBackground>
     </KeyboardAvoidingView>
@@ -292,11 +303,18 @@ const styles = StyleSheet.create({
     pfpContainer: {
         alignItems: 'center',
         justifyContent: 'center',
-        borderRadius: 50,
+        width: 80,
+        height: 80,
+        borderRadius: 40,
         backgroundColor: "#E8E8E8",
         padding:12,
         marginBottom: 30,
         position: "relative",
+    },
+    profileImage: {
+        width: '140%',
+        height: '140%',
+        borderRadius: 55,
     },
     cameraIcon: {
         position: 'absolute',

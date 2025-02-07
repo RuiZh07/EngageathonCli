@@ -15,7 +15,7 @@ const CustomCameraIcon = () => (
     </Svg>
 );
 
-const CameraModal = ({ onPhotoConfirmed, onClose }) => {
+const CameraModal = ({ isVisible, onPhotoConfirmed, onClose }) => {
     const [cameraPermission, setCameraPermission] = useState(null);
     const backDevice = useCameraDevice('back');
     const frontDevice = useCameraDevice('front');
@@ -116,7 +116,7 @@ const CameraModal = ({ onPhotoConfirmed, onClose }) => {
 
     return (
         <Modal
-            visible={true} 
+            visible={isVisible} 
             transparent={true} 
             animationType="slide" 
             onRequestClose={onClose} 

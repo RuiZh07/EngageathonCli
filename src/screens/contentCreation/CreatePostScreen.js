@@ -56,12 +56,13 @@ const CreatePostScreen = () => {
             image_url: `${base64}`,
             cover_image: true,
         };
+        setBase64Image(base64);
         setPhotoList([newPhoto]);
         setIsCameraModalVisible(false); 
     };
     
     const validateInputs = () => {
-        if (!photoUri) return { 
+        if (!base64Image) return { 
             valid: false, error: "Image is required"
         };
         if (!location) return {
@@ -79,6 +80,8 @@ const CreatePostScreen = () => {
         };
         navigation.navigate('TagCausePost')
     };
+
+    console.log('base1', base64Image);
 
     useEffect(() => {
     }, [categoryIdPost]);
@@ -166,16 +169,12 @@ const CreatePostScreen = () => {
                 url.searchParams.append(searchKey, searchValue);
 
                 const response = await apiClient.get(url.toString(), {
-                    method: 'GET',
                     headers: {
-                        "Authorization": `Token ${token}`,
+                        "Authorization": `Bearer ${token}`,
                     },
                 });
 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const userInfo = await response.json();
+                const userInfo = await response.data;
                 setUsers(userInfo);
             } catch (error) {
                 console.log("Error fetching user data", error);
@@ -269,7 +268,8 @@ const CreatePostScreen = () => {
                             );
     
                             const base64Image = await RNFS.readFile(resizedImage.uri, 'base64');
-    
+                            //console.log('base', base64Image);
+                            setBase64Image(base64Image);
                             // Create a new photo object with the base64 image and mark it as the cover image
                             const newPhoto = {
                                 image_url: `${base64Image}`,
@@ -288,7 +288,7 @@ const CreatePostScreen = () => {
             console.error('Error picking image:', error);
         }
     };
-
+    console.log(photoList);
     // Create a dict from photoList
     const photoDict = photoList.reduce((dict, photo) => {
         dict[photo.image_url] = photo.cover_image;
@@ -332,9 +332,9 @@ const CreatePostScreen = () => {
                     
                     <View style={styles.cameraContainer}>
                         <TouchableOpacity style={styles.photos} onPress={() => setModalVisible(true)}>
-                            {photoUri ? (
+                            {base64Image ? (
                                 <View style={styles.capturedImageContainer}>
-                                    <Image source={{ uri: photoUri }} style={styles.capturedImage} />
+                                    <Image source={{ uri: `data:image/jpeg;base64,${base64Image}` }} style={styles.capturedImage} />
                                 </View>
                                 ) : (
                                 <View style={styles.photoContainer}>

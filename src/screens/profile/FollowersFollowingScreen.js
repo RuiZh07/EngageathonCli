@@ -9,7 +9,6 @@ import {
     TouchableOpacity,
     RefreshControl,
     ImageBackground,
-    Platform
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -30,7 +29,7 @@ const FollowersFollowingScreen = () => {
     useEffect(() => {
         const fetchFollowersFollowing = async () => {
             try {
-                const storedToken = await AsyncStorage.getItem("authToken");
+                const storedToken = await AsyncStorage.getItem("AccessToken");
                 if (!storedToken) {
                     console.error("No token found");
                     return;

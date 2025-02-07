@@ -44,89 +44,27 @@ const DiscoverPost = ({
     const navigation = useNavigation();
     const [isShareModalVisible, setShareModalVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
+
     const handleAttend = () => {
-        navigation.navigate("CalendarEvent");
-    };
-    const handleLikePress = async (postId) => {
-        try {
-            const token = await AsyncStorage.getItem('AccessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-        
-            const response = await fetch(`${baseUrl}/like/EV/${postId}/`, {
-                method: 'POST',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-                }
-            });
-        
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-            console.log(data.message);
-        
-            setLikeCounts((prevCounts) => ({
-                ...prevCounts,
-                [postId]: prevCounts[postId] + 1,
-            }));
-        } catch (error) {
-          console.error('Error handling like:', error);
-        }
-    };
-    
-    const handleBookmarkPress = async (postId) => {
-        try {
-            const token = await AsyncStorage.getItem('AccessToken');
-            if (!token) {
-                console.error('No token found');
-                return;
-            }
-        
-            const response = await fetch(`${baseUrl}/bookmark/EV/${postId}/`, {
-                method: 'POST',
-                headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-                }
-            });
-        
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-        
-            const data = await response.json();
-            console.log(data.message);
-        
-            setBookmarked((prevBookmarks) => ({
-                ...prevBookmarks,
-                [postId]: !prevBookmarks[postId],
-            }));
-        } catch (error) {
-          console.error('Error handling bookmark:', error);
-        }
+        navigation.navigate("CalendarScreen");
     };
     
     const handleSharePress = useCallback(async (postId) => {
         try {
-          const token = await AsyncStorage.getItem('authToken');
-          
-          if (!token) {
-            console.error('No token found');
-            return;
-          }
-          const link = `${baseUrl}/event/${postId}`;
-          //console.log('share', link);
-      
-          setShareableLink(link);
-          setShareModalVisible(true);
-          setSelectedPostId(postId);
+            const token = await AsyncStorage.getItem('AccessToken');
+            
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+            const link = `${baseUrl}/event/${postId}`;
+            //console.log('share', link);
+        
+            setShareableLink(link);
+            setShareModalVisible(true);
+            setSelectedPostId(postId);
         } catch (error) {
-          console.error('Error handling share:', error);
+            console.error('Error handling share:', error);
         }
     }, [setShareableLink, setShareModalVisible]);
     
@@ -138,9 +76,8 @@ const DiscoverPost = ({
         setSelectedPostId(postId);
         setCommentsVisible(true);
     };
-    
-      //console.log('umage', coverImageUrl);
-    
+    console.log("post",post);
+    console.log("postID",post.id);
     return(
         <TouchableOpacity onPress={onPress}>
             <View style={styles.post}>
@@ -174,17 +111,15 @@ const DiscoverPost = ({
                 </View>
                 <View style={styles.postInteraction}>
                     <View style={styles.likeSection}>
-                        <TouchableOpacity onPress={() => handleLikePress(post.id)}>
-                            <Heart filled={false} />
-                        </TouchableOpacity>
-                        <Text style={styles.likeCountText}>{post.likes_count || 0}</Text>
+                        <Heart postId={post.id} like={post.liked}/>
+                        <Text style={styles.likeCountText}>
+                            {post.likes_count ?? 0}
+                        </Text>
                     </View>
                         <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
-                        <Comment />
+                            <Comment />
                         </TouchableOpacity>
-                        <TouchableOpacity style={styles.saveButton} onPress={() => handleBookmarkPress(post.id)}>
-                        <Save filled={false} />
-                        </TouchableOpacity>
+                        <Save postId={post.id} bookmark={post.bookmarked} />
                         <TouchableOpacity style={styles.shareButton} onPress={() => handleSharePress(post.id)}>
                         <SvgUri width="16" height="14" uri={shareIcon} />
                         </TouchableOpacity>

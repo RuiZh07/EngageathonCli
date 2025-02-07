@@ -50,7 +50,7 @@ const ShareModal = memo(({ isVisible, onClose, link }) => {
     useEffect(() => {
         const fetchUserData = async () => {
             try {
-                const token = await AsyncStorage.getItem('authToken');
+                const token = await AsyncStorage.getItem('AccessToken');
                 if (!token) {
                     console.error('No token found');
                     return;

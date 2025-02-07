@@ -8,6 +8,7 @@ import apiClient from "../../services/apiClient";
 
 const Save = ({ postId, bookmark }) => {
     const [saved, setSaved] = useState(bookmark);
+    
     useEffect(() => {
         console.log(`Initial bookmark state for postId ${postId}:`, bookmark);
     }, [bookmark, postId]);

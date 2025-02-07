@@ -11,8 +11,9 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { backArrow } from '../../utils/icons';
+import { backArrow, qrCodeIcon } from '../../utils/icons';
 import baseUrl from '../../utils/api';
+import axios from 'axios';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
 import { SvgUri } from "react-native-svg";
 import apiClient from '../../services/apiClient';
@@ -24,25 +25,25 @@ const TagCause = () => {
     const navigation = useNavigation();
     const route = useRoute();
     const { userData } = route.params;
-    
+    {/*
     useEffect(() => {
         if (userData) {
           console.log("User Data in tagCause:", userData);
         }
       }, [userData]);
-
+*/}
     // effect to fetch data from the API 
     useEffect(() => {
         // Fetch cause types and initialize pressedStates based on categoryIdPost
         const fetchCauseTypes = async () => {
             try {
-                const response = await apiClient.get(`${baseUrl}/missions/categories/`);
+                const response = await axios.get(`${baseUrl}/missions/categories/`);
 
-                if (!response.ok) {
+                if (response.status < 200 || response.status >= 300) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
 
-                const data = await response.json();
+                const data = await response.data;
 
                 // Categorize causes
                 const categorized = data.reduce((acc, cause) => {
@@ -71,6 +72,7 @@ const TagCause = () => {
         fetchCauseTypes();
     }, []);
 
+
     const handleCauseButtonPress = (cause) => {
         const causeName = cause.name;
         const causeId = cause.id;
@@ -92,17 +94,38 @@ const TagCause = () => {
     const updatePressedStates = (states) => {
         setPressedStates(states);
     };
-    //console.log(selectedCauseIds);
-    //console.log(pressedStates);
+
+    // Save the causes locally
+    const saveSelectedCauses = async (selectedCauseIds) => {
+        try {
+            const causesString  = JSON.stringify(selectedCauseIds);
+            await AsyncStorage.setItem('selectedCauses', causesString);
+            console.log('Selected causes saved locally');
+        } catch (error) {
+            console.error('Error saving selected causes', error);
+        }
+    };
     
     // Function to handle button functionality.
     const handlePressShareBtn = async () => {
         try {
-           // if (selectedCauseIds.length === 0) {
-           //     Alert.alert("Validation Error", "No categories selected");
-           //     return;
-           // }
-            navigation.navigate("InvitationScreen", { userData });
+            Alert.alert(
+                "Please Confirm Your Email",
+                "To finish registration, please confirm your email.",
+                [
+                    {
+                        text: "OK",
+                        onPress: async () => {
+                            //await updateUserMission();
+                            navigation.reset({
+                                index: 0,
+                                routes: [{ name: 'Login'}],
+                            });
+                        },
+                    },
+                ],
+                { cancelable: false }
+            );
         } catch (error) {
             console.error('Error during share button press:', error);
         }
@@ -122,12 +145,6 @@ const TagCause = () => {
                 <View style={styles.header}>
                     {/* Left header objects */}
                     <View style={styles.headerLeft}>
-                        <TouchableOpacity
-                            style={styles.button}
-                            onPress={() => navigation.goBack()}
-                        >
-                            <SvgUri uri={backArrow} />
-                        </TouchableOpacity>
                         <View style={styles.innerContainer}>
                             <Text style={styles.heading}>Causes</Text>
                             <Text style={styles.subHeading}>Select Up To 10</Text>
