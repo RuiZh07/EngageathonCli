@@ -22,7 +22,7 @@ const CalendarScreen = ({ route }) => {
 
     // Automatically select the current date when navigating to the calendar
     useEffect(() => {
-        setSelectedDate(today);
+        setSelectedDate(today); 
     }, []);
     
     // Mark current date with a grey circle
@@ -124,6 +124,8 @@ const CalendarScreen = ({ route }) => {
         };
         loadAttendList();
     }, []);
+
+
 
     // Mark events with yellow dots and handle selection
     const markUpcomingEvents = () => {
