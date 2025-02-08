@@ -7,17 +7,13 @@ import {
     ScrollView,
     TouchableOpacity,
     ImageBackground,
-    Dimensions,
-    Alert,
     ActivityIndicator,
     RefreshControl,
 } from "react-native";
 import apiClient from "../../services/apiClient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { backArrow } from "../../utils/icons";
-import { Platform } from "react-native";
-import { useNavigation } from '@react-navigation/native';
-import moment from "moment";
+import moment from 'moment-timezone';
 import baseUrl from "../../utils/api";
 import { SvgUri } from "react-native-svg";
 
@@ -35,7 +31,7 @@ const UpcomingEventScreen = ({ navigation }) => {
                 return;
             }
         
-            const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
+            const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event`, {
                 headers: {
                     'Authorization': `Bearer ${storedToken}`,
                     'Content-Type': 'application/json',
@@ -43,6 +39,7 @@ const UpcomingEventScreen = ({ navigation }) => {
             });
         
             setEvents(response.data.slice(3));
+            console.log('event',events);
             setError(null);
         } catch (error) {
             console.error("Error fetching events data", error);
@@ -62,6 +59,8 @@ const UpcomingEventScreen = ({ navigation }) => {
         fetchEvents();
     };
 
+    // Group events into two groups: past events and future events. 
+    // Organize the future events by the month they occur in
     const groupEventsByMonth = (events) => {
         const now = moment();
         return events.reduce((groups, event) => {
@@ -91,8 +90,6 @@ const UpcomingEventScreen = ({ navigation }) => {
 
     eventGroups.pastEvents.sort((a, b) => moment(b.datetime_start).isBefore(moment(a.datetime_start)) ? -1 : 1);
 
-    console.log('Sorted Past Events:', eventGroups.pastEvents);
-    console.log('Sorted Future Months:', sortedFutureMonths);
     return (
         <ImageBackground
             source={require("../../assets/main-background.png")}
@@ -121,14 +118,14 @@ const UpcomingEventScreen = ({ navigation }) => {
                 {error ? (
                     <Text style={styles.errorText}>{error}</Text>
                 ) : (
-                    sortedFutureMonths > 0 ? (
+                    sortedFutureMonths.length > 0 ? (
                         sortedFutureMonths.map((month, index) => (
                             <View key={index} style={styles.monthSection}>
                                 <Text style={styles.monthHeader}>{month}</Text>
-                                    {eventGroups.futureEvents[month].map((event, index) => (
+                                {eventGroups.futureEvents[month].map((event, index) => (
                                     <TouchableOpacity
                                         key={index}
-                                        style={styles.eventCard}
+                                        style={styles.eventCardFuture}
                                         onPress={() => navigation.navigate('QRCodeScreen', { event })}
                                     >
                                         <Image
@@ -139,8 +136,12 @@ const UpcomingEventScreen = ({ navigation }) => {
                                             <Text style={styles.eventName}>{event.name}</Text>
                                             <Text style={styles.eventOrg}>Organization</Text>
                                             <View style={styles.eventDateTime}>
-                                                <Text style={styles.eventDate}>{moment(event.datetime_start).format('MM/DD/YY')}</Text>
-                                                <Text style={styles.eventTime}>{moment(event.datetime_start).format('h:mm A')} EST</Text>
+                                                <Text style={styles.eventDate}>
+                                                    {moment(event.datetime_start).tz('America/New_York').format('MM/DD/YY')}
+                                                </Text>
+                                                <Text style={styles.eventTime}>
+                                                    {moment(event.datetime_start).tz('America/New_York').format('h:mm A z')}
+                                                </Text>
                                             </View>
                                         </View>
                                     </TouchableOpacity>
@@ -169,8 +170,12 @@ const UpcomingEventScreen = ({ navigation }) => {
                                     <Text style={styles.eventName}>{event.name}</Text>
                                     <Text style={styles.eventOrg}>Organization</Text>
                                     <View style={styles.eventDateTime}>
-                                        <Text style={styles.eventDate}>{moment(event.datetime_start).format('MM/DD/YY')}</Text>
-                                        <Text style={styles.eventTime}>{moment(event.datetime_start).format('h:mm A')} EST</Text>
+                                        <Text style={styles.eventDate}>
+                                            {moment(event.datetime_start).tz('America/New_York').format('MM/DD/YY')}
+                                        </Text>
+                                        <Text style={styles.eventTime}>
+                                            {moment(event.datetime_start).tz('America/New_York').format('h:mm A z')}
+                                        </Text>
                                     </View>
                                 </View>
                             </TouchableOpacity>
@@ -240,6 +245,15 @@ const styles = StyleSheet.create({
         color: "#FFFFFF",
         marginBottom: 5,
         fontFamily: "Poppins-Medium"
+    },
+    eventCardFuture: {
+        flexDirection: "row",
+        backgroundColor: "#FFFFFF",
+        borderRadius: 10,
+        padding: 10,
+        marginVertical: 7,
+        alignItems: "center",
+        justifyContent: "space-between",
     },
     eventCard: {
         flexDirection: "row",
