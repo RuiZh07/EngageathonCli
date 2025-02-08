@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
-import homeService from '../../services/homeService';
 import { useNavigation } from '@react-navigation/native';
-import { Platform } from "react-native";
 import moment from 'moment';
-import { accountPrivacyIcon, backArrow } from '../../utils/icons';
+import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../../services/apiClient';
@@ -22,8 +20,9 @@ const CalendarScreen = ({ route }) => {
 
     const { post } = route.params || {};
 
+    // Automatically select the current date when navigating to the calendar
     useEffect(() => {
-        setSelectedDate(today); // Automatically select the current date when navigating to the calendar
+        setSelectedDate(today);
     }, []);
     
     // Mark current date with a grey circle
@@ -125,8 +124,6 @@ const CalendarScreen = ({ route }) => {
         };
         loadAttendList();
     }, []);
-
-
 
     // Mark events with yellow dots and handle selection
     const markUpcomingEvents = () => {
