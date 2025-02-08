@@ -24,7 +24,6 @@ const LeaderboardScreen = () => {
     const [loading, setLoading] = useState(true);
     const [refreshing, setRefreshing] = useState(false);
     const { eventId } = route.params;
-
     useEffect(() => {
         const fetchLeaderboard = async () => {
             try {
@@ -90,6 +89,10 @@ const LeaderboardScreen = () => {
                     <View style={styles.loadingOverlay}>
                         <ActivityIndicator size="large" color="#FFE600" />
                         <Text style={styles.loadingText}>Loading...</Text>
+                    </View>
+                ) : sortedLeaderBoard.length === 0 ? (
+                    <View style={styles.no}>
+                        <Text style={styles.noLeaderboardText}>No Leaderboard data available</Text>
                     </View>
                 ) : (
                     sortedLeaderBoard.map((item, index) => (
@@ -196,6 +199,13 @@ const styles = StyleSheet.create({
         marginTop: 10,
         color: '#FFE600',
         fontSize: 16,
+    },
+    noLeaderboardText: {
+        marginTop: 20,
+        textAlign: 'center',
+        color: "white",
+        fontSize: 18,
+        fontFamily: "Poppins-Regular",
     },
 });
   
