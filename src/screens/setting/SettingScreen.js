@@ -144,31 +144,31 @@ export default function SettingScreen () {
         }
     };
 
-    const uploadProfileImage = async (uri) => {
+    const uploadProfileImage = async (base64) => {
         try {
             const token = await AsyncStorage.getItem("AccessToken");
             if (!token) {
                 console.error("No token found");
                 return;
             }
-
+            console.log(base64);
             //const base64Image = await RNFS.readFile(uri, 'base64');
             //const urlEncodedImage = encodeURIComponent(base64Image);
             //const data = {image: base64Image};
 
-            await apiClient.put(`${baseUrl}/profile_image/`, `image=${profileImage}`, {
+            await apiClient.put(`${baseUrl}/profile_image/`, `image=${base64}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
             });
-        
-            console.log('Profile image uploaded successfully');
+            Alert.alert('Profile image uploaded successfully');
         } catch (error) {
             console.error("Error uploading profile image:", error);
             Alert.alert("Error", "Failed to upload profile image");
         }
     };
+    console.log(profileImage);
 
     const handleImagePick = async () => {
         try {
