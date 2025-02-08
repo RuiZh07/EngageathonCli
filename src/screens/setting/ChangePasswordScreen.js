@@ -32,6 +32,11 @@ const ChangePasswordScreen = ({ route }) => {
             Alert.alert("Error", "Passwords do not match!");
             return;
         }
+
+        if (newPassword.length < 12) {
+            Alert.alert("Password too short", "Your password must be at least 12 characters long.");
+            return;
+        }
   
         try {
             const token = await AsyncStorage.getItem('AccessToken');
