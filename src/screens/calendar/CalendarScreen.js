@@ -2,12 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity, ImageBackground, Image } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useNavigation } from '@react-navigation/native';
-import moment from 'moment';
 import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import apiClient from '../../services/apiClient';
 import baseUrl from '../../utils/api';
+import moment from 'moment-timezone';
 
 const CalendarScreen = ({ route }) => {
     const navigation = useNavigation();
@@ -16,25 +16,15 @@ const CalendarScreen = ({ route }) => {
     const [markedDates, setMarkedDates] = useState({});
     const [upcomingEvents, setUpcomingEvents] = useState([]);
     const [calendarData, setCalendarData] = useState([]);
-    const today = new Date().toISOString().split('T')[0]; // Current date in YYYY-MM-DD format
-
+    const today = moment.tz('America/New_York').format('YYYY-MM-DD'); // Current date in YYYY-MM-DD format
     const { post } = route.params || {};
 
-    // Automatically select the current date when navigating to the calendar
+    // Automatically select the current date when navigating to the calendar (in EST)
     useEffect(() => {
-        setSelectedDate(today); 
+        // Get today's date in EST and format it (YYYY-MM-DD)
+        const localDate = moment.tz('America/New_York').format('YYYY-MM-DD'); 
+        setSelectedDate(localDate);
     }, []);
-    
-    // Mark current date with a grey circle
-    const markCurrentDate = () => {
-        setMarkedDates({ 
-            [today]: { 
-                selected: true, 
-                selectedColor: '#A9A9A9', 
-                selectedTextColor: '#FFFFFF' 
-            } 
-        });
-    };
 
     // Fetch the events in the calendar
     useEffect(() => {
@@ -53,6 +43,8 @@ const CalendarScreen = ({ route }) => {
                 });
                 const data = response.data.slice(0,-1);
                 setCalendarData(data);
+
+                //markUpcomingEvents();
             } catch (error) {
                 console.error('Error to fetch calendar events', error);
             }
@@ -95,13 +87,11 @@ const CalendarScreen = ({ route }) => {
         }
     };
     
-
     // Combine the events in the calendar and attend events
     const combinedEvents = [
         ...attendEvents.filter((event) => !calendarData.some((e) => e.id === event.id)),
         ...calendarData,
     ];
-    console.log(combinedEvents);
 
     const saveAttendListToStorage = async (updatedAttendList) => {
         try {
@@ -126,6 +116,9 @@ const CalendarScreen = ({ route }) => {
     }, []);
 
 
+    useEffect(() => {
+        markUpcomingEvents();
+    }, [selectedDate, attendEvents, calendarData]);
 
     // Mark events with yellow dots and handle selection
     const markUpcomingEvents = () => {
@@ -136,11 +129,12 @@ const CalendarScreen = ({ route }) => {
             console.log("Event datetime_start:", event.datetime_start);
             // Check if datetime_start is a valid string
             if (event.datetime_start && typeof event.datetime_start === 'string') {
-                const eventDate = event.datetime_start.split('T')[0]; // Get the date (YYYY-MM-DD)
+                //const eventDate = event.datetime_start.split('T')[0]; // Get the date (YYYY-MM-DD)
+                const eventDate = moment.tz(event.datetime_start, 'America/New_York').format('YYYY-MM-DD');
                 updatedMarkedDates[eventDate] = { marked: true, dotColor: '#FF8D00' };
             }
         });
-
+        
         // If a date is selected, mark it with a yellow circle and remove any previous yellow circle
         if (selectedDate) {
             // Remove previous yellow circle from any other date
@@ -157,6 +151,13 @@ const CalendarScreen = ({ route }) => {
                 selectedTextColor: '#FFFFFF',
             };
         }
+         // Ensure today's date remains marked with a grey circle (even if the selected date is today)
+        const localDate = moment.tz('America/New_York').format('YYYY-MM-DD');
+        updatedMarkedDates[localDate] = {
+            selected: true,
+            selectedColor: '#A9A9A9',
+            selectedTextColor: '#FFFFFF',
+        };
 
         // Set the updated marked dates
         setMarkedDates(updatedMarkedDates);
@@ -171,8 +172,14 @@ const CalendarScreen = ({ route }) => {
 
     // Filter out events that are today or in the future
     useEffect(() => {        
-        const uniqueEvents = Array.from(new Set(combinedEvents.map(event => event.id)))
-            .map(id => combinedEvents.find(event => event.id === id));
+        // Remove duplicates using reduce() based on event id
+        const uniqueEvents = combinedEvents.reduce((acc, event) => {
+            if (!acc.some(e => e.id === event.id)) {
+                acc.push(event);
+            }
+            return acc;
+        }, []);
+        
         // Filter out events that are today or in the future
         const filteredUpcomingEvents = uniqueEvents.filter(event => {
             const eventDate = event.datetime_start ? event.datetime_start.split('T')[0] : ''; // Get the event date
@@ -193,14 +200,8 @@ const CalendarScreen = ({ route }) => {
         const eventDate = event.datetime_start?.split('T')[0];
         return eventDate === selectedDate;
     });
-
-    useEffect(() => {
-        // Mark the current date and upcoming events whenever the selected date or attendEvents change
-        markCurrentDate();
-        markUpcomingEvents();
-    }, [selectedDate, attendEvents]);
     
-    let date = moment(new Date()).format('MM/DD/YYYY');
+    let date = moment.tz('America/New_York').format('MM/DD/YYYY');
 
     return (
         <ImageBackground source={require("../../assets/main-background.png")} style={styles.backgroundImage}>
@@ -222,7 +223,8 @@ const CalendarScreen = ({ route }) => {
                         calendarBackground: 'transparent',
                         textSectionTitleColor: '#FFFFFF',
                         dayTextColor: '#FFFFFF',
-                        todayTextColor: '#FFE600',
+                       // todayTextColor: '#FFE600',
+                        todayTextColor: '#FFFFFF',
                         selectedDayBackgroundColor: '#FF8D00',
                         selectedDayTextColor: '#FFFFFF',
                         arrowColor: '#FFFFFF',
@@ -260,9 +262,10 @@ const CalendarScreen = ({ route }) => {
                                                 
                                             <View style={styles.dateTimeContainer}>
                                                 <Text style={styles.eventDate}>
-                                                    {new Date(item.datetime_start).toLocaleString('en-GB', { timeZone: 'UTC' }).split(', ').map((line, index) => (
-                                                        <Text key={index}>{line}{index === 0 ? '\n' : null}</Text> // Add a line break after the first part
-                                                    ))}
+                                                    {moment(item.datetime_start).tz('America/New_York').format('MM/DD/YYYY')}
+                                                </Text>
+                                                <Text style={styles.eventTime}>
+                                                    {moment(item.datetime_start).tz('America/New_York').format('h:mmA z')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -296,9 +299,10 @@ const CalendarScreen = ({ route }) => {
                                                 
                                             <View style={styles.dateTimeContainer}>
                                                 <Text style={styles.eventDate}>
-                                                    {new Date(item.datetime_start).toLocaleString('en-GB', { timeZone: 'UTC' }).split(', ').map((line, index) => (
-                                                        <Text key={index}>{line}{index === 0 ? '\n' : null}</Text> // Add a line break after the first part
-                                                    ))}
+                                                    {moment(item.datetime_start).tz('America/New_York').format('MM/DD/YYYY')}
+                                                </Text>
+                                                <Text style={styles.eventTime}>
+                                                    {moment(item.datetime_start).tz('America/New_York').format('h:mmA z')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -377,6 +381,7 @@ const styles = StyleSheet.create({
         fontSize: 14,
         //color: '#F5F4F4',
         color: 'black',
+        paddingBottom: 3,
     },
     noEvents: {
         fontSize: 17,
