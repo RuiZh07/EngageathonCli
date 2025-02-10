@@ -10,7 +10,6 @@ import {
     Switch,
     Image,
     TextInput,
-    Button,
     Modal,
     Alert,
     Platform
@@ -27,7 +26,7 @@ import * as ImagePicker from 'react-native-image-picker';
 import ImageResizer from 'react-native-image-resizer';
 import RNFS from 'react-native-fs';
 import { SvgUri } from "react-native-svg";
-import { calendarEvent, cameraCancel, addCameraIcon, backArrow } from "../../utils/icons";
+import { calendarEvent, addCameraIcon, backArrow } from "../../utils/icons";
 import CameraModal from "../../components/common/CameraModal";
 import baseUrl from "../../utils/api";
 import apiClient from "../../services/apiClient";
@@ -45,7 +44,7 @@ const CreateEventScreen = () => {
     const [showPicker, setShowPicker] = useState(false);
     const [location, setLocation] = useState("");
     const [eventDes, setEventDes] = useState("");
-    //const [reoccurringEvent, setReoccurringEvent] = useState(false);
+    const [recurringEvent, setRecurringEvent] = useState(false);
     const [leaderboards, setLeaderboards] = useState(false);
     const [photoList, setPhotoList] = useState([]);
     const [base64Image, setBase64Image] = useState(null);
@@ -113,8 +112,6 @@ const CreateEventScreen = () => {
         setSaveEvent(() => handleSaveEvent);
     }, [categoryId, activities]);
 
-    
-
     useEffect(() => {
         const getToken = async () => {
             const storedToken = await AsyncStorage.getItem("AccessToken");
@@ -131,7 +128,7 @@ const CreateEventScreen = () => {
         setEndDate("");
         setLocation("");
         setEventDes("");
-        //setReoccurringEvent(false);
+        setRecurringEvent(false);
         setLeaderboards(false);
         setPhotoList([]);
         setBase64Image(null); 
@@ -177,7 +174,7 @@ const CreateEventScreen = () => {
                 categories: categoryId,
                 location: location,
                 description: eventDes,
-                //recurring_event: reoccurringEvent,
+                recurring_event: recurringEvent, 
                 leaderboards: leaderboards,
                 datetime_start: isoStartDate,
                 datetime_end: isoEndDate,
@@ -228,19 +225,16 @@ const CreateEventScreen = () => {
         setShowPicker(false);
     };
     
-    {/*
     // Recurring event switch
-    const toggleReoccurringEvent = () => {
-        setReoccurringEvent(previousState => !previousState);
+    const toggleRecurringEvent = () => {
+        setRecurringEvent(previousState => !previousState);
     };
-    */}
 
     // Leaderboard switch
     const toggleLeaderboards = () => {
         setLeaderboards(previousState => !previousState);
     };
     
-
     // Pick photos from photo library
     const pickImage = async () => {
         try {
@@ -403,18 +397,17 @@ const CreateEventScreen = () => {
                         </View>
                     
                         <View style={styles.toggleSwitchContainer}>
-                            {/*
                             <View style={styles.switcher}>
                                 <Switch 
                                     trackColor={{ false: "#4d4d4d", true: "#FFA500" }}
-                                    thumbColor={reoccurringEvent ? '#ffffff' : "#ffffff"}
-                                    onValueChange={toggleReoccurringEvent}
-                                    value={reoccurringEvent}
+                                    thumbColor={recurringEvent ? '#ffffff' : "#ffffff"}
+                                    onValueChange={toggleRecurringEvent}
+                                    value={recurringEvent}
                                     style={{ transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
                                 />
                             </View>
-                            <Text style={styles.recurringEventText}>Reoccurring Event</Text>
-                            */} 
+                            <Text style={styles.recurringEventText}>Recurring Event</Text>
+                            
                             <View style={styles.switcher}>
                                 <Switch 
                                     trackColor={{ false: "#4d4d4d", true: "#FFA500" }}
@@ -441,6 +434,8 @@ const CreateEventScreen = () => {
                             onChangeText={setEventDes}
                             placeholder="Event description"
                             placeholderTextColor="black"
+                            multiline={true}
+                            scrollEnabled={true}
                         />
 
                         <View style={styles.cameraContainer}>
@@ -602,11 +597,13 @@ const styles = StyleSheet.create({
         backgroundColor: "#efefef",
         borderRadius: 20,
         paddingTop: 15,
-        paddingBottom: 70,
+        height: 120,
+        paddingHorizontal: 20,
         marginLeft: 20,
         marginRight: 20,
         marginTop: 12,
         textAlign: 'center',
+        textAlignVertical: 'top',
     },
     timeInput: {
         backgroundColor: "#efefef",
