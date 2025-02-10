@@ -269,7 +269,7 @@ const DiscoverScreen = () => {
                                             date={moment(event.datetime_start)
                                                 .tz('America/New_York')
                                                 .format('MM/DD/YYYY h:mmA z')}
-                                            coverImageUrl={{ uri: event.image_urls[0].image_url }}
+                                            coverImageUrl={{ uri: event.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                                             onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event })}
                                             post={event}
                                         />
