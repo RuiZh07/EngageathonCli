@@ -88,6 +88,17 @@ const UpcomingEventScreen = ({ navigation }) => {
         moment(a, 'MMMM').isBefore(moment(b, 'MMMM')) ? -1 : 1
     );
 
+    const sortedFutureEvents = sortedFutureMonths.map(month => {
+        const eventsInMonth = eventGroups.futureEvents[month];
+
+        // Sort the events by datetime_start within the month
+        const sortedEventsInMonth = eventsInMonth.sort((a, b) => {
+            return moment(a.datetime_start).isBefore(moment(b.datetime_start)) ? -1 : 1;
+        });
+
+        return { month, events: sortedEventsInMonth };
+    });
+
     eventGroups.pastEvents.sort((a, b) => moment(b.datetime_start).isBefore(moment(a.datetime_start)) ? -1 : 1);
 
     return (
