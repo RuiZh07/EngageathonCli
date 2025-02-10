@@ -47,9 +47,6 @@ const signup = async (userData) => {
         ...userData,
     };
 
-    console.log('data', data);
-    console.log("profile_photo", userData.profile_photo);
-
     try {
         const isFormUrlEncoded = accountType === 'IN';
         const payload = isFormUrlEncoded
@@ -66,8 +63,7 @@ const signup = async (userData) => {
         const response = await axios.post(`${baseUrl}${endpoints.register}`, payload, {
             headers,
         });
-        
-        console.log("response data:", response.data);
+
         return response.data;
     } catch (error) {
         if (error.response?.status === 400 && error.response?.data?.email) {
@@ -138,6 +134,10 @@ const logout = async () => {
 const updateUserMission = async (token) => {
     try {
         const causesString = await AsyncStorage.getItem('selectedCauses');
+        const causeStringStorage = JSON.parse(causesString);
+        console.log('getCause', causeStringStorage);
+        console.log('cause', causesString);
+        
         if (!causesString) {
             console.log('No selected causes found.');
             return;
@@ -148,6 +148,7 @@ const updateUserMission = async (token) => {
         const data = {
             "categories": selectedCauseIds,
         }
+        console.log('Data being sent to the server:', data);
         const response = await axios.put(`${baseUrl}/missions/categories/user/`, data, {
             headers: {
                 'Authorization': `Bearer ${token}`,
