@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Text,
@@ -11,27 +11,16 @@ import {
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { backArrow, qrCodeIcon } from '../../utils/icons';
 import baseUrl from '../../utils/api';
 import axios from 'axios';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
-import { SvgUri } from "react-native-svg";
-import apiClient from '../../services/apiClient';
 
 const TagCause = () => {
     const [causeTypes, setCauseTypes] = useState({});
     const [selectedCauseIds, setSelectedCauseIds] = useState([]);
     const [pressedStates, setPressedStates] = useState({});
     const navigation = useNavigation();
-    const route = useRoute();
-    const { userData } = route.params;
-    {/*
-    useEffect(() => {
-        if (userData) {
-          console.log("User Data in tagCause:", userData);
-        }
-      }, [userData]);
-*/}
+
     // effect to fetch data from the API 
     useEffect(() => {
         // Fetch cause types and initialize pressedStates based on categoryIdPost
@@ -98,6 +87,7 @@ const TagCause = () => {
     // Save the causes locally
     const saveSelectedCauses = async (selectedCauseIds) => {
         try {
+            console.log('selectedCauseIdss', selectedCauseIds);
             const causesString  = JSON.stringify(selectedCauseIds);
             await AsyncStorage.setItem('selectedCauses', causesString);
             console.log('Selected causes saved locally');
@@ -105,7 +95,8 @@ const TagCause = () => {
             console.error('Error saving selected causes', error);
         }
     };
-    
+    saveSelectedCauses(selectedCauseIds);
+
     // Function to handle button functionality.
     const handlePressShareBtn = async () => {
         try {
