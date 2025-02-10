@@ -1,3 +1,4 @@
+// Add Pin Later
 import React, { useState } from "react";
 import {
     View,
@@ -71,10 +72,11 @@ const PinReport = ({ isModalVisible, setModalVisible }) => {
                     <View style={styles.modalOverlay}>
                         <TouchableWithoutFeedback>
                         <View style={styles.mainModalContent}>
+                            {/*
                             <TouchableOpacity>
                                 <Text style={styles.pinText}>Pin Event</Text>
                             </TouchableOpacity>
-                            <View style={styles.separator} />
+                            <View style={styles.separator} /> */}
                             <TouchableOpacity onPress={handleOpenReportForm}>
                                 <Text style={styles.pinText}>Report Event</Text>
                             </TouchableOpacity>
