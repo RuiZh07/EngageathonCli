@@ -14,9 +14,9 @@ import DiscoverSearchHeader from "../../components/discover/DiscoverSearchHeader
 import DiscoverPeople from "../../components/discover/DiscoverPeople";
 import SearchResultPerson from '../../components/discover/SearchResultPerson';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { parseISO } from 'date-fns';
 import baseUrl from "../../utils/api";
 import apiClient from "../../services/apiClient";
+import moment from 'moment-timezone';
 
 const DiscoverScreen = () => {
     const [isSearching, setSearch] = useState(false);
@@ -29,10 +29,12 @@ const DiscoverScreen = () => {
     const [searchInput, setSearchInput] = useState('');
     const navigation = useNavigation(); 
 
+    // Handle tab change events or people
     const handleTabChange = (tab) => {
         setCurrentTab(tab);
     };
 
+    // Fetch recommended events data
     useEffect(() => {
         const fetchRecommendedEvent = async () => {
             try {
@@ -58,6 +60,7 @@ const DiscoverScreen = () => {
         fetchRecommendedEvent();
     }, []);
 
+    // Fetch recommended users data
     useEffect(() => {
         const fetchRecommendedUser = async () => {
             try {
@@ -83,6 +86,7 @@ const DiscoverScreen = () => {
           fetchRecommendedUser();
     }, []);
 
+    // Fetch search results for events based on the search input
     useEffect(() => {
         const fetchSearchEvent = async () => {
             try {
@@ -107,8 +111,9 @@ const DiscoverScreen = () => {
             }
         };
           fetchSearchEvent();
-    }, [searchInput]);
+    }, [searchInput]); // This hook runs whenever `searchInput` changes
         
+    // Fetch search results for profiles based on the search input
     useEffect(() => {
         const fetchSearchProfile = async () => {
             try {
@@ -134,38 +139,11 @@ const DiscoverScreen = () => {
         };
         fetchSearchProfile();
     }, [searchInput]);
-    {/*
-    const formatEventDate = (dateString) => {
-        try {
-            if (!dateString) {
-                throw new Error('Date string is undefined or null');
-            }
-            const date = parseISO(dateString);
-        
-            if (isNaN(date.getTime())) {
-                throw new Error('Invalid date value');
-            }
-        
-            const options = {
-                timeZone: 'America/New_York', 
-                weekday: 'short', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: 'numeric', 
-                minute: 'numeric', 
-                hour12: true, 
-                timeZoneName: 'short' 
-            };
-            const formattedDate = date.toLocaleString('en-US', options);
-            return formattedDate;
-        } catch (error) {
-            console.error('Error formatting date:', error.message);
-            return 'Invalid date';
-        }
-    };
-*/}
+
+    // Handle search toggle: switches between searching or not
     const handleSearchToggle = () => {
         if (isSearching) {
+            // If already searching, clear the search input
             setSearchInput('');
         }
         setSearch(!isSearching);
@@ -175,17 +153,21 @@ const DiscoverScreen = () => {
         setSearchInput(input);
     };
     
+    // Filter events based on the search input
     const filteredEvent = searchEvent.filter((event) => {
         const eventNameMatch = event.name && event.name.toLowerCase().includes(searchInput.toLowerCase());
         return eventNameMatch;
         }
     );
+
+    // Filter profiles based on the search input
     const filteredUser = searchProfile.filter((profile) => {
         const usernameMatch = profile.username && profile.username.toLowerCase().includes(searchInput.toLowerCase());
         return usernameMatch;
         }
     );
 
+    // Combine filtered events and users into a single array
     const combinedFilteredData = [
         ...filteredUser.map(user => ({ type: 'user', data: user })),
         ...filteredEvent.map(event => ({ type: 'event', data: event }))
@@ -225,7 +207,6 @@ const DiscoverScreen = () => {
                                         }
             
                                         if (item.type === 'event') {
-                                            //const formattedDate = formatEventDate(data.datetime_start);
                                             return (
                                                 <DiscoverPost 
                                                     key={data.id}
@@ -240,7 +221,9 @@ const DiscoverScreen = () => {
                                                     title={data.event_type}
                                                     description={data.description}
                                                     location={data.location}
-                                                    //date={formattedDate}
+                                                    date={moment(data.datetime_start)
+                                                        .tz('America/New_York')
+                                                        .format('MM/DD/YYYY h:mmA z')}
                                                     coverImageUrl={{ uri: data.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                                                     isFullView={false}
                                                     onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event: data })}
@@ -269,7 +252,6 @@ const DiscoverScreen = () => {
                         ) : currentTab === 'events' ? ( 
                             recommendedEvent && recommendedEvent.length > 0 ? 
                                 (recommendedEvent.map((event, index) => {
-                                    //const formattedDate = formatEventDate(event.datetime_start);
                                     return (  
                                         <DiscoverPost 
                                             key={event.id}
@@ -284,7 +266,9 @@ const DiscoverScreen = () => {
                                             title={event.event_type}
                                             description={event.description}
                                             location={event.location}
-                                            //date={formattedDate}
+                                            date={moment(event.datetime_start)
+                                                .tz('America/New_York')
+                                                .format('MM/DD/YYYY h:mmA z')}
                                             coverImageUrl={{ uri: event.image_urls[0].image_url }}
                                             onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event })}
                                             post={event}
