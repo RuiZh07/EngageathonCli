@@ -5,7 +5,8 @@ import { ImageBackground,
     Text,
     TouchableOpacity,
     TextInput,
-    Alert
+    Alert,
+    ScrollView
 } from 'react-native';
 import Svg, { Path } from "react-native-svg";
 import MainButton from "../../components/common/MainButton";
@@ -20,10 +21,13 @@ const CreateActivityScreen = () => {
     const { activities, setActivities } = useContext(CategoryContext);
     const navigation = useNavigation();
 
+    // Toggles the view to 'createNewActivity' to allow the user to add a new activity
     const handleCreateNew = () => {
         setViewState('createNewActivity');
     };
 
+    // Handles to cancel action
+    // if there are activities, it switches to 'activityList', otherwise to 'noActivity'
     const handleCancel = () => {
         if (activities.length > 0) {
             setViewState('activityList');
@@ -40,6 +44,7 @@ const CreateActivityScreen = () => {
         }
     }, [activities]);
 
+    // Validate the user inputs for activity name and points
     const validateInputs = () => {
         if (!activityName) return { valid: false, error: "Activity name is required" };
         if (!activityPoints) return { valid: false, error: "Point value is required" };
@@ -63,6 +68,8 @@ const CreateActivityScreen = () => {
         };
     };
 
+    // Handles the 'Next' button press
+    // Handles various states based on the current view
     const handleNextPress = () => {
         if (viewState === 'noActivity') {
             setViewState('createNewActivity')
@@ -118,6 +125,7 @@ const CreateActivityScreen = () => {
                                 placeholderTextColor="#575757"
                                 value={activityName}
                                 onChangeText={setActivityName}
+                                multiline={true}
                             />
                             <TextInput
                                 style={styles.enterPointValue}
@@ -136,6 +144,7 @@ const CreateActivityScreen = () => {
                         </View>
                     ) : (
                         <View style={styles.activityList}>
+                            <ScrollView style={styles.activityListScroll}>
                             {activities.map((activity, index) => (
                                 <View key={index} style={styles.singleActivity}>
                                     <View style={styles.activityNameStyle}>
@@ -150,6 +159,7 @@ const CreateActivityScreen = () => {
                                     </View>
                                 </View>
                             ))}
+                            </ScrollView>
                             <TouchableOpacity style={styles.createNewButton} onPress={handleCreateNew}>
                                 <Text style={styles.createNewText}>Create New</Text>
                             </TouchableOpacity>
@@ -260,6 +270,9 @@ const styles = StyleSheet.create({
         fontFamily: "poppins-semibold",
         color: 'white',
     },
+    activityListScroll: {
+        maxHeight: 400,
+    },
     singleActivity: {
         paddingVertical: 6,
         borderRadius: 16,
@@ -270,24 +283,29 @@ const styles = StyleSheet.create({
         paddingLeft: 14,
         marginBottom: 12,
         flexDirection: 'row',
-        justifyContent: "space-between"
+        justifyContent: "flex-start",
+        alignItems: 'center',
     },
     activityName: {
         color: 'grey',
-        fontSize: 20,
+        fontSize: 18,
         fontFamily: "poppins-semibold",
+        flexWrap: 'wrap',
+        alignSelf: 'left',
     },
     pointsEarned: {
         flexDirection: "row",
+        marginLeft: 'auto',
     },
     points: {
-        fontSize: 26,
+        fontSize: 24,
         fontFamily: "poppins-semibold",
-        marginRight: 10,
+        marginRight: 6,
         color: 'orange',
+        flexWrap: 'wrap',
     },
     pointsTextContainer: {
-        marginRight: 15,
+        marginRight: 12,
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -298,8 +316,7 @@ const styles = StyleSheet.create({
         fontSize: 10,
     },
     activityNameStyle: {
-        alignItems: 'center',
-        justifyContent: 'center',
+        width: '60%',
     },
     mainButton: {
         width: "80%",
