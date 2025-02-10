@@ -10,10 +10,7 @@ import {
     Text,
     StyleSheet,
     Image,
-    ScrollView,
     TouchableOpacity,
-    StatusBar,
-    ImageBase,
 } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import CommentsModal from "../modals/CommentsModal";
@@ -24,7 +21,6 @@ import baseUrl from "../../utils/api";
 
 const DiscoverPost = ({
     profilePicture,
-    userID,
     name,
     title,
     description,
@@ -35,18 +31,15 @@ const DiscoverPost = ({
     coverImageUrl,
     eventName,
 }) => {
-    const [likeCounts, setLikeCounts] = useState(post.likes_count || 0);
-    const [bookmarked, setBookmarked] = useState(false);
     const [commentsVisible, setCommentsVisible] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState(null);
-    const [fontLoaded, setFontLoaded] = useState(false);
-    const [token, setToken] = useState(null);
     const navigation = useNavigation();
     const [isShareModalVisible, setShareModalVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
 
-    const handleAttend = () => {
-        navigation.navigate("CalendarScreen");
+     // Pass the post details and event's date
+     const handleAttend = (post) => {
+        navigation.navigate("CalendarScreen", { post });
     };
     
     const handleSharePress = useCallback(async (postId) => {
@@ -190,18 +183,16 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     dateText: {
-        fontFamily: "inter",
+        fontFamily: "Inter-Semibold",
         fontSize: 13,
-        fontWeight: "500",
     },
     descriptionText: {
         fontFamily: "inter",
         paddingTop: 5,
     },
-    locationText: 
-    {
-        fontFamily: "inter",
-        paddingTop: 5,
+    locationText: {
+        fontFamily: "Inter",
+        paddingTop: 10,
     },
     eventNameContainer: {
         paddingBottom: 2,
@@ -241,7 +232,7 @@ const styles = StyleSheet.create({
     postImageContainer: {
         flex: 1,
         position: 'relative',
-        marginBottom: 20,
+        marginBottom: 12,
     },
     postImage: {
         //width: "100%",
