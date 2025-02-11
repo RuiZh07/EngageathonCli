@@ -94,7 +94,6 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         paddingVertical: 16,
         marginLeft: 15,
-        marginRight: -5,
         alignItems: 'center',
     },
     postHeader: {
