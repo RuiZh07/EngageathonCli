@@ -2,9 +2,12 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 
-const MainButton = ({ onPress, title, style }) => {
+const MainButton = ({ onPress, title, style, isDisabled=false }) => {
     return (
-        <TouchableOpacity onPress={onPress} style={[styles.buttonContainer, style]}>
+        <TouchableOpacity 
+            onPress={isDisabled ? null : onPress}  // Prevent clicking if disabled
+            style={[styles.buttonContainer, style, isDisabled && styles.disabledButton]}
+        >
             <LinearGradient
                 colors={["#FF8D00", "#FFBA00", "#FFE600"]}
                 locations={[0.72, 0.86, 1]}  
@@ -12,7 +15,9 @@ const MainButton = ({ onPress, title, style }) => {
                 end={{ x: 1, y: 0 }}
                 style={styles.button}
             >
-                <Text style={styles.buttonText}>{title}</Text>
+                <Text style={styles.buttonText}>
+                    {isDisabled ? 'Already Attending' : title}
+                </Text>
             </LinearGradient>
         </TouchableOpacity>
     );
@@ -38,6 +43,12 @@ const styles = StyleSheet.create({
         lineHeight: 22,
         letterSpacing: 0.4,
         color: "#F5F4F4",
+    },
+    disabledButton: {
+        opacity: 0.8,
+    },
+    disabledText: {
+        color: "#2BAB47",
     },
 });
   
