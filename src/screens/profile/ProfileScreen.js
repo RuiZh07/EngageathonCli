@@ -110,8 +110,7 @@ export default function ProfileScreen ({ userData }) {
             setUserContent([]);
         }
     };
-    console.log('profile', profileImage);
-    //console.log("eventList", eventList);
+
     const fetchFollowers = async (token) => {
         try {
             const response = await apiClient.get(`${baseUrl}/followers-user/`, {
@@ -155,15 +154,10 @@ export default function ProfileScreen ({ userData }) {
         }
     };
     
-    const handleCalendar = () => {
-        navigation.navigate("CalendarScreen");
-    };
-    
     const handleMyEvents = () => {
         navigation.navigate("UpcomingEventScreen");
     };
     
-
     const navigateToFollowersFollowing = (type) => {
         navigation.navigate("FollowersFollowingScreen", {
             type,
@@ -171,8 +165,6 @@ export default function ProfileScreen ({ userData }) {
         });
     };
     
-    //handelImagePick function
-
     const handleImageClick = (postDetails) => {
         navigation.navigate('PostDetailScreen', { postDetails });
     };
@@ -182,19 +174,14 @@ export default function ProfileScreen ({ userData }) {
             source={require("../../assets/main-background.png")}
             style={styles.backgroundImage}
         >
-            <ScrollView
-                style={styles.scrollView}
-                contentContainerStyle={styles.scrollContentContainer}
-                showsVerticalScrollIndicator={false}
-            >
-                <View style={styles.header}>
-                    <TouchableOpacity style={styles.hamburgerIcon} onPress={toggleSidebar}>
-                        <SvgUri uri={hamburgerIcon} height={26} /> 
-                    </TouchableOpacity>
-                    <Text style={styles.headerText}>Profile</Text>
-                </View>
-        
-                {isSidebarVisible && (
+            <View style={styles.header}>
+                <TouchableOpacity style={styles.hamburgerIcon} onPress={toggleSidebar}>
+                    <SvgUri uri={hamburgerIcon} height={26} /> 
+                </TouchableOpacity>
+                <Text style={styles.headerText}>Profile</Text>
+            </View>
+    
+            {isSidebarVisible && (
                 <>
                     <TouchableOpacity style={styles.overlay} onPress={toggleSidebar} />
                     <Animated.View style={[styles.sidebarContainer, { transform: [{ translateX: sidebarAnimation }] }]}>
@@ -202,6 +189,12 @@ export default function ProfileScreen ({ userData }) {
                     </Animated.View>
                 </>
             )}
+
+            <ScrollView
+                style={styles.scrollView}
+                contentContainerStyle={styles.scrollContentContainer}
+                showsVerticalScrollIndicator={false}
+            >
                 <View style={styles.circle}>
                     <Image
                         source={profileImage ? { uri: profileImage } : require("../../assets/default_profile.png")}
@@ -308,6 +301,7 @@ const styles = StyleSheet.create({
         width: "100%",
         paddingHorizontal: "5%",
         marginTop: "14%",
+        marginBottom: '2%',
         position: "relative",
     },
     hamburgerIcon: {
