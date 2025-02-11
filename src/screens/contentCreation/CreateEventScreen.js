@@ -89,8 +89,8 @@ const CreateEventScreen = () => {
         if (!eventDes) return {
             valid: false, error: "Description is required"
         };
-        if (!photoList) return { 
-            valid: false, error: "Image is required"
+        if (photoList.length === 0) return { 
+            valid: false, error: "Cover image is required"
         };
         if (endDate < startDate) { 
             return { valid: false, error: "End date cannot be before start date"};
@@ -284,6 +284,7 @@ const CreateEventScreen = () => {
         }
     };
 
+    console.log('photo', photoList);
     // Create a dict from photoList
     // Create a dict prioritizing multiPhotoList if not empty
     const photoDict = (multiPhotoList && multiPhotoList.length > 0 ? multiPhotoList : photoList).reduce(
