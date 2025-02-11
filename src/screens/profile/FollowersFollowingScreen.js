@@ -57,9 +57,10 @@ const FollowersFollowingScreen = () => {
         fetchFollowersFollowing();
     };
 
+    // This function renders each item in the list
     const renderItem = ({ item }) => (
         <View style={styles.item}>
-            <Image source={{ uri: item.profilePhoto || "https://via.placeholder.com/50" }} style={styles.profileImage} />
+            <Image source={{ uri: item.profilePhoto || "../../assets/default_white_profile.png" }} style={styles.profileImage} />
             <View style={styles.textContainer}>
                 <Text style={styles.username}>
                     {item.following_first} {item.following_last}
@@ -112,14 +113,21 @@ const FollowersFollowingScreen = () => {
                         </TouchableOpacity>
                     </View>
 
-                    <FlatList
-                        data={data}
-                        keyExtractor={(item) => item.follower_id.toString()}
-                        renderItem={renderItem}
-                        refreshControl={
-                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-                        }
-                    />
+                    {data.length === 0 ? (
+                        <Text style={styles.noDataMessage}>
+                            {activeTab === 'followers' ? "You don't have any followers yet." : "You haven't followed anyone yet."}
+                        </Text>
+                    ) : (
+                        <FlatList
+                            data={data}
+                            keyExtractor={(item) => item.follower_id.toString()}
+                            renderItem={renderItem}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+                            }
+                        />
+                    )}
+                    
                 </>
             )}
         </ImageBackground>
@@ -214,6 +222,13 @@ const styles = StyleSheet.create({
         color: "#FFF",
         fontSize: 14,
     },
+    noDataMessage: {
+        marginTop: 10,
+        textAlign: 'center',
+        fontSize: 16,
+        color: '#FFFFFF',
+        fontFamily: "poppins-regular",
+    }
 });
 
 export default FollowersFollowingScreen;
