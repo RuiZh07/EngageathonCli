@@ -7,14 +7,13 @@ import {
     Image,
     ScrollView,
     TouchableOpacity,
-    StatusBar,
     TouchableWithoutFeedback,
     BackHandler,
     ImageBackground,
     Modal,
+    Alert,
 } from "react-native";
 import HomeHeader from "../../components/home/HomeHeader";
-import ScreenBackground from "../../assets/home-background.png";
 import Chip from "../../components/post/Chip";
 import Heart from "../../components/post/Heart";
 import Comment from "../../components/post/Comment";
@@ -42,9 +41,9 @@ const HomeScreen = () => {
     const [isShareModalVisible, setShareModalVisible] = useState(false);
     const [isPinReportVisible, setPinReportVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
+    const [isAttending, setIsAttending] = useState(false);
     const navigation = useNavigation();
 
-    console.log("posts",posts);
     useEffect(() => {
         const handleBackButtonPress = () => {
             if (showFilterDropdown) {
@@ -110,7 +109,13 @@ const HomeScreen = () => {
     
     // Pass the post details and event's date
     const handleAttend = (post) => {
-        navigation.navigate("CalendarScreen", { post });
+        if (isAttending) {
+            Alert.alert("You've already marked yourself as attending this event");
+        } else {
+            setIsAttending(true);
+            navigation.navigate("CalendarScreen", { post });
+        }
+        
     };
     
     const handleSharePress = useCallback(async (postId, postName) => {
@@ -258,7 +263,11 @@ const HomeScreen = () => {
                             </Text>
                         </View>
                         {post.event_type && (
-                            <MainButton title="Attend" onPress={() => handleAttend(post)} />
+                            <MainButton 
+                                title="Attend" 
+                                isDisabled={isAttending} 
+                                onPress={() => handleAttend(post)} 
+                            />
                         )}
                         </View>
                     </TouchableWithoutFeedback>
