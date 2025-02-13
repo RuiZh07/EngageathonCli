@@ -41,6 +41,10 @@ export default function ProfileScreen ({ userData }) {
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
     const sidebarAnimation = useRef(new Animated.Value(-300)).current;
     
+    console.log(eventList);
+    eventList.forEach((event) => {
+        console.log(`${event.id}-${event.name || event.caption}`)
+    })
     const toggleSidebar = () => {
         if (isSidebarVisible) {
             // Slide out to the left
@@ -260,7 +264,7 @@ export default function ProfileScreen ({ userData }) {
                     {eventList && eventList.length ? (
                         eventList.map((content) => (
                             <TouchableOpacity
-                                key={`${content.id}`}
+                                key={`${content.id}-${content.name || content.caption}`}
                                 style={styles.imageItem}
                                 onPress={() => handleImageClick(content)}
                             >
