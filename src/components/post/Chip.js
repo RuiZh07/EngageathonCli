@@ -24,25 +24,24 @@ export default Chip;
 
 const styles = StyleSheet.create({
     container: {
-        marginVertical: 10,
+       // marginVertical: 10,
     },
     gradient: {
         borderRadius: 50,
         overflow: "hidden",
     },
     content: {
-        padding: 6,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
-        gap: 10,
     },
     label: {
-        fontWeight: "600",
-        fontSize: 10,
-        lineHeight: 10,
-        color: "#F5F4F4",
+        fontFamily: 'inter-Medium',
+        fontSize: 12,
+        color: "#000000",
         textTransform: "capitalize",
         textAlign: "center",
+        paddingHorizontal: 10,
+        paddingVertical: 6,
     },
 });
