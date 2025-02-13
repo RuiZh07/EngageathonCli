@@ -36,13 +36,15 @@ const DiscoverPostDetailScreen = ({ route }) => {
                         </View>
                         </TouchableOpacity>
                         <View style={styles.profileHeader}>
-                            <Image
-                                source={event?.profile_photo_url 
-                                    ? { uri: event.profile_photo_url } 
-                                    : require("../../assets/default_profile.png")
-                                }
-                                style={styles.pfp}
-                            />
+                            <View style={styles.pfpContainer}>
+                                <Image
+                                    source={event?.profile_photo_url 
+                                        ? { uri: event.profile_photo_url } 
+                                        : require("../../assets/default_profile.png")
+                                    }
+                                    style={styles.pfp}
+                                />
+                            </View>
                             <View style={styles.userInfo}>
                                 <View>
                                     <Text style={styles.userNameText}>{event.username}</Text>
@@ -59,7 +61,7 @@ const DiscoverPostDetailScreen = ({ route }) => {
                             ))  
                         )}
                     </View>
-                    <Image style={styles.image} source={{ uri: event.image_urls[0].image_url }} />
+                    <Image style={styles.image} source={{ uri: event.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }} />
                     {/*
                     <View style={styles.postInteraction}>
                         <View style={styles.likeSection}>
@@ -162,11 +164,22 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         marginBottom: 20,
     },
+    pfpContainer: {
+        alignItems: "center",
+        borderColor: '#2BAB47',
+        borderWidth: 2,
+        borderRadius: 40,
+        paddingHorizontal: 2,
+        paddingVertical: 2,
+    },
     pfp: {
-        width: 32, 
-        height: 32, 
-        resizeMode: "cover",
-        borderRadius: 16,
+        width: 36, 
+        height: 36, 
+        resizeMode: "cover", 
+        borderRadius: 18,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#2BAB47',
     },
     userNameText: {
         fontFamily: "poppins-regular",
