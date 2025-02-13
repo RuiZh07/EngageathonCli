@@ -8,22 +8,15 @@ const apiClient = axios.create({
     baseURL: baseUrl,
 });
 
-const logout = async () => {
+const performLogout = async () => {
     try {
-        const token = await AsyncStorage.getItem("AccessToken");
-        const refreshToken = await AsyncStorage.getItem("RefreshToken")
-        if (token) {
-            await apiClient.post(`${baseUrl}${endpoints.logout}`, `refresh=${refreshToken}`, {
-                headers: { 
-                    "Authorization": `Bearer ${token}`,
-                    "Content-Type": "application/x-www-form-urlencoded", 
-                },
-            });
-            await AsyncStorage.removeItem("AccessToken"); 
-            await AsyncStorage.removeItem("RefreshToken");
-        }
+        await authService.logout();
+        navigation.reset({
+            index: 0,
+            routes: [{ name: 'Login' }],
+        });
     } catch (error) {
-        throw error;
+        console.error("Error logging out:", error);
     }
 };
 
@@ -49,11 +42,7 @@ const refreshAccessToken = async () => {
         if(error.response && error.response.status === 401) {
             try {
                 console.error("Refresh token is expired or invalid");
-                await logout();
-                navigation.reset({
-                    index: 0,
-                    routes: [{ name: 'Login' }],
-                });
+                await performLogout();
             } catch (error) {
                 console.log("logout failed: ", error.message);
             }
