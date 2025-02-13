@@ -6,19 +6,36 @@ import { backArrow } from '../../utils/icons';
 import baseUrl from "../../utils/api";
 import MainButton from '../../components/common/MainButton';
 import apiClient from '../../services/apiClient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function DeleteAccountScreen() {
     const navigation = useNavigation();
 
     const handleDeleteAccount = async () => {
         try {
-            const response = await apiClient.delete(`${baseUrl}/auth/delete/`);
-            if (response.status === 200) {
+            const token = await AsyncStorage.getItem("AccessToken");
+            
+            if(!token) {
+                console.error("no token found");
+                return;
+            }
+        
+            const response = await apiClient.delete(`${baseUrl}/auth/delete/`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,  
+                },
+            });
+
+            if (response.status >= 200 && response.status < 300) {
                 Alert.alert('Success', 'Your account has been deleted.', [
                     { text: 'OK', onPress: () => navigation.navigate('Login') },
                 ]);
+            } else {
+                console.error('Unexpected response status:', response.status);
+                Alert.alert('Error', 'Unexpected response from server. Please try again.');
             }
         } catch (error) {
+            console.error('Error deleting account:', error); 
             Alert.alert('Error', 'There was an issue deleting your account. Please try again.');
         }
     };
