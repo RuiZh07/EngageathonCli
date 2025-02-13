@@ -42,6 +42,8 @@ const HomeScreen = () => {
     const [isPinReportVisible, setPinReportVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
     const [isAttending, setIsAttending] = useState(false);
+    const [attendEvents, setAttendEvents] = useState([]);
+    const [attendingStates, setAttendingStates] = useState({});
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -84,7 +86,7 @@ const HomeScreen = () => {
             }
         
             const data = response.data.content;
-            console.log('data in home', data);
+            //console.log('data in home', data);
             if (!Array.isArray(data)) {
                 throw new Error("Data is not an array");
             }
@@ -100,24 +102,57 @@ const HomeScreen = () => {
     };
 
     useEffect(() => {
-        console.log("Posts updated:", posts);
+       // console.log("Posts updated:", posts);
     }, [posts]);
     
     const handleFilterPress = () => {
         setShowFilterDropdown(!showFilterDropdown);
     };
-    
-    // Pass the post details and event's date
-    const handleAttend = (post) => {
-        if (isAttending) {
-            Alert.alert("You've already marked yourself as attending this event");
-        } else {
-            setIsAttending(true);
-            navigation.navigate("CalendarScreen", { post });
+
+    useEffect(() => {
+        const loadAttendingStates = async () => {
+            try {
+                const states = {}; // Object to store the attending state for each post
+                for (const post of posts) {
+                    const storedStatus = await AsyncStorage.getItem(`attendingEvent_${post.id}`);
+                    states[post.id] = storedStatus === 'true'; // true or false based on the stored value
+                }
+                setAttendingStates(states); // Update the state with the loaded attending statuses
+            } catch (error) {
+                console.error('Error loading attending states:', error);
+            }
+        };
+
+        if (posts.length > 0) {
+            loadAttendingStates();
         }
-        
+    }, [posts]);
+
+    // Pass the post details and event's date
+    const handleAttend = async (post) => {
+        const postId = post.id;
+
+        // Check if the event is already marked as attending
+        const storedStatus = await AsyncStorage.getItem(`attendingEvent_${postId}`);
+        if (storedStatus === 'true') {
+            // Event already marked as attending
+            Alert.alert("You've already marked yourself as attending this event");
+            return;
+        }
+
+        // If not already attended, mark as attending
+        setAttendingStates(prev => ({ ...prev, [postId]: true }));
+
+        // Store the attending state in AsyncStorage
+        try {
+            await AsyncStorage.setItem(`attendingEvent_${postId}`, 'true');
+            navigation.navigate("CalendarScreen", { post });
+        } catch (error) {
+            console.error('Error saving attending state:', error);
+        }
     };
     
+
     const handleSharePress = useCallback(async (postId, postName) => {
         try {
             const token = await AsyncStorage.getItem('AccessToken');
@@ -127,7 +162,7 @@ const HomeScreen = () => {
                 return;
             }
             const link = `https://app.engageathon.com/event/${postName}`;
-            console.log('share', link);
+            //('share', link);
         
             setShareableLink(link);
             setShareModalVisible(true);
@@ -222,9 +257,11 @@ const HomeScreen = () => {
                             )}
                         {post.location && <Text style={styles.location}>{post.location}</Text>}
                         <View style={styles.postTags}>
-                        {post.event_type && (
-                            <Chip label={post.event_type} />
-                        )}
+                            {post.categories && (
+                                post.categories.map((category, index) => (
+                                    <Chip key={index} label={category.name} />
+                                ))  
+                            )}
                         </View>
                         <View style={styles.postImageContainer}>
                             <Image
@@ -234,7 +271,7 @@ const HomeScreen = () => {
                         </View>
                         <View style={styles.postInteraction}>
                             <View style={styles.likeSection}>
-                                <Heart postId={post.id} like={post.liked}/>
+                                <Heart postId={post.id} like={post.liked} />
                                 <Text style={styles.likeCountText}>
                                     {post.likes_count ?? 0}
                                 </Text>
@@ -264,9 +301,9 @@ const HomeScreen = () => {
                         </View>
                         {post.event_type && (
                             <MainButton 
-                                title="Attend" 
-                                isDisabled={isAttending} 
-                                onPress={() => handleAttend(post)} 
+                                title={attendingStates[post.id] ? "Attending" : "Attend"}
+                                isDisabled={attendingStates[post.id]}
+                                onPress={() => handleAttend(post)}
                             />
                         )}
                         </View>
@@ -313,8 +350,10 @@ const styles = StyleSheet.create({
     },
     location: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'inter-semibold',
         marginVertical: 5,
+        marginBottom: 10,
+        marginLeft: 5,
     },
     caption: {
         fontSize: 14,
@@ -364,14 +403,13 @@ const styles = StyleSheet.create({
     },
     postTags: {
         flexDirection: "row",
-        gap: 4,
-        marginVertical: 5,
-        marginHorizontal: 10,
+        gap: 6,
+        marginRight: 10,
+        flexWrap: 'wrap',
     },
     postImageContainer: {
         flex: 1,
-       // marginHorizontal: 5,
-        marginBottom: 10,
+        marginVertical: 10,
     },
     postImage: {
         width: "100%",
