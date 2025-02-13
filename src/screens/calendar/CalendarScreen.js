@@ -16,13 +16,12 @@ const CalendarScreen = ({ route }) => {
     const [markedDates, setMarkedDates] = useState({});
     const [upcomingEvents, setUpcomingEvents] = useState([]);
     const [calendarData, setCalendarData] = useState([]);
-    const today = moment.tz('America/New_York').format('YYYY-MM-DD'); // Current date in YYYY-MM-DD format
+    const today = moment().format('YYYY-MM-DD'); // Current date in YYYY-MM-DD format
     const { post } = route.params || {};
 
     // Automatically select the current date when navigating to the calendar (in EST)
     useEffect(() => {
-        // Get today's date in EST and format it (YYYY-MM-DD)
-        const localDate = moment.tz('America/New_York').format('YYYY-MM-DD'); 
+        const localDate = moment().format('YYYY-MM-DD');  // Use local timezone
         setSelectedDate(localDate);
     }, []);
 
@@ -130,7 +129,7 @@ const CalendarScreen = ({ route }) => {
             // Check if datetime_start is a valid string
             if (event.datetime_start && typeof event.datetime_start === 'string') {
                 //const eventDate = event.datetime_start.split('T')[0]; // Get the date (YYYY-MM-DD)
-                const eventDate = moment.tz(event.datetime_start, 'America/New_York').format('YYYY-MM-DD');
+                const eventDate = moment(event.datetime_start).local().format('YYYY-MM-DD');  // Use local timezone
                 updatedMarkedDates[eventDate] = { marked: true, dotColor: '#FF8D00' };
             }
         });
@@ -152,7 +151,7 @@ const CalendarScreen = ({ route }) => {
             };
         }
          // Ensure today's date remains marked with a grey circle (even if the selected date is today)
-        const localDate = moment.tz('America/New_York').format('YYYY-MM-DD');
+        const localDate = moment().format('YYYY-MM-DD');
         updatedMarkedDates[localDate] = {
             selected: true,
             selectedColor: '#A9A9A9',
@@ -182,12 +181,16 @@ const CalendarScreen = ({ route }) => {
         
         // Filter out events that are today or in the future
         const filteredUpcomingEvents = uniqueEvents.filter(event => {
-            const eventDate = event.datetime_start ? event.datetime_start.split('T')[0] : ''; // Get the event date
-            return new Date(eventDate) >= new Date(today); // Check if the event is today or in the future
+            const eventDate = event.datetime_start ? event.datetime_start.split('T')[0] : ''; 
+            const eventDateLocal = moment.utc(eventDate).local().startOf('day');  // Convert to local timezone
+            const todayLocal = moment().local().startOf('day'); 
+            return eventDateLocal.isSameOrAfter(todayLocal); 
         });
+        
         
         // Set the filtered upcoming events
         setUpcomingEvents(filteredUpcomingEvents);
+        console.log(filteredUpcomingEvents);
     }, [attendEvents, calendarData, selectedDate]);
     
     
@@ -197,11 +200,13 @@ const CalendarScreen = ({ route }) => {
     
     // Filter events based on selected date
     const filteredEvents = combinedEvents.filter(event => {
-        const eventDate = event.datetime_start?.split('T')[0];
-        return eventDate === selectedDate;
+        const eventDateLocal = moment.utc(event.datetime_start).local().format('YYYY-MM-DD');
+        const selectedDateLocal = moment(selectedDate).local().format('YYYY-MM-DD');
+        return eventDateLocal === selectedDateLocal;
     });
     
-    let date = moment.tz('America/New_York').format('MM/DD/YYYY');
+    
+    let date = moment().format('MM/DD/YYYY');
 
     return (
         <ImageBackground source={require("../../assets/main-background.png")} style={styles.backgroundImage}>
@@ -262,10 +267,10 @@ const CalendarScreen = ({ route }) => {
                                                 
                                             <View style={styles.dateTimeContainer}>
                                                 <Text style={styles.eventDate}>
-                                                    {moment(item.datetime_start).tz('America/New_York').format('MM/DD/YYYY')}
+                                                    {moment(item.datetime_start).local().format('MM/DD/YYYY')}
                                                 </Text>
                                                 <Text style={styles.eventTime}>
-                                                    {moment(item.datetime_start).tz('America/New_York').format('h:mmA z')}
+                                                    {moment(item.datetime_start).local().format('h:mmA z')}
                                                 </Text>
                                             </View>
                                         </View>
@@ -282,7 +287,7 @@ const CalendarScreen = ({ route }) => {
                     filteredEvents.length > 0 ? (
                         <FlatList
                             data={filteredEvents}
-                            keyExtractor={(item) => item.id.toString()}
+                            keyExtractor={(item) => item.id ? item.id.toString() : 'defaultKey'}
                             renderItem={({ item }) => (
                                 <TouchableOpacity onPress={() => handleEventPress(item)}>
                                     <View style={styles.eventItem}>
@@ -299,10 +304,10 @@ const CalendarScreen = ({ route }) => {
                                                 
                                             <View style={styles.dateTimeContainer}>
                                                 <Text style={styles.eventDate}>
-                                                    {moment(item.datetime_start).tz('America/New_York').format('MM/DD/YYYY')}
+                                                    {moment(item.datetime_start).local().format('MM/DD/YYYY')}
                                                 </Text>
                                                 <Text style={styles.eventTime}>
-                                                    {moment(item.datetime_start).tz('America/New_York').format('h:mmA z')}
+                                                    {moment(item.datetime_start).local().format('h:mmA z')}
                                                 </Text>
                                             </View>
                                         </View>
