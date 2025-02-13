@@ -12,6 +12,7 @@ const PostDetailScreen = ({ route }) => {
     const { postDetails } = route.params || {};
     const navigation = useNavigation();
 
+    console.log(postDetails)
     return (
         <ImageBackground
             source={require("../../assets/main-background.png")}
@@ -22,17 +23,16 @@ const PostDetailScreen = ({ route }) => {
                 contentContainerStyle={styles.scrollContentContainer}
                 showsVerticalScrollIndicator={false}
             >
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        style={styles.backButton}
-                        onPress={() => navigation.goBack()}
-                    >
-                        <SvgUri uri={backArrow} />
-                    </TouchableOpacity>
-                </View>
                 <View style={styles.container}>
                     <View style={styles.post}>
                         <View style={styles.postHeader}>
+                            <TouchableOpacity
+                                style={styles.backButton}
+                                onPress={() => navigation.goBack()}
+                            >
+                                <SvgUri uri={backArrow} />
+                            </TouchableOpacity>
+
                             {postDetails.caption ? (
                                 <View style={styles.postHeader}>
                                     <Image
@@ -68,12 +68,17 @@ const PostDetailScreen = ({ route }) => {
                             </View>
                             )}
                         </View>
+
                         {postDetails.location && <Text style={styles.location}>{postDetails.location}</Text>}
-                        {/*
+                        
                         <View style={styles.postTags}>
-                            <Chip label={postDetails.event_type} />
+                            {postDetails.categories && (
+                                postDetails.categories.map((category, index) => (
+                                    <Chip key={index} label={category.name} />
+                                ))  
+                            )}
                         </View>
-                        */}
+                        
                         <View style={styles.postImageContainer}>
                             {postDetails.image_urls.map((image, index) => (
                                 <Image
@@ -158,8 +163,9 @@ const styles = StyleSheet.create({
         paddingTop: 16,
     },
     post: {
+        marginTop: '14%',
         backgroundColor: "#fff",
-        borderRadius: 10,
+        borderRadius: 20,
         padding: 16,
         marginBottom: 16,
         shadowColor: "#000",
@@ -171,7 +177,6 @@ const styles = StyleSheet.create({
     postHeader: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 10,
     },
     profileImage: {
         width: 34,
@@ -199,10 +204,14 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
         marginVertical: 5,
+        marginTop: 10,
+        marginLeft: 8,
     },
     postTags: {
         flexDirection: "row",
-        gap: 4,
+        gap: 6,
+        marginRight: 10,
+        flexWrap: 'wrap',
     },
     postImageContainer: {
         marginVertical: 10,
