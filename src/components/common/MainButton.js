@@ -16,7 +16,7 @@ const MainButton = ({ onPress, title, style, isDisabled=false }) => {
                 style={styles.button}
             >
                 <Text style={styles.buttonText}>
-                    {isDisabled ? 'Already Attending' : title}
+                    {title}
                 </Text>
             </LinearGradient>
         </TouchableOpacity>
