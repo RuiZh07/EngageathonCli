@@ -47,8 +47,6 @@ const CreatePostScreen = () => {
     const [searchQuery, setSearchQuery] = useState(''); 
     const navigation = useNavigation();
 
-    const API_BASE_URL_POST_CREATE = `${baseUrl}/posts/`;
-
     const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
     const handlePhotoConfirmed = (photo) => {
         const { uri, base64 } = photo;
@@ -62,6 +60,9 @@ const CreatePostScreen = () => {
     };
     
     const validateInputs = () => {
+        if (!caption) return {
+            valid: false, error: "Caption is required"
+        }
         if (!base64Image) return { 
             valid: false, error: "Image is required"
         };
@@ -80,8 +81,6 @@ const CreatePostScreen = () => {
         };
         navigation.navigate('TagCausePost')
     };
-
-    console.log('base1', base64Image);
 
     useEffect(() => {
     }, [categoryIdPost]);
