@@ -9,6 +9,7 @@ import {
     ImageBackground,
 } from "react-native";
 import { SvgUri } from "react-native-svg";
+import Chip from "../../components/post/Chip";
 import { backArrow } from "../../utils/icons";
 import { useNavigation } from "@react-navigation/native";
 import DiscoverPostHeader from "../../components/discover/DiscoverPostHeader";
@@ -50,7 +51,14 @@ const DiscoverPostDetailScreen = ({ route }) => {
                             </View>
                         </View>
                     </View>
-
+                    
+                    <View style={styles.postTags}>
+                        {event.categories && (
+                            event.categories.map((category, index) => (
+                                <Chip key={index} label={category.name} />
+                            ))  
+                        )}
+                    </View>
                     <Image style={styles.image} source={{ uri: event.image_urls[0].image_url }} />
                     {/*
                     <View style={styles.postInteraction}>
@@ -134,6 +142,12 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
         marginLeft: 'auto',  
     },
+    postTags: {
+        flexDirection: "row",
+        gap: 6,
+        marginRight: 10,
+        flexWrap: 'wrap',
+    },
     detailContainer: {
         flex: 1,
         backgroundColor: 'white',
@@ -175,7 +189,9 @@ const styles = StyleSheet.create({
         width: '100%',
         height: 200,
         borderRadius: 10,
+        marginTop: 10,
         marginBottom: 20,
+
     },
     title: {
         fontSize: 24,
