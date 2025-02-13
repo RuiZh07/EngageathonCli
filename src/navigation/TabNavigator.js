@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useRoute } from "@react-navigation/native";
 import { useNavigation } from "@react-navigation/native";
-import { View, StyleSheet, Modal, Text, TouchableOpacity } from "react-native";
+import { View, StyleSheet, Modal, Text, TouchableOpacity, Platform } from "react-native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeScreen from "../screens/home/HomeScreen";
 import DiscoverScreen from "../screens/discover/DiscoverScreen";
@@ -51,10 +51,10 @@ const Tabs = () => {
         <View style={styles.container}>
             <Tab.Navigator
                 screenOptions={{
-                tabBarShowLabel: false,
-                tabBarStyle: styles.tabBar,
-                tabBarHideOnKeyboard: true,
-                headerShown: false,
+                    tabBarShowLabel: false,
+                    tabBarStyle: styles.tabBar,
+                    tabBarHideOnKeyboard: true,
+                    headerShown: false,
                 }}
             >
             
@@ -63,7 +63,7 @@ const Tabs = () => {
                     component={HomeScreen}
                     options={{
                         tabBarIcon: ({ focused }) => (
-                        <View>
+                        <View style={[styles.tab, Platform.OS === 'android' && { paddingBottom: 20 }]}>
                             <Home selected={focused} />
                             <Background style={styles.background} />
                         </View>
@@ -76,7 +76,7 @@ const Tabs = () => {
                     component={DiscoverScreen}
                     options={{
                         tabBarIcon: ({ focused }) => (
-                        <View style={styles.tab}>
+                            <View style={[styles.tab, Platform.OS === 'android' && { paddingBottom: 20 }]}>
                             <Discover selected={focused} />
                         </View>
                         ),
@@ -87,7 +87,7 @@ const Tabs = () => {
                     name="Post"
                     options={{
                         tabBarIcon: ({ focused }) => (
-                        <TouchableOpacity style={styles.post} onPress={handlePostClick}>
+                        <TouchableOpacity style={[styles.post, Platform.OS === 'android' && { paddingBottom: 20 }]} onPress={handlePostClick}>
                             <Post selected={focused} />
                         </TouchableOpacity>
                         ),
@@ -101,7 +101,7 @@ const Tabs = () => {
                     component={DiscoverScreen}
                     options={{
                         tabBarIcon: ({ focused }) => (
-                        <View style={styles.tab}>
+                            <View style={[styles.tab, Platform.OS === 'android' && { paddingBottom: 20 }]}>
                             <Messages selected={focused} />
                         </View>
                         ),
@@ -112,7 +112,7 @@ const Tabs = () => {
                     name="Profile"
                     options={{
                         tabBarIcon: ({ focused }) => (
-                        <View style={styles.tab}>
+                            <View style={[styles.tab, Platform.OS === 'android' && { paddingBottom: 20 }]}>
                             <Profile selected={focused} />
                         </View>
                         ),
