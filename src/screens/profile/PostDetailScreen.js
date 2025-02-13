@@ -35,10 +35,15 @@ const PostDetailScreen = ({ route }) => {
 
                             {postDetails.caption ? (
                                 <View style={styles.postHeader}>
-                                    <Image
-                                        source={{ uri: postDetails?.profile_photo_url ? postDetails.profile_photo_url : "/mnt/data/Media (7).jpg" }}
-                                        style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
-                                    />
+                                    <View style={styles.pfpContainer}>
+                                        <Image
+                                            source={postDetails?.profile_photo_url 
+                                                ? { uri: postDetails.profile_photo_url } 
+                                                : require("../../assets/default_profile.png")
+                                            }
+                                            style={styles.pfp}
+                                        />
+                                    </View>
                                     <View style={styles.postUser}>
                                         <View>
                                             <Text style={styles.userNameText}>{postDetails.username}</Text>
@@ -50,10 +55,15 @@ const PostDetailScreen = ({ route }) => {
                                 </View>
                             ) : (
                                 <View style={styles.postHeader}>
-                                <Image
-                                    source={{ uri: postDetails?.profile_photo_url ? postDetails.profile_photo_url : "/mnt/data/Media (7).jpg" }}
-                                    style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
-                                />
+                                    <View style={styles.pfpContainer}>
+                                        <Image
+                                            source={postDetails?.profile_photo_url 
+                                                ? { uri: postDetails.profile_photo_url } 
+                                                : require("../../assets/default_profile.png")
+                                            }
+                                            style={styles.pfp}
+                                        />
+                                    </View>
                                 <View style={styles.postUser}>
                                 <View>
                                     <Text style={styles.userNameText}>{postDetails.name}</Text>
@@ -194,6 +204,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: "poppins-bold",
         color: "#333",
+    },
+    pfpContainer: {
+        alignItems: "center",
+        borderColor: '#2BAB47',
+        borderWidth: 2,
+        borderRadius: 40,
+        paddingHorizontal: 2,
+        paddingVertical: 2,
+    },
+    pfp: {
+        width: 36, 
+        height: 36, 
+        resizeMode: "cover", 
+        borderRadius: 18,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#2BAB47',
     },
     userDescriptionText: {
         fontSize: 12,
