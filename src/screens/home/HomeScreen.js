@@ -105,6 +105,10 @@ const HomeScreen = () => {
        // console.log("Posts updated:", posts);
     }, [posts]);
     
+    posts.forEach((post) => {
+        console.log(`${post.id} and ${post.name} and ${post.caption} for post in posts`);
+    });
+    
     const handleFilterPress = () => {
         setShowFilterDropdown(!showFilterDropdown);
     };
@@ -135,7 +139,6 @@ const HomeScreen = () => {
         // Check if the event is already marked as attending
         const storedStatus = await AsyncStorage.getItem(`attendingEvent_${postId}`);
         if (storedStatus === 'true') {
-            // Event already marked as attending
             Alert.alert("You've already marked yourself as attending this event");
             return;
         }
@@ -219,14 +222,16 @@ const HomeScreen = () => {
                 <ScrollView style={styles.eventContainer} scrollEventThrottle={16}>
                     {posts.map((post) => (
                     
-                    <TouchableWithoutFeedback key={`${post.id}-${post.name}`} onPress={() => setShowFilterDropdown(false)}>
+                    <TouchableWithoutFeedback key={`${post.id}-${post.name || post.caption}`} onPress={() => setShowFilterDropdown(false)}>
                         <View style={styles.post}>
                             {post.caption ? (
                                 <View style={styles.postHeader}>
-                                    <Image
-                                        source={{ uri: post?.profile_photo_url ? post.profile_photo_url : "/mnt/data/Media (7).jpg" }}
-                                        style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
-                                    />
+                                    <View style={styles.pfpContainer}>
+                                        <Image
+                                            source={post?.profile_photo_url ? { uri: post.profile_photo_url } : require("../../assets/default_profile.png")}
+                                            style={styles.pfp}
+                                        />
+                                    </View>
                                     <View style={styles.postUser}>
                                         <View>
                                             <Text style={styles.userNameText}>{post.username}</Text>
@@ -238,22 +243,24 @@ const HomeScreen = () => {
                                 </View>
                             ) : (
                                 <View style={styles.postHeader}>
-                                <Image
-                                    source={{ uri: post?.profile_photo_url ? post.profile_photo_url : "/mnt/data/Media (7).jpg" }}
-                                    style={{ width: 36, height: 36, resizeMode: "cover", borderRadius: 18 }}
-                                />
-                                <View style={styles.postUser}>
-                                <View>
-                                    <Text style={styles.userNameText}>{post.name}</Text>
-                                    <Text style={styles.userDescriptionText}>
-                                    Organizer | {post.event_type}
-                                    </Text>
+                                    <View style={styles.pfpContainer}>
+                                        <Image
+                                            source={post?.profile_photo_url ? { uri: post.profile_photo_url } : require("../../assets/default_profile.png")}
+                                            style={styles.pfp}
+                                        />
+                                     </View>
+                                    <View style={styles.postUser}>
+                                    <View>
+                                        <Text style={styles.userNameText}>{post.name}</Text>
+                                        <Text style={styles.userDescriptionText}>
+                                        Organizer | {post.event_type}
+                                        </Text>
+                                    </View>
+                                    <TouchableOpacity onPress={() => setPinReportVisible(true)}>
+                                        <SvgUri uri={greyDots} />
+                                    </TouchableOpacity>
+                                    </View>
                                 </View>
-                                <TouchableOpacity onPress={() => setPinReportVisible(true)}>
-                                    <SvgUri uri={greyDots} />
-                                </TouchableOpacity>
-                                </View>
-                            </View>
                             )}
                         {post.location && <Text style={styles.location}>{post.location}</Text>}
                         <View style={styles.postTags}>
@@ -383,6 +390,23 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         marginBottom: 10,
+    },
+    pfpContainer: {
+        alignItems: "center",
+        borderColor: '#2BAB47',
+        borderWidth: 2,
+        borderRadius: 40,
+        paddingHorizontal: 2,
+        paddingVertical: 2,
+    },
+    pfp: {
+        width: 36, 
+        height: 36, 
+        resizeMode: "cover", 
+        borderRadius: 18,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#2BAB47',
     },
     postUser: {
         flexDirection: "row",
