@@ -18,6 +18,7 @@ import { useNavigation } from "@react-navigation/native";
 import { SvgUri } from "react-native-svg";
 import { shareIcon } from "../../utils/icons";
 import baseUrl from "../../utils/api";
+import apiClient from "../../services/apiClient";
 
 const DiscoverPost = ({
     profilePicture,
@@ -37,47 +38,31 @@ const DiscoverPost = ({
     const [isShareModalVisible, setShareModalVisible] = useState(false);
 
     const [shareableLink, setShareableLink] = useState('');
-    const [attending, setAttending] = useState(false);
-    const [attendingStates, setAttendingStates] = useState({});
-
-     useEffect(() => {
-        const loadAttendingState = async () => {
-            try {
-                // Get the stored attending status for the single post
-                const storedStatus = await AsyncStorage.getItem(`attendingEvent_${post.id}`);
-                setAttending(storedStatus === 'true'); // Set attending state based on the stored value
-            } catch (error) {
-                console.error('Error loading attending state:', error);
-            }
-        };
-
-        if (post?.id) {
-            loadAttendingState(); // Load the attending state when post data is available
-        }
-    }, [post]);
-
+    console.log('post', post);
     // Pass the post details and event's date
     const handleAttend = async (post) => {
-        const postId = post.id;
-
-        // Check if the event is already marked as attending
-        const storedStatus = await AsyncStorage.getItem(`attendingEvent_${postId}`);
-        if (storedStatus === 'true') {
-            // Event already marked as attending
-            Alert.alert("You've already marked yourself as attending this event");
-            return; // Do nothing if already attended
-        }
-
-        // If not already attended, mark as attending
-        setAttendingStates(prev => ({ ...prev, [postId]: true }));
-
-        // Store the attending state in AsyncStorage
         try {
-            await AsyncStorage.setItem(`attendingEvent_${postId}`, 'true');
-            // After marking the event as attended, navigate to the Calendar screen
-            navigation.navigate("CalendarScreen", { post });
+            const token = await AsyncStorage.getItem('AccessToken');
+            
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+
+            const response = await apiClient.post(`${baseUrl}/events/attendance/${post.id}/`, {}, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            if (response.status >= 200 && response.status < 300) {
+                console.log("Attendance status updated successfully");
+                navigation.navigate("CalendarScreen");
+            } else {
+                console.error('Failed to update attendance status');
+            }
         } catch (error) {
-            console.error('Error saving attending state:', error);
+            console.error("Error attending event:", error);
         }
     };
     
@@ -163,8 +148,8 @@ const DiscoverPost = ({
                         />}   
                 </View> 
                 <MainButton
-                    title={attending || attendingStates[post.id] ? "Attending" : "Attend"}
-                    isDisabled={attending || attendingStates[post.id]} // Disable the button if already attending
+                    title={post.attending ? "Attending" : "Attend"}
+                    isDisabled={post.attending}
                     onPress={() => handleAttend(post)}
                 />
             </View>
