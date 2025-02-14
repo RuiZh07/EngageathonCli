@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState, useCallback } from "react";
 import {
     View,
@@ -10,8 +9,8 @@ import {
     TouchableWithoutFeedback,
     BackHandler,
     ImageBackground,
-    Modal,
     Alert,
+    RefreshControl,
 } from "react-native";
 import HomeHeader from "../../components/home/HomeHeader";
 import Chip from "../../components/post/Chip";
@@ -26,9 +25,10 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ShareModal from "../../components/modals/ShareModal";
 import { SvgUri } from "react-native-svg";
-import baseUrl from "../../utils/api";
 import { greyDots, shareIcon } from "../../utils/icons";
 import PinReport from "../../components/home/PinReport";
+import apiClient from "../../services/apiClient";
+import baseUrl from "../../utils/api";
 
 const HomeScreen = () => {
     const [posts, setPosts] = useState([]);
@@ -41,9 +41,8 @@ const HomeScreen = () => {
     const [isShareModalVisible, setShareModalVisible] = useState(false);
     const [isPinReportVisible, setPinReportVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
-    const [isAttending, setIsAttending] = useState(false);
-    const [attendEvents, setAttendEvents] = useState([]);
-    const [attendingStates, setAttendingStates] = useState({});
+    const [refreshing, setRefreshing] = useState(false);
+
     const navigation = useNavigation();
 
     useEffect(() => {
@@ -105,57 +104,37 @@ const HomeScreen = () => {
        // console.log("Posts updated:", posts);
     }, [posts]);
     
-    posts.forEach((post) => {
-        console.log(`${post.id} and ${post.name} and ${post.caption} for post in posts`);
-    });
-    
     const handleFilterPress = () => {
         setShowFilterDropdown(!showFilterDropdown);
     };
 
-    useEffect(() => {
-        const loadAttendingStates = async () => {
-            try {
-                const states = {}; // Object to store the attending state for each post
-                for (const post of posts) {
-                    const storedStatus = await AsyncStorage.getItem(`attendingEvent_${post.id}`);
-                    states[post.id] = storedStatus === 'true'; // true or false based on the stored value
-                }
-                setAttendingStates(states); // Update the state with the loaded attending statuses
-            } catch (error) {
-                console.error('Error loading attending states:', error);
-            }
-        };
-
-        if (posts.length > 0) {
-            loadAttendingStates();
-        }
-    }, [posts]);
-
     // Pass the post details and event's date
     const handleAttend = async (post) => {
-        const postId = post.id;
-
-        // Check if the event is already marked as attending
-        const storedStatus = await AsyncStorage.getItem(`attendingEvent_${postId}`);
-        if (storedStatus === 'true') {
-            Alert.alert("You've already marked yourself as attending this event");
-            return;
-        }
-
-        // If not already attended, mark as attending
-        setAttendingStates(prev => ({ ...prev, [postId]: true }));
-
-        // Store the attending state in AsyncStorage
         try {
-            await AsyncStorage.setItem(`attendingEvent_${postId}`, 'true');
-            navigation.navigate("CalendarScreen", { post });
+            const token = await AsyncStorage.getItem('AccessToken');
+            
+            if (!token) {
+                console.error('No token found');
+                return;
+            }
+
+            const response = await apiClient.post(`${baseUrl}/events/attendance/${post.id}/`, {}, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            if (response.status >= 200 && response.status < 300) {
+                console.log("Attendance status updated successfully");
+                navigation.navigate("CalendarScreen");
+            } else {
+                console.error('Failed to update attendance status');
+            }
         } catch (error) {
-            console.error('Error saving attending state:', error);
+            console.error("Error attending event:", error);
         }
     };
     
-
     const handleSharePress = useCallback(async (postId, postName) => {
         try {
             const token = await AsyncStorage.getItem('AccessToken');
@@ -195,6 +174,17 @@ const HomeScreen = () => {
         });
     };
 
+    // Handle pull-to-refresh
+    const handleRefresh = useCallback(() => {
+        setLoading(true);
+        fetchData(["events", "posts"]); // Adjust the filters as needed
+    }, []);
+
+    // Fetch posts initially
+    useEffect(() => {
+        fetchData(["events", "posts"]); // You can modify filters as needed
+    }, []);
+
     return (
         <TouchableWithoutFeedback onPress={() => setShowFilterDropdown(false)}>
             <ImageBackground
@@ -213,110 +203,122 @@ const HomeScreen = () => {
                 )}
         
                 {loading ? (
-                <Text style={styles.loadingText}>Loading...</Text>
+                    <Text style={styles.loadingText}>Loading...</Text>
                 ) : error ? (
-                <Text style={styles.errorText}>{error}</Text>
+                    <Text style={styles.errorText}>{error}</Text>
                 ) : posts.length === 0 ? (
-                <Text style={styles.noDataText}>No posts available.</Text>
+                    <Text style={styles.noDataText}>No posts available.</Text>
                 ) : (
-                <ScrollView style={styles.eventContainer} scrollEventThrottle={16}>
-                    {posts.map((post) => (
-                    
-                    <TouchableWithoutFeedback key={`${post.id}-${post.name || post.caption}`} onPress={() => setShowFilterDropdown(false)}>
-                        <View style={styles.post}>
-                            {post.caption ? (
-                                <View style={styles.postHeader}>
-                                    <View style={styles.pfpContainer}>
-                                        <Image
-                                            source={post?.profile_photo_url ? { uri: post.profile_photo_url } : require("../../assets/default_profile.png")}
-                                            style={styles.pfp}
-                                        />
-                                    </View>
-                                    <View style={styles.postUser}>
-                                        <View>
-                                            <Text style={styles.userNameText}>{post.username}</Text>
+                    <ScrollView 
+                        style={styles.eventContainer} 
+                        //scrollEventThrottle={16} 
+                        refreshControl={
+                            <RefreshControl
+                                refreshing={loading} 
+                                onRefresh={handleRefresh} 
+                                colors={['#ffffff']}
+                                tintColor="#ffffff"
+                            />
+                    }>
+                        {posts.map((post) => (
+                            <TouchableWithoutFeedback 
+                                key={`${post.id}-${post.name || post.caption}`} 
+                                onPress={() => setShowFilterDropdown(false)}
+                            >
+                                <View style={styles.post}>
+                                    {post.caption ? (
+                                        <View style={styles.postHeader}>
+                                            <View style={styles.pfpContainer}>
+                                                <Image
+                                                    source={post?.profile_photo_url ? { uri: post.profile_photo_url } : require("../../assets/default_profile.png")}
+                                                    style={styles.pfp}
+                                                />
+                                            </View>
+                                            <View style={styles.postUser}>
+                                                <View>
+                                                    <Text style={styles.userNameText}>{post.username}</Text>
+                                                </View>
+                                            <TouchableOpacity onPress={() => setPinReportVisible(true)}>
+                                                <SvgUri uri={greyDots} />
+                                            </TouchableOpacity>
+                                            </View>
                                         </View>
-                                    <TouchableOpacity onPress={() => setPinReportVisible(true)}>
-                                        <SvgUri uri={greyDots} />
-                                    </TouchableOpacity>
+                                    ) : (
+                                        <View style={styles.postHeader}>
+                                            <View style={styles.pfpContainer}>
+                                                <Image
+                                                    source={post?.profile_photo_url ? { uri: post.profile_photo_url } : require("../../assets/default_profile.png")}
+                                                    style={styles.pfp}
+                                                />
+                                            </View>
+                                            <View style={styles.postUser}>
+                                            <View>
+                                                <Text style={styles.userNameText}>{post.name}</Text>
+                                                <Text style={styles.userDescriptionText}>
+                                                Organizer | {post.event_type}
+                                                </Text>
+                                            </View>
+                                            <TouchableOpacity onPress={() => setPinReportVisible(true)}>
+                                                <SvgUri uri={greyDots} />
+                                            </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    )}
+                                    {post.location && <Text style={styles.location}>{post.location}</Text>}
+                                    <View style={styles.postTags}>
+                                        {post.categories && (
+                                            post.categories.map((category, index) => (
+                                                <Chip key={index} label={category.name} />
+                                            ))  
+                                        )}
                                     </View>
-                                </View>
-                            ) : (
-                                <View style={styles.postHeader}>
-                                    <View style={styles.pfpContainer}>
+                                    <View style={styles.postImageContainer}>
                                         <Image
-                                            source={post?.profile_photo_url ? { uri: post.profile_photo_url } : require("../../assets/default_profile.png")}
-                                            style={styles.pfp}
+                                            style={styles.postImage}
+                                            source={{ uri: post.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                                         />
-                                     </View>
-                                    <View style={styles.postUser}>
-                                    <View>
-                                        <Text style={styles.userNameText}>{post.name}</Text>
-                                        <Text style={styles.userDescriptionText}>
-                                        Organizer | {post.event_type}
+                                    </View>
+                                    <View style={styles.postInteraction}>
+                                        <View style={styles.likeSection}>
+                                            <Heart postId={post.id} like={post.liked} />
+                                            <Text style={styles.likeCountText}>
+                                                {post.likes_count ?? 0}
+                                            </Text>
+                                        </View>
+                                        {post.event_type && (
+                                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
+                                                <Comment />
+                                            </TouchableOpacity>
+                                        )}
+                                        <Save postId={post.id} bookmark={post.bookmarked} />
+                                        <View style={styles.shareContainer}>                 
+                                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleSharePress(post.id, post.name)}>
+                                                <SvgUri width="16" height="14" uri={shareIcon} />
+                                            </TouchableOpacity>
+                                        </View>
+                                    </View>
+                                    {post.caption && <Text style={styles.caption}>{post.caption}</Text>}
+                                    {post.tagged_users && (
+                                        <Text style={styles.taggedUsers}>
+                                            {post.tagged_users.map(user => `@${user.username}`).join('  ')}
+                                        </Text>
+                                    )}
+                                    <View style={styles.postDescription}>
+                                        <Text style={styles.postDescriptionText}>
+                                        {post.description}
                                         </Text>
                                     </View>
-                                    <TouchableOpacity onPress={() => setPinReportVisible(true)}>
-                                        <SvgUri uri={greyDots} />
-                                    </TouchableOpacity>
-                                    </View>
+                                    {post.event_type && (
+                                        <MainButton 
+                                            title={post.attending ? "Attending" : "Attend"}
+                                            isDisabled={post.attending}
+                                            onPress={() => handleAttend(post)}
+                                        />
+                                    )}
                                 </View>
-                            )}
-                        {post.location && <Text style={styles.location}>{post.location}</Text>}
-                        <View style={styles.postTags}>
-                            {post.categories && (
-                                post.categories.map((category, index) => (
-                                    <Chip key={index} label={category.name} />
-                                ))  
-                            )}
-                        </View>
-                        <View style={styles.postImageContainer}>
-                            <Image
-                                style={styles.postImage}
-                                source={{ uri: post.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
-                            />
-                        </View>
-                        <View style={styles.postInteraction}>
-                            <View style={styles.likeSection}>
-                                <Heart postId={post.id} like={post.liked} />
-                                <Text style={styles.likeCountText}>
-                                    {post.likes_count ?? 0}
-                                </Text>
-                            </View>
-                            {post.event_type && (
-                                <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
-                                    <Comment />
-                                </TouchableOpacity>
-                            )}
-                            <Save postId={post.id} bookmark={post.bookmarked} />
-                            <View style={styles.shareContainer}>                 
-                                <TouchableOpacity style={styles.interactionButton} onPress={() => handleSharePress(post.id, post.name)}>
-                                    <SvgUri width="16" height="14" uri={shareIcon} />
-                                </TouchableOpacity>
-                            </View>
-                        </View>
-                        {post.caption && <Text style={styles.caption}>{post.caption}</Text>}
-                        {post.tagged_users && (
-                            <Text style={styles.taggedUsers}>
-                                {post.tagged_users.map(user => `@${user.username}`).join('  ')}
-                            </Text>
-                        )}
-                        <View style={styles.postDescription}>
-                            <Text style={styles.postDescriptionText}>
-                            {post.description}
-                            </Text>
-                        </View>
-                        {post.event_type && (
-                            <MainButton 
-                                title={attendingStates[post.id] ? "Attending" : "Attend"}
-                                isDisabled={attendingStates[post.id]}
-                                onPress={() => handleAttend(post)}
-                            />
-                        )}
-                        </View>
-                    </TouchableWithoutFeedback>
-                    ))}
-                </ScrollView>
+                            </TouchableWithoutFeedback>
+                        ))}
+                    </ScrollView>
                 )}
                 <CommentsModal visible={commentsVisible} onClose={() => setCommentsVisible(false)} postId={selectedPostId} />
                 {isShareModalVisible && 
@@ -334,7 +336,6 @@ const HomeScreen = () => {
             </ImageBackground>
         </TouchableWithoutFeedback>
     );
-
 };
 
 export default HomeScreen;
@@ -493,4 +494,4 @@ const styles = StyleSheet.create({
     saveButton: {
         marginRight: '30%', // Add more space between Save and Share buttons
     },
-  });
+});
