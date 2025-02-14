@@ -1,11 +1,12 @@
 //optimze the data format
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
     View,
     Text,
     StyleSheet,
     ScrollView,
     ImageBackground,
+    RefreshControl,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import DiscoverHeader from "../../components/discover/DiscoverHeader";
@@ -35,56 +36,52 @@ const DiscoverScreen = () => {
     };
 
     // Fetch recommended events data
-    useEffect(() => {
-        const fetchRecommendedEvent = async () => {
-            try {
-                const token = await AsyncStorage.getItem("AccessToken");
-                if(!token) {
-                    console.error("no token found");
-                    return;
-                }
-        
-                const response = await apiClient.get(`${baseUrl}/events/recommend/`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
-        
-                setRecommendedEvent(response.data);
-            } catch (error) {
-                console.error("error to fetch data", error);
-            } finally {
-                setLoading(false); 
+    const fetchRecommendedEvent = async () => {
+        try {
+            const token = await AsyncStorage.getItem("AccessToken");
+            if(!token) {
+                console.error("no token found");
+                return;
             }
-        };
-        fetchRecommendedEvent();
-    }, []);
+    
+            const response = await apiClient.get(`${baseUrl}/events/recommend/`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+    
+            setRecommendedEvent(response.data);
+        } catch (error) {
+            console.error("error to fetch data", error);
+        } finally {
+            setLoading(false); 
+        }
+    };
 
     // Fetch recommended users data
-    useEffect(() => {
-        const fetchRecommendedUser = async () => {
-            try {
-                const token = await AsyncStorage.getItem("AccessToken");
-                if(!token) {
-                    console.error("no token found");
-                    return;
-                }
-
-                const response = await apiClient.get(`${baseUrl}/profiles/recommend/`, {
-                    headers: {
-                        "Authorization": `Bearer ${token}`,
-                    },
-                });
-    
-                setRecommendedUser(response.data);
-            } catch (error) {
-                console.error("error to fetch recommended users", error);
-            } finally {
-              setLoading(false); 
+  
+    const fetchRecommendedUser = async () => {
+        try {
+            const token = await AsyncStorage.getItem("AccessToken");
+            if(!token) {
+                console.error("no token found");
+                return;
             }
-        };
-          fetchRecommendedUser();
-    }, []);
+
+            const response = await apiClient.get(`${baseUrl}/profiles/recommend/`, {
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
+            });
+
+            setRecommendedUser(response.data);
+        } catch (error) {
+            console.error("error to fetch recommended users", error);
+        } finally {
+            setLoading(false); 
+        }
+    };
+  
 
     // Fetch search results for events based on the search input
     useEffect(() => {
@@ -140,6 +137,14 @@ const DiscoverScreen = () => {
         fetchSearchProfile();
     }, [searchInput]);
 
+    useEffect(() => {
+        fetchRecommendedEvent(); 
+    }, []);
+    
+    useEffect(() => {
+        fetchRecommendedUser();
+    }, []);
+
     // Handle search toggle: switches between searching or not
     const handleSearchToggle = () => {
         if (isSearching) {
@@ -173,6 +178,19 @@ const DiscoverScreen = () => {
         ...filteredEvent.map(event => ({ type: 'event', data: event }))
     ];
 
+    // Handle pull-to-refresh
+    const handleRefresh = useCallback(() => {
+        setLoading(true);
+        fetchRecommendedEvent(); 
+        fetchRecommendedUser();
+    }, []);
+
+    useEffect(() => {
+        //setLoading(true);  
+        fetchRecommendedEvent();
+        fetchRecommendedUser();
+    }, []);
+
     return (
         <ImageBackground
             source={require("../../assets/main-background.png")}
@@ -185,7 +203,14 @@ const DiscoverScreen = () => {
                             onSearchToggle={handleSearchToggle} 
                             onSearchInput={handleSearchInput} 
                         />
-                        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                        <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={
+                            <RefreshControl
+                                refreshing={loading} 
+                                onRefresh={handleRefresh}
+                                colors={['#ffffff']}
+                                tintColor="#ffffff"
+                            />
+                        }>
                             {searchInput ? (
                                 combinedFilteredData.length > 0 ? (
                                     combinedFilteredData.map((item, index) => {
@@ -222,8 +247,8 @@ const DiscoverScreen = () => {
                                                     description={data.description}
                                                     location={data.location}
                                                     date={moment(data.datetime_start)
-                                                        .tz('America/New_York')
-                                                        .format('MM/DD/YYYY h:mmA z')}
+                                                        .local()
+                                                        .format('MM/DD/YYYY h:mmA') + ' ' + moment().format('z')}
                                                     coverImageUrl={{ uri: data.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
                                                     isFullView={false}
                                                     onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event: data })}
@@ -246,70 +271,80 @@ const DiscoverScreen = () => {
                         selectedTab={currentTab}
                         onTabChange={handleTabChange} 
                     />
-                    <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                   
                         {loading ? (
                             <Text style={styles.loadingText}>Loading...</Text>
-                        ) : currentTab === 'events' ? ( 
-                            recommendedEvent && recommendedEvent.length > 0 ? 
-                                (recommendedEvent.map((event, index) => {
-                                    return (  
-                                        <DiscoverPost 
-                                            key={event.id}
-                                            eventName={event.name}
-                                            profilePicture={
-                                                event?.profile_photo_url 
-                                                ? { uri: event.profile_photo_url } 
-                                                : require("../../assets/default_profile.png")
-                                            }  
-                                            userID={event.organizer} 
-                                            name={event.username} 
-                                            title={event.event_type}
-                                            description={event.description}
-                                            location={event.location}
-                                            date={moment(event.datetime_start)
-                                                .tz('America/New_York')
-                                                .format('MM/DD/YYYY h:mmA z')}
-                                            coverImageUrl={{ uri: event.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
-                                            onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event })}
-                                            post={event}
-                                        />
-                                    );
-                                })
-                                ) : (
-                                    <Text style={styles.noResultsText}>No recommended events found.</Text>
-                                )
-                            ) : (
-                                Object.entries(recommendedUser ?? {}).length > 0 ? (
-                                    Object.entries(recommendedUser ?? {}).map(([category, users], index) => (
-                                    users.length > 0 && (
-                                        <View key={index} style={styles.categorySection}>
-                                            <Text style={styles.categoryText}>{category}</Text>
-                                            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.userScroll}>
-                                                {users.map((user, userIndex) => (
-                                                    <DiscoverPeople
-                                                        key={userIndex}
-                                                        category={category}
-                                                        profilePicture={
-                                                            user?.profile_photo_url 
-                                                            ? { uri: `data:image/jpeg;base64,${user.profile_photo_url}` } 
-                                                            : require("../../assets/default_profile.png")
-                                                        } 
-                                                        userID={user.owner} 
-                                                        name={`${user.first_name} ${user.last_name}`}
-                                                        isFullView={false}
-                                                        onPress={()=>navigation.navigate('UserProfileScreen', { userID: user.owner })}
-                                                    />
-                                                ))}
-                                            </ScrollView>
-                                        </View>
+                        ) : (  
+                            <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={
+                                <RefreshControl
+                                    refreshing={loading} 
+                                    onRefresh={handleRefresh}
+                                    tintColor="#ffffff"
+                                    colors={['#ffffff']}
+                                />
+                            }>
+                                {currentTab === 'events' ? ( 
+                                    recommendedEvent && recommendedEvent.length > 0 ? 
+                                        (recommendedEvent.map((event, index) => {
+                                            return (  
+                                                <DiscoverPost 
+                                                    key={event.id}
+                                                    eventName={event.name}
+                                                    profilePicture={
+                                                        event?.profile_photo_url 
+                                                        ? { uri: event.profile_photo_url } 
+                                                        : require("../../assets/default_profile.png")
+                                                    }  
+                                                    userID={event.organizer} 
+                                                    name={event.username} 
+                                                    title={event.event_type}
+                                                    description={event.description}
+                                                    location={event.location}
+                                                    date={moment(event.datetime_start)
+                                                        .local()
+                                                        .format('MM/DD/YYYY h:mmA') + ' ' + moment().format('z')}
+                                                    coverImageUrl={{ uri: event.image_urls[0]?.image_url || "/mnt/data/Media (7).jpg" }}
+                                                    onPress={()=>navigation.navigate('DiscoverPostDetailScreen', { event })}
+                                                    post={event}
+                                                />
+                                            );
+                                        })
+                                    ) : (
+                                        <Text style={styles.noResultsText}>No recommended events found.</Text>
                                     )
-                                ))
-                            ) : (
-                                <Text style={styles.noResultsText}>No recommended users found.</Text>
-                            )
+                                ) : (
+                                    Object.entries(recommendedUser ?? {}).length > 0 ? (
+                                        Object.entries(recommendedUser ?? {}).map(([category, users], index) => (
+                                        users.length > 0 && (
+                                            <View key={index} style={styles.categorySection}>
+                                                <Text style={styles.categoryText}>{category}</Text>
+                                                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.userScroll}>
+                                                    {users.map((user, userIndex) => (
+                                                        <DiscoverPeople
+                                                            key={userIndex}
+                                                            category={category}
+                                                            profilePicture={
+                                                                user?.profile_photo_url 
+                                                                ? { uri: `data:image/jpeg;base64,${user.profile_photo_url}` } 
+                                                                : require("../../assets/default_profile.png")
+                                                            } 
+                                                            userID={user.owner} 
+                                                            name={`${user.first_name} ${user.last_name}`}
+                                                            isFullView={false}
+                                                            onPress={()=>navigation.navigate('UserProfileScreen', { userID: user.owner })}
+                                                        />
+                                                    ))}
+                                                </ScrollView>
+                                            </View>
+                                        )
+                                    ))
+                                ) : (
+                                    <Text style={styles.noResultsText}>No recommended users found.</Text>
+                                )
+                            )}
+                        </ScrollView>
                         )}
-                    </ScrollView>
-                </>
+                    </>
                 )}      
             </View>
         </ImageBackground>
