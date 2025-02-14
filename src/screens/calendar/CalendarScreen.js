@@ -75,9 +75,6 @@ const CalendarScreen = ({ route }) => {
             if (!postExistsInAttendEvents) {
                 const updatedAttend = [...attendEvents, newPost];
                 setAttendEvents(updatedAttend);
-    
-                // Save the updated list to AsyncStorage
-                saveAttendListToStorage(updatedAttend);
             } else {
                 console.log('Post already exists in attendEvents.');
             }
@@ -91,28 +88,6 @@ const CalendarScreen = ({ route }) => {
         ...attendEvents.filter((event) => !calendarData.some((e) => e.id === event.id)),
         ...calendarData,
     ];
-
-    const saveAttendListToStorage = async (updatedAttendList) => {
-        try {
-            await AsyncStorage.setItem('attendList', JSON.stringify(updatedAttendList));
-        } catch (error) {
-            console.error('Error saving attend list to AsyncStorage', error);
-        }
-    };
-    // Function to load attend events from AsyncStorage
-    useEffect(() => {
-        const loadAttendList = async () => {
-            try {
-                const storedAttend = await AsyncStorage.getItem('attendList');
-                if (storedAttend) {
-                    setAttendEvents(JSON.parse(storedAttend));
-                }
-            } catch (error) {
-                console.error('Error loading attend list from AsyncStorage');
-            }
-        };
-        loadAttendList();
-    }, []);
 
 
     useEffect(() => {
