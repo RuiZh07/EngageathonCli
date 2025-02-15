@@ -15,6 +15,8 @@ import { useNavigation } from "@react-navigation/native";
 import { backArrow, gradientLine } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 import apiClient from '../../services/apiClient';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import baseUrl from '../../utils/api';
 
 const InviteContactScreen = () => {
     const navigation = useNavigation();
@@ -47,7 +49,7 @@ const InviteContactScreen = () => {
             Alert.alert("Invitation Sent.", "Thank you for inviting!");
         } catch (error) {
             console.error("Invitation failed:", error.message);
-            Alert.alert("Invitation Failed.", error.message);
+            Alert.alert("Invitation Failed.", error.response.data.error);
         }
     };
     return (
