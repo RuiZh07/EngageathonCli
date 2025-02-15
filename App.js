@@ -47,6 +47,8 @@ import PostDetailScreen from "./src/screens/profile/PostDetailScreen";
 import ShareModal from "./src/components/modals/ShareModal";
 import DiscoverPostDetailScreen from "./src/screens/discover/DiscoverPostDetailScreen";
 import InviteContactScreen from "./src/screens/setting/InviteContactScreen";
+import UpdateTagCause from "./src/screens/profile/UpdateTagCause";
+
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -114,7 +116,7 @@ const App = () => {
         <Stack.Screen name="ImageSelectionScreen" component={ImageSelectionScreen} options={{ headerShown: false }} />
         <Stack.Screen name="InviteContactScreen" component={InviteContactScreen} options={{ headerShown: false }} />
         <Stack.Screen name="BecomeMemberScreen" component={BecomeMemberScreen} options={{ headerShown: false }} />
-        
+        <Stack.Screen name="UpdateTagCause" component={UpdateTagCause} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </CategoryProvider>
