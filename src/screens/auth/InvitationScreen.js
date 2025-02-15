@@ -32,7 +32,7 @@ const InvitationScreen = ({ route }) => {
             Alert.alert("Invitation Sent.", "Thank you for inviting!");
         } catch (error) {
             console.error("Invitation failed:", error.message);
-            Alert.alert("Invitation Failed.", error.message);
+            Alert.alert("Invitation Failed.", error.response.data.error);
         }
     };
     return (
