@@ -39,6 +39,29 @@ const DiscoverPost = ({
 
     const [shareableLink, setShareableLink] = useState('');
     console.log('post', post);
+
+    const generateQrCode = async () => {
+        try {
+            const token = await AsyncStorage.getItem("AccessToken");
+
+            const response = await apiClient.post(`${baseUrl}/events/qrcode/${event.id}/`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.data && response.data.qr_code_token) {
+                console.log("QR Code Generated Successfully:", response.data.qr_code_token);
+            } else {
+                console.log("Error: QR code generation failed.");
+                Alert.alert("QR Code generation failed. Please try again.");
+            }
+        } catch {
+            console.error("Error generating QR code:", error);
+        }
+    };
+
     // Pass the post details and event's date
     const handleAttend = async (post) => {
         try {
@@ -57,6 +80,7 @@ const DiscoverPost = ({
 
             if (response.status >= 200 && response.status < 300) {
                 console.log("Attendance status updated successfully");
+                generateQrCode();
                 navigation.navigate("CalendarScreen");
             } else {
                 console.error('Failed to update attendance status');
