@@ -1,16 +1,45 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ImageBackground } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import SvgQRCode from 'react-native-qrcode-svg';
+import QRCode from 'react-native-qrcode-svg';
 import { backArrow } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
 import MainButton from '../../components/common/MainButton';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiClient from '../../services/apiClient';
+import baseUrl from '../../utils/api';
 const QRCodeScreen = () => {
+    const [qrCodeToken, setQrCodeToken] = useState(null);
     const navigation = useNavigation();
     const route = useRoute();
     const { event } = route.params;
+
+    useEffect(() => {
+        const fetchQrCode = async () => {
+            try {
+                const token = await AsyncStorage.getItem("AccessToken");
+
+                const response = await apiClient.get(`${baseUrl}/events/qrcode/${event.id}/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                console.log(response.data);
+                if (response.data) {
+                    setQrCodeToken(response.data["QR Code"]);
+                    console.log("Fetched QR Code Token:", response.data);
+                } else {
+                    console.log("Error: QR Code not found.");
+                }
+            } catch (error) {
+                console.error("Error fetching QR code:", error);
+            }
+        };
+        fetchQrCode();
+    }, []);
 
     return (
         <ImageBackground source={require('../../assets/main-background.png')} style={styles.backgroundImage}>
@@ -34,7 +63,14 @@ const QRCodeScreen = () => {
                         style={styles.qrCodeLinearGradient}
                     >
                         <View style={styles.qrCodeOutline}>
-                            <SvgQRCode value={event.qr_code} size={250} />
+                            {qrCodeToken ? (
+                                <QRCode 
+                                    value={qrCodeToken}
+                                    size={250}
+                                />
+                            ) : (
+                                <SvgQRCode value={event.qr_code} size={250} />
+                            )}
                         </View>
                     </LinearGradient>
                 </View>
