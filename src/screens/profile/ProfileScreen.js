@@ -41,6 +41,19 @@ export default function ProfileScreen ({ userData }) {
     const [isSidebarVisible, setIsSidebarVisible] = useState(false);
     const sidebarAnimation = useRef(new Animated.Value(-300)).current;
     
+    const [showAll, setShowAll] = useState(false);
+    const [visibleCategories, setVisibleCategories] = useState(5);
+
+    const handleShowMore = () => {
+        setShowAll(true);
+        setVisibleCategories(categories.length); // Show all categories
+    };
+
+    // Close the expanded list
+    const handleClose = () => {
+        setShowAll(false);
+        setVisibleCategories(5); // Reset to show only the first 5 categories
+    };
     console.log(eventList);
     eventList.forEach((event) => {
         console.log(`${event.id}-${event.name || event.caption}`)
@@ -65,24 +78,33 @@ export default function ProfileScreen ({ userData }) {
     };
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const storedToken = await AsyncStorage.getItem("AccessToken");
-                if (!storedToken) {
-                    console.error("No token found");
-                    return;
-                }
-                setToken(storedToken);
-        
-                await fetchFollowers(storedToken);
-                await fetchFollowing(storedToken);
-                await fetchPoints(storedToken);
-                await fetchUserContent(storedToken);
-            } catch (error) {
-                console.error("Error fetching data", error);
-            }
-            };
+        const unsubscribe = navigation.addListener('focus', () => {
+          fetchData(); 
+        });
     
+        return unsubscribe;
+      }, [navigation]);
+
+
+    const fetchData = async () => {
+        try {
+            const storedToken = await AsyncStorage.getItem("AccessToken");
+            if (!storedToken) {
+                console.error("No token found");
+                return;
+            }
+            setToken(storedToken);
+
+            await fetchFollowers(storedToken);
+            await fetchFollowing(storedToken);
+            await fetchPoints(storedToken);
+            await fetchUserContent(storedToken);
+        } catch (error) {
+            console.error("Error fetching data", error);
+        }
+    };
+
+    useEffect(() => {
         fetchData();
     }, []);
 
@@ -173,6 +195,10 @@ export default function ProfileScreen ({ userData }) {
         navigation.navigate('PostDetailScreen', { postDetails });
     };
 
+    const handleUpdateCauses = async () => {
+        
+    }
+
     return (
         <ImageBackground
             source={require("../../assets/main-background.png")}
@@ -223,22 +249,40 @@ export default function ProfileScreen ({ userData }) {
                 </View>
 
                 <View style={styles.categoryContainer}>
-                    <Text style={styles.myCauseText}>My Causes</Text>
+                    <View style={styles.myCauseheader}>
+                        <Text style={styles.myCauseText}>My Causes</Text>
+                        <TouchableOpacity styles={styles.updateCauses} onPress={() => navigation.navigate("UpdateTagCause")}>
+                           <Text style={styles.updateCauseText}>Update Causes</Text>
+                        </TouchableOpacity>
+                    </View>
+                    
                     <View style={styles.categoryList}>
-                        {categories.map((category, index) => (
-                        <View key={index} style={styles.categoryItem}>
-                            <LinearGradient
-                                colors={["#FF8D00", "#FFBA00", "#FFE600"]}
-                                locations={[0.72, 0.86, 1]}  
-                                start={{ x: 0, y: 0 }}      
-                                end={{ x: 1, y: 0 }}
-                                style={styles.categoryGradient}
-                            >
-                                <Text style={styles.categoryText}>{category.name}</Text>
-                            </LinearGradient>
-                        </View>
+                        {categories.slice(0, visibleCategories).map((category, index) => (
+                            <View key={index} style={styles.categoryItem}>
+                                <LinearGradient
+                                    colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                                    locations={[0.72, 0.86, 1]}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={styles.categoryGradient}
+                                >
+                                    <Text style={styles.categoryText}>{category.name}</Text>
+                                </LinearGradient>
+                            </View>
                         ))}
                     </View>
+
+                    {categories.length > visibleCategories && !showAll && (
+                            <TouchableOpacity onPress={handleShowMore} style={styles.showMoreButton}>
+                                <Text style={styles.showMoreText}>Show More</Text>
+                            </TouchableOpacity>
+                        )}
+
+                        {showAll && (
+                            <TouchableOpacity onPress={handleClose} style={styles.showMoreButton}>
+                                <Text style={styles.showMoreText}>Close</Text>
+                            </TouchableOpacity>
+                        )}
                 </View>
 
                 <MainButton 
@@ -317,6 +361,18 @@ const styles = StyleSheet.create({
         fontSize: 26,
         fontFamily: "Poppins-Medium",
         textAlign: 'center',
+    },
+    myCauseheader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    updateCauseText: {
+        color: "#FFBA00",
+        fontSize: 15,
+        fontFamily: "Poppins-Semibold",
+        marginBottom: '2%',
+        marginLeft: '2%',
+        textDecorationLine: 'underline',
     },
     loadingText: {
         textAlign: "center",
@@ -555,5 +611,16 @@ const styles = StyleSheet.create({
         width: "40%",     
         height: height,
         zIndex: 9998,
+    },
+    showMoreButton: {
+        marginLeft: 3,
+        textDecorationLine: 'underline',
+        marginBottom: 15,
+    },
+    showMoreText: {
+        color: '#fff',
+        fontSize: 15,
+        textDecorationLine: 'underline',
+        fontFamily:'Poppins-Medium',
     },
 });
