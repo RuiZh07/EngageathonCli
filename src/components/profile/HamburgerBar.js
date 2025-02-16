@@ -31,7 +31,7 @@ const HamburgerBar = () => {
             </TouchableOpacity>
             <View style={styles.separator} />
 
-            <TouchableOpacity style={styles.subContainer} onPress={() => navigation.navigate("")}>
+            <TouchableOpacity style={styles.subContainer} onPress={() => navigation.navigate("YourActivityScreen")}>
                 <SvgUri uri={myActivityIcon} />
                 <Text style={styles.name}>Your Activity</Text>
             </TouchableOpacity>
