@@ -1,24 +1,19 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-    StatusBar,
     StyleSheet,
     Image,
     Text,
     View,
-    ScrollView,
     TouchableOpacity,
     ImageBackground,
     Alert,
-    Animated,
-    Platform,
     TextInput,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
 import { SvgUri } from "react-native-svg";
-import { 
-    greenPencilIcon, 
+import {  
     backArrow,
     checkmark,
     pencilIcon, 
@@ -287,7 +282,7 @@ export default function SettingScreen () {
                     <SvgUri uri={becomeMemberIcon} />
                     <Text style={styles.actionButtonText}>Become a Member</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.actionButton}>
+                <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("AccountPrivacy")}>
                     <SvgUri uri={accountPrivacyIcon} />
                     <Text style={styles.actionButtonText}>Account Privacy</Text>
                 </TouchableOpacity>
