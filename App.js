@@ -48,6 +48,10 @@ import ShareModal from "./src/components/modals/ShareModal";
 import DiscoverPostDetailScreen from "./src/screens/discover/DiscoverPostDetailScreen";
 import InviteContactScreen from "./src/screens/setting/InviteContactScreen";
 import UpdateTagCause from "./src/screens/profile/UpdateTagCause";
+import AccountPrivacy from "./src/screens/setting/AccountPrivacy";
+import YourActivityScreen from "./src/screens/setting/YourActivityScreen";
+import LikedEventScreen from "./src/screens/setting/LikedEventScreen";
+import BookmarkedEventScreen from "./src/screens/setting/BookmarkedEvent";
 
 const Stack = createNativeStackNavigator();
 
@@ -117,6 +121,10 @@ const App = () => {
         <Stack.Screen name="InviteContactScreen" component={InviteContactScreen} options={{ headerShown: false }} />
         <Stack.Screen name="BecomeMemberScreen" component={BecomeMemberScreen} options={{ headerShown: false }} />
         <Stack.Screen name="UpdateTagCause" component={UpdateTagCause} options={{ headerShown: false }} />
+        <Stack.Screen name="AccountPrivacy" component={AccountPrivacy} options={{ headerShown: false }} />
+        <Stack.Screen name="YourActivityScreen" component={YourActivityScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="LikedEventScreen" component={LikedEventScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="BookmarkedEventScreen" component={BookmarkedEventScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </CategoryProvider>
