@@ -108,24 +108,24 @@ const HomeScreen = () => {
         setShowFilterDropdown(!showFilterDropdown);
     };
 
-    const generateQrCode = async () => {
+    const generateQrCode = async (post) => {
         try {
             const token = await AsyncStorage.getItem("AccessToken");
 
-            const response = await apiClient.post(`${baseUrl}/events/qrcode/${event.id}/`, {}, {
+            const response = await apiClient.post(`${baseUrl}/events/qrcode/${post.id}/`, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
-            if (response.data && response.data.qr_code_token) {
-                console.log("QR Code Generated Successfully:", response.data.qr_code_token);
+            if (response.data) {
+                console.log("QR Code Generated Successfully");
             } else {
                 console.log("Error: QR code generation failed.");
                 Alert.alert("QR Code generation failed. Please try again.");
             }
-        } catch {
+        } catch (error) {
             console.error("Error generating QR code:", error);
         }
     };
@@ -148,7 +148,7 @@ const HomeScreen = () => {
 
             if (response.status >= 200 && response.status < 300) {
                 console.log("Attendance status updated successfully");
-                generateQrCode();
+                generateQrCode(post);
                 navigation.navigate("CalendarScreen");
             } else {
                 console.error('Failed to update attendance status');
