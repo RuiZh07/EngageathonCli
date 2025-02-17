@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
     StyleSheet,
     Text,
@@ -16,14 +16,46 @@ import { SvgUri } from "react-native-svg";
 import apiClient from "../../services/apiClient";
 
 const AccountPrivacy = () => {
-    const [isPrivate, setIsPriavte] = useState(false);
+    const [isPrivate, setIsPrivate] = useState(false);
     const navigation = useNavigation();
 
+    // Fetch privacy status when the component mounts
+    useEffect(() => {
+        const fetchPrivacy = async () => {
+            try {
+                const token = await AsyncStorage.getItem("AccessToken");
+
+                const response = await apiClient.get(`${baseUrl}/auth/privateuser/`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (response.data) {
+                    if (response.data.message === "User is private") {
+                        setIsPrivate(true); // Account is private
+                    } else {
+                        setIsPrivate(false); // Account is public
+                    }
+                    console.log(response.data);
+                } else {
+                    console.log("Error: failed to fetch account privacy status");
+                }
+            } catch (error) {
+                console.error("Error fetching account privacy status", error);
+            }
+        };
+
+        fetchPrivacy();
+    }, []); 
+
+    // Toggle privacy setting
     const togglePrivacy = async () => {
         try {
             const token = await AsyncStorage.getItem("AccessToken");
 
-            const response = await apiClient.put(`${baseUrl}/auth/privateuser/`, {
+            const response = await apiClient.put(`${baseUrl}/auth/privateuser/`, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -31,16 +63,20 @@ const AccountPrivacy = () => {
             });
 
             if (response.data) {
-                setIsPriavte(previousState => !previousState);
+                if (response.data.message === "User is now private") {
+                    setIsPrivate(true);
+                } else {
+                    setIsPrivate(false);
+                }
                 console.log(response.data);
-                Alert.alert(response.data.message);
+                Alert.alert(response.data.message); 
             } else {
                 console.log("Error: update your account privacy");
             }
         } catch (error) {
             console.error("Error updating your account privacy", error);
         }
-    }; 
+    };
     return (
         <ImageBackground
             source={require('../../assets/main-background.png')}
