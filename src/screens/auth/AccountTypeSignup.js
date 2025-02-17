@@ -9,9 +9,10 @@ import {
     KeyboardAvoidingView,
     Image,
     Modal,
+    ScrollView,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { backArrow, userRoundedIcon, cameraIcon, lockIcon } from '../../utils/icons';
+import { backArrow, userRoundedIcon, cameraIcon, lockIcon, eyeCloseIcon, eyeIcon } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import MainButton from '../../components/common/MainButton';
 import CameraModal from '../../components/common/CameraModal';
@@ -24,6 +25,9 @@ const AccountTypeSignup = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [cPassword, setCPassword] = useState("");
+    const [showNewPassword, setShowNewPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
     const navigation = useNavigation();
     
     const route = useRoute();
@@ -147,7 +151,9 @@ const AccountTypeSignup = () => {
             source={require("../../assets/signup-bg1.png")}
             style={{ height: "100%", justifyContent: "flex-end" }}
         >
+        
         <View style={styles.container}>
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <SvgUri uri={backArrow} />
@@ -236,6 +242,13 @@ const AccountTypeSignup = () => {
                     value={password}
                     placeholder="Enter Password"
                     placeholderTextColor="#ABABAB"
+                    secureTextEntry={!showNewPassword}
+                />
+                <SvgUri 
+                    uri={showNewPassword ? eyeIcon : eyeCloseIcon}
+                    width="26"
+                    height="20"
+                    onPress={() => setShowNewPassword(!showNewPassword)}
                 />
             </View>
 
@@ -245,19 +258,28 @@ const AccountTypeSignup = () => {
                     width="24"
                     height="18" 
                 />
-                    <TextInput
-                        style={styles.input}
-                        onChangeText={setCPassword}
-                        value={cPassword}
-                        placeholder="Confirm Password"
-                        placeholderTextColor="#ABABAB"
-                    />
+                <TextInput
+                    style={styles.input}
+                    onChangeText={setCPassword}
+                    value={cPassword}
+                    placeholder="Confirm Password"
+                    placeholderTextColor="#ABABAB"
+                    secureTextEntry={!showConfirmPassword}
+                />
+                <SvgUri 
+                    uri={showConfirmPassword ? eyeIcon : eyeCloseIcon}
+                    width="26"
+                    height="20"
+                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                />
             </View>
             <MainButton 
                 onPress={handleNext} 
                 title={typeInput === 'IN' ? "Register" : "Next"}
                 style={styles.mainButton} />
+                </ScrollView>
         </View>
+        
         </ImageBackground>
     </KeyboardAvoidingView>
     );
@@ -279,6 +301,10 @@ const styles = StyleSheet.create({
         marginHorizontal: "4%",
         borderRadius: 40,
         paddingHorizontal: "7%",
+    },
+    scrollViewContent: {
+        flexGrow: 1,
+        alignItems: "center",
     },
     headerContainer: {
         flexDirection: "row",
@@ -349,7 +375,7 @@ const styles = StyleSheet.create({
         marginBottom: 15,
     },
     input: {
-        width: "90%",
+        width: "83%",
         paddingLeft: "4%",
         fontFamily: "Inter-Medium",
         fontSize: 15,
