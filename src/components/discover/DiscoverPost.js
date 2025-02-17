@@ -152,7 +152,7 @@ const DiscoverPost = ({
                 </View>
                 <View style={styles.postInteraction}>
                     <View style={styles.likeSection}>
-                        <Heart postId={post.id} like={post.liked}/>
+                        <Heart postId={post.id} like={post.liked} contentType={post.content_type} />
                         <Text style={styles.likeCountText}>
                             {post.likes_count ?? 0}
                         </Text>
@@ -160,7 +160,7 @@ const DiscoverPost = ({
                         <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
                             <Comment />
                         </TouchableOpacity>
-                        <Save postId={post.id} bookmark={post.bookmarked} />
+                        <Save postId={post.id} bookmark={post.bookmarked} contentType={post.content_type} />
                         <TouchableOpacity style={styles.shareButton} onPress={() => handleSharePress(post.id)}>
                         <SvgUri width="16" height="14" uri={shareIcon} />
                         </TouchableOpacity>
