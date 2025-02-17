@@ -43,8 +43,8 @@ const LikedEventScreen = () => {
         fetchLikedEvent();
     }, []);
 
-    const handleImageClick = (postDetails) => {
-        navigation.navigate('PostDetailScreen', { postDetails });
+    const handleImageClick = (event) => {
+        navigation.navigate('EventDetailScreen', { event });
     };
 
     return (
@@ -135,15 +135,14 @@ const styles = StyleSheet.create({
     gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
         width: '100%',
-        paddingHorizontal: '5%',
         flex: 1,
+        paddingTop: 20,
     },
     imageItem: {
-        width: '48%', // Adjust width for two images per row, or use '30%' for three images per row
-        height: 150,
-        marginBottom: 10,
+        width: '33%',
+        height: 120,
+        marginBottom: 2,
         justifyContent: 'center', 
         alignItems: 'center',      
         overflow: 'hidden',  
@@ -153,7 +152,9 @@ const styles = StyleSheet.create({
         width: '100%',
         height: '100%', // Adjust height as needed
         resizeMode: 'cover',
-        borderRadius: 10, // Optional: Add border radius for rounded corners
+        borderRadius: 10, 
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
     },
 });
   
