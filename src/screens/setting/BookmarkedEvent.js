@@ -4,28 +4,26 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Alert,
     ImageBackground,
-    Switch,
     Image,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
-import { backArrow, gradientLine, heartGradient, bookmarkGradient, whiteRightArrow } from "../../utils/icons";
+import { backArrow, gradientLine } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 import apiClient from "../../services/apiClient";
 
 const BookmarkedEventScreen = () => {
-    const [likedEvent, setLikedEvent] = useState([]);
+    const [bookmarkedEvent, setBookmarkedEvent] = useState([]);
     const navigation = useNavigation();
     
     useEffect(() => {
-        const fetchLikedEvent = async () => {
+        const fetchBookmarkedEvent = async () => {
             try {
                 const token = await AsyncStorage.getItem("AccessToken");
     
-                const response = await apiClient.get(`${baseUrl}/users/like/`, {
+                const response = await apiClient.get(`${baseUrl}/users/bookmark/`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -33,18 +31,18 @@ const BookmarkedEventScreen = () => {
                 });
     
                 if (response.data) {
-                    setLikedEvent(response.data);
+                    setBookmarkedEvent(response.data);
                     console.log(response.data);
                 }
             } catch (error) {
                 console.error("Error fetching liked events", error);
             }
         }; 
-        fetchLikedEvent();
+        fetchBookmarkedEvent();
     }, []);
 
-    const handleImageClick = (postDetails) => {
-        navigation.navigate('PostDetailScreen', { postDetails });
+    const handleImageClick = (event) => {
+        navigation.navigate('EventDetailScreen', { event });
     };
 
     return (
@@ -59,14 +57,14 @@ const BookmarkedEventScreen = () => {
                 >
                     <SvgUri uri={backArrow} />
                 </TouchableOpacity>
-                <Text style={styles.headerText}>Likes</Text>
+                <Text style={styles.headerText}>Saves</Text>
             </View>
             
             <View style={styles.container}>
                 <SvgUri uri={gradientLine} />
                 <View style={styles.gridContainer}>
-                    {likedEvent && likedEvent.length ? (
-                        likedEvent.map((content) => (
+                    {bookmarkedEvent && bookmarkedEvent.length ? (
+                        bookmarkedEvent.map((content) => (
                             <TouchableOpacity
                                 key={`${content.id}-${content.content_object_id}`}
                                 style={styles.imageItem}
@@ -79,7 +77,7 @@ const BookmarkedEventScreen = () => {
                             </TouchableOpacity>
                         ))
                     ) : (
-                        <Text style={styles.noContentText}>You haven't liked any posts yet</Text>    
+                        <Text style={styles.noContentText}>You haven't bookmarked any posts yet</Text>    
                     )}
                 </View>
             </View>
@@ -135,15 +133,14 @@ const styles = StyleSheet.create({
     gridContainer: {
         flexDirection: 'row',
         flexWrap: 'wrap',
-        justifyContent: 'space-between',
         width: '100%',
-        paddingHorizontal: '5%',
         flex: 1,
+        paddingTop: 20,
     },
     imageItem: {
-        width: '48%', // Adjust width for two images per row, or use '30%' for three images per row
-        height: 150,
-        marginBottom: 10,
+        width: '33%',
+        height: 120,
+        marginBottom: 2,
         justifyContent: 'center', 
         alignItems: 'center',      
         overflow: 'hidden',  
@@ -151,9 +148,11 @@ const styles = StyleSheet.create({
     },
     gridImage: {
         width: '100%',
-        height: '100%', // Adjust height as needed
+        height: '100%', 
         resizeMode: 'cover',
-        borderRadius: 10, // Optional: Add border radius for rounded corners
+        borderRadius: 10, 
+        borderColor: '#FFFFFF',
+        borderWidth: 1,
     },
 });
   
