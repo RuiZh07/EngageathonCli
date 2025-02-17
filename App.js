@@ -52,7 +52,7 @@ import AccountPrivacy from "./src/screens/setting/AccountPrivacy";
 import YourActivityScreen from "./src/screens/setting/YourActivityScreen";
 import LikedEventScreen from "./src/screens/setting/LikedEventScreen";
 import BookmarkedEventScreen from "./src/screens/setting/BookmarkedEvent";
-
+import EventDetailScreen from "./src/screens/setting/EventDetailScreen";
 const Stack = createNativeStackNavigator();
 
 const App = () => {
@@ -125,6 +125,7 @@ const App = () => {
         <Stack.Screen name="YourActivityScreen" component={YourActivityScreen} options={{ headerShown: false }} />
         <Stack.Screen name="LikedEventScreen" component={LikedEventScreen} options={{ headerShown: false }} />
         <Stack.Screen name="BookmarkedEventScreen" component={BookmarkedEventScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="EventDetailScreen" component={EventDetailScreen} options={{ headerShown: false }} />
       </Stack.Navigator>
     </NavigationContainer>
     </CategoryProvider>
