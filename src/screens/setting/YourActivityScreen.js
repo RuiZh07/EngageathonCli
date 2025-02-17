@@ -4,44 +4,15 @@ import {
     Text,
     View,
     TouchableOpacity,
-    Alert,
     ImageBackground,
-    Switch,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import baseUrl from "../../utils/api";
 import { backArrow, gradientLine, heartGradient, bookmarkGradient, whiteRightArrow } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
-import apiClient from "../../services/apiClient";
-import LikedEventScreen from "./LikedEventScreen";
 
 const YourActivityScreen = () => {
-    const [isPrivate, setIsPriavte] = useState(false);
     const navigation = useNavigation();
 
-    const togglePrivacy = async () => {
-        try {
-            const token = await AsyncStorage.getItem("AccessToken");
-
-            const response = await apiClient.put(`${baseUrl}/auth/privateuser/`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (response.data) {
-                setIsPriavte(previousState => !previousState);
-                console.log(response.data);
-                Alert.alert(response.data.message);
-            } else {
-                console.log("Error: update your account privacy");
-            }
-        } catch (error) {
-            console.error("Error updating your account privacy", error);
-        }
-    }; 
     return (
         <ImageBackground
             source={require('../../assets/main-background.png')}
@@ -66,7 +37,7 @@ const YourActivityScreen = () => {
                     </View>
                         <SvgUri uri={whiteRightArrow} />
                 </TouchableOpacity>
-                <TouchableOpacity style={styles.likeIcon}>
+                <TouchableOpacity style={styles.likeIcon} onPress={() => navigation.navigate('BookmarkedEventScreen')}>
                     <View style={styles.iconsContainer}>
                         <SvgUri uri={bookmarkGradient} />
                         <Text style={styles.wordText}>Saves</Text>
