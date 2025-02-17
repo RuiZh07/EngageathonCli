@@ -5,7 +5,7 @@ import { heartIconFilled, heartIconOutline } from "../../utils/icons";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
 import apiClient from "../../services/apiClient";
-const Heart = ({ postId, like}) => {
+const Heart = ({ postId, like, contentType}) => {
     const [liked, setLiked] = useState(like);
   
     const handleLikePress = async () => {
@@ -15,8 +15,11 @@ const Heart = ({ postId, like}) => {
                 console.error('No token found');
                 return;
             }
-        
-            const response = await apiClient.put(`${baseUrl}/like/EV/${postId}/`, {}, {
+            const url = contentType === 'EV' 
+            ? `${baseUrl}/like/EV/${postId}/`  
+            : `${baseUrl}/like/PO/${postId}/`;
+
+            const response = await apiClient.put(url, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
