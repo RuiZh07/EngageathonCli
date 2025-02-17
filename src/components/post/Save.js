@@ -6,7 +6,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
 import apiClient from "../../services/apiClient";
 
-const Save = ({ postId, bookmark }) => {
+const Save = ({ postId, bookmark, contentType }) => {
     const [saved, setSaved] = useState(bookmark);
     
     useEffect(() => {
@@ -22,7 +22,12 @@ const Save = ({ postId, bookmark }) => {
                 return;
             }
             console.log(`Toggling bookmark for postId ${postId}. Current state:`, saved);
-            const response = await apiClient.put(`${baseUrl}/bookmark/EV/${postId}/`, {}, {
+
+            const url = contentType === 'EV' 
+            ? `${baseUrl}/bookmark/EV/${postId}/`  
+            : `${baseUrl}/bookmark/PO/${postId}/`;
+
+            const response = await apiClient.put(url, {}, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
