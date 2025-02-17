@@ -101,7 +101,7 @@ const PostDetailScreen = ({ route }) => {
                         <View style={styles.postInteraction}>
                             <View style={styles.likeSection}>
                                 <TouchableOpacity onPress={() => handleLikePress(postDetails.id)}>
-                                    <Heart filled={false} />
+                                <Heart postId={postDetails.id} like={postDetails.liked} contentType={postDetails.content_type}/>
                                 </TouchableOpacity>
                                 <Text style={styles.likeCountText}>
                                     {postDetails.likes_count || 0}
@@ -111,7 +111,7 @@ const PostDetailScreen = ({ route }) => {
                                 <Comment />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.saveButton} onPress={() => handleBookmarkPress(postDetails.id)}>
-                                <Save filled={false} />
+                            <Save postId={postDetails.id} bookmark={postDetails.bookmarked} contentType={postDetails.content_type} />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.interactionButton}>
                                 
