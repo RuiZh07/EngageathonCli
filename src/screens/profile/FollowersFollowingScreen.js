@@ -59,19 +59,24 @@ const FollowersFollowingScreen = () => {
 
     // This function renders each item in the list
     const renderItem = ({ item }) => (
-        <View style={styles.item}>
-            <Image source={{ uri: item.profilePhoto || "../../assets/default_white_profile.png" }} style={styles.profileImage} />
-            <View style={styles.textContainer}>
-                <Text style={styles.username}>
-                    {item.following_first} {item.following_last}
-                </Text>
+        <TouchableOpacity onPress={() => navigation.navigate("UserProfileScreen", { userID: item.following_id })} >
+            <View style={styles.item}>
+                <Image 
+                    source={item?.profile_photo_url ? { uri: item.profile_photo_url } : require("../../assets/default_white_profile.png")}
+                    style={styles.profileImage} 
+                />
+                <View style={styles.textContainer}>
+                    <Text style={styles.username}>
+                        {item.following_first} {item.following_last}
+                    </Text>
+                </View>
+                <TouchableOpacity style={styles.followButton}>
+                    <Text style={styles.followButtonText}>
+                        {item.followed ? "Following" : "Follow"}
+                    </Text>
+                </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.followButton}>
-                <Text style={styles.followButtonText}>
-                    {item.followed ? "Following" : "Follow"}
-                </Text>
-            </TouchableOpacity>
-        </View>
+        </TouchableOpacity>
     );
 
     return (
@@ -195,10 +200,12 @@ const styles = StyleSheet.create({
         borderBottomColor: "#333",
     },
     profileImage: {
-        width: 50,
-        height: 50,
-        borderRadius: 25,
+        width: 45,
+        height: 45,
+        borderRadius: 22,
         marginRight: 15,
+        borderWidth: 1,
+        borderColor: '#00C853',
     },
     textContainer: {
         flex: 1,
