@@ -125,7 +125,7 @@ const FollowersFollowingScreen = () => {
                     ) : (
                         <FlatList
                             data={data}
-                            keyExtractor={(item) => item.follower_id.toString()}
+                            keyExtractor={(item) => item.following_id.toString()}
                             renderItem={renderItem}
                             refreshControl={
                                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
