@@ -153,7 +153,7 @@ const AccountTypeSignup = () => {
         >
         
         <View style={styles.container}>
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
+           
             <View style={styles.headerContainer}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <SvgUri uri={backArrow} />
@@ -162,7 +162,7 @@ const AccountTypeSignup = () => {
                 <Text style={styles.heading}>Sign up</Text>
             </View>
             <Text style={styles.title}>{title}</Text>
-
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <TouchableOpacity style={styles.pfpContainer} onPress={openCamera}>
                 {selectedImage ? (
                     <Image 
