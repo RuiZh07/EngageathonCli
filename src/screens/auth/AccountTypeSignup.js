@@ -78,7 +78,7 @@ const AccountTypeSignup = () => {
     const handleNext = async () => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-        if (!email || !password || !cPassword) {
+        if (!email || !password || !cPassword || !fname || !lname) {
             alert("Please fill in all fields.");
             return;
         }
@@ -92,6 +92,12 @@ const AccountTypeSignup = () => {
             alert("Passwords do not match.");
             return;
         }
+
+        if (password.length < 12) {
+            alert("Password must be at least 12 characters long.");
+            return;
+        }
+
         console.log("userData", userData);
         if (typeInput === 'IN') {
             const response = await authService.signup(
