@@ -10,6 +10,7 @@ import {
     TouchableOpacity,
     ImageBackground,
     KeyboardAvoidingView,
+    ScrollView,
 } from "react-native";
 import MainButton from "../../components/common/MainButton";
 import authService from "../../services/authService";
@@ -58,63 +59,68 @@ export default function Signup () {
     return (
         <KeyboardAvoidingView
             style={styles.avoidView}
-            behavior="position"
+            //behavior="position"
         >
             <ImageBackground
                 source={require("../../assets/signup-bg1.png")}
-                style={{ height: "100%", justifyContent: "flex-end" }}
+                style={{ flex: 1, justifyContent: "flex-end" }}
             >
                 <View style={styles.container}>
                     <Text style={styles.heading}>Sign up</Text>
                     <Text style={styles.createAccountText}>Create Your Account</Text>
-                    <Text style={styles.selectAccountText}>Select Account Type</Text>
-                    <View style={styles.accountTypeContainer}>
-                        {['Individual', 'University', 'Organization', 'Non-Profit', 'Corporation', 'Government'].map(accountType =>
-                        <View style={styles.accountTypeSelectionChoice} key={accountType}>
-                            <TouchableOpacity
-                                style={styles.selectionOuter}
-                                onPress={() => setSelectedAccountType(accountType)}
-                            >
-                                {selectedAccountType === accountType && <View style={styles.selectionInner}></View>}
+                    <ScrollView 
+                        contentContainerStyle={styles.scrollViewContent} 
+                        horizontal={false}
+                    >
+                        <Text style={styles.selectAccountText}>Select Account Type</Text>
+                        <View style={styles.accountTypeContainer}>
+                            {['Individual', 'University', 'Organization', 'Non-Profit', 'Corporation', 'Government'].map(accountType =>
+                            <View style={styles.accountTypeSelectionChoice} key={accountType}>
+                                <TouchableOpacity
+                                    style={styles.selectionOuter}
+                                    onPress={() => setSelectedAccountType(accountType)}
+                                >
+                                    {selectedAccountType === accountType && <View style={styles.selectionInner}></View>}
+                                </TouchableOpacity>
+                                <Text style={styles.accountTypeText}>{accountType}</Text>
+                            </View>)}
+                        </View>
+
+                        <View style={styles.agreeContainer}>
+                            <BouncyCheckbox 
+                                size={20} 
+                                iconStyle={{ borderColor: "red" }}
+                                onPress={() => setAcceptTerms(!acceptTerms)} />
+                            <Text style={styles.agreeText}>I agree to the terms and conditions</Text>
+                        </View>
+                        
+                        <MainButton onPress={handleRegister} title="Continue" />
+
+                        <View style={styles.centeredContainer}>
+                            <View style={styles.line} />
+                            <Text style={styles.continueText}>Or continue with</Text>
+                            <View style={styles.line} />
+                        </View>
+
+                        <View style={styles.centeredContainer}>
+                            <TouchableOpacity style={styles.googleFacebook}>
+                                <Image source={require("../../assets/google-logo.png")}></Image>
+                                <Text style={styles.googleFacebookText}>Google</Text>
                             </TouchableOpacity>
-                            <Text style={styles.accountTypeText}>{accountType}</Text>
-                        </View>)}
-                    </View>
 
-                    <View style={styles.agreeContainer}>
-                        <BouncyCheckbox 
-                            size={20} 
-                            iconStyle={{ borderColor: "red" }}
-                            onPress={() => setAcceptTerms(!acceptTerms)} />
-                        <Text style={styles.agreeText}>I agree to the terms and conditions</Text>
-                    </View>
-                    
-                    <MainButton onPress={handleRegister} title="Continue" />
+                            <TouchableOpacity style={styles.googleFacebook}>
+                                <Image source={require("../../assets/facebook-logo.png")}></Image>
+                                <Text style={styles.googleFacebookText}>Facebook</Text>
+                            </TouchableOpacity>
+                        </View>
 
-                    <View style={styles.centeredContainer}>
-                        <View style={styles.line} />
-                        <Text style={styles.continueText}>Or continue with</Text>
-                        <View style={styles.line} />
-                    </View>
-
-                    <View style={styles.centeredContainer}>
-                        <TouchableOpacity style={styles.googleFacebook}>
-                            <Image source={require("../../assets/google-logo.png")}></Image>
-                            <Text style={styles.googleFacebookText}>Google</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity style={styles.googleFacebook}>
-                            <Image source={require("../../assets/facebook-logo.png")}></Image>
-                            <Text style={styles.googleFacebookText}>Facebook</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <View style={styles.centeredContainer}>
-                        <Text style={styles.alreadyText}>Already have an account?</Text>
-                        <TouchableOpacity onPress={handleLogin}>
-                            <Text style={styles.loginText}>Login</Text>
-                        </TouchableOpacity>
-                    </View>
+                        <View style={styles.centeredContainer}>
+                            <Text style={styles.alreadyText}>Already have an account?</Text>
+                            <TouchableOpacity onPress={handleLogin}>
+                                <Text style={styles.loginText}>Login</Text>
+                            </TouchableOpacity>
+                        </View>
+                   </ScrollView>
                 </View>
             </ImageBackground>
         </KeyboardAvoidingView>
@@ -137,6 +143,9 @@ const styles = StyleSheet.create({
         marginHorizontal: "4%",
         borderRadius: 40,
         paddingHorizontal: "7%",
+    },
+    scrollViewContent: {
+        flexGrow: 1,
     },
     heading: {
         alignSelf: "flex-start",
@@ -221,7 +230,7 @@ const styles = StyleSheet.create({
         marginHorizontal: "2%",
     },
     googleFacebook: {
-        width: "45%",
+        width: "43%",
         height: 45,
         backgroundColor: "#F3F3FC",
         alignItems: "center",
