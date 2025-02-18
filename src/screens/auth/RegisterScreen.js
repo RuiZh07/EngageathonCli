@@ -9,6 +9,7 @@ import {
     KeyboardAvoidingView,
     Image,
     Alert,
+    ScrollView,
   } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { backArrow } from '../../utils/icons';
@@ -296,6 +297,7 @@ const RegisterScreen = () => {
             source={require("../../assets/signup-bg1.png")}
             style={{ height: "100%", justifyContent: "flex-end" }}
         >
+            
         <View style={styles.container}>
             <View style={styles.headerContianer}>
                 <TouchableOpacity onPress={() => navigation.goBack()}>
@@ -305,7 +307,7 @@ const RegisterScreen = () => {
                 <Text style={styles.heading}>Sign up</Text>
             </View>
             <Text style={styles.title}>{title}</Text>
-
+            <ScrollView contentContainerStyle={styles.scrollViewContent}>
             <View style={styles.inputContainer}>
                 <TextInput 
                     style={styles.input} 
@@ -359,7 +361,9 @@ const RegisterScreen = () => {
             </View>
 
             <MainButton onPress={handleNext} title="Register" style={styles.mainButton} />
+            </ScrollView>
         </View>
+        
         </ImageBackground>
     </KeyboardAvoidingView>
     );
@@ -370,6 +374,10 @@ const styles = StyleSheet.create({
         width: "100%",
         height: "100%",
         maxWidth: "100%",
+    },
+    scrollViewContent: {
+        flexGrow: 1,
+        //alignItems: "center",
     },
     container: {
         backgroundColor: "#FFFFFF",
@@ -402,20 +410,6 @@ const styles = StyleSheet.create({
         marginTop: 5, 
         marginBottom: 10,
     },
-    pfpContainer: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderRadius: 50,
-        backgroundColor: "#E8E8E8",
-        padding:12,
-        marginBottom: 30,
-        position: "relative",
-    },
-    cameraIcon: {
-        position: 'absolute',
-        top: 60,
-        left: 50,
-    },
     inputContainer: {
         flexDirection: "row",
         alignItems: "center",
@@ -425,7 +419,7 @@ const styles = StyleSheet.create({
         borderRadius: 10,
         paddingVertical: "6%",
         paddingHorizontal: "5%",
-        width: "95%",
+        width: "100%",
         marginBottom: 15,
     },
     input: {
