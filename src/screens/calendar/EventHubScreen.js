@@ -1,5 +1,5 @@
-import React from 'react';
-import { useNavigation, useRoute } from '@react-navigation/native';
+import React, { useState } from 'react';
+import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import {
     View,
     Text,
@@ -8,12 +8,20 @@ import {
     ImageBackground,
     ScrollView,
     Alert,
+    Image,
 } from 'react-native';
 import { Platform } from "react-native";
-import { backArrow, addCameraIcon, circleCheckmark, blackCircle } from '../../utils/icons';
+import { backArrow, addCameraIcon, blackCircle } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
+import QRCodeScannerModal from '../../components/common/QRCodeScannerModal';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import apiClient from "../../services/apiClient";
+import baseUrl from "../../utils/api";
 
 const EventHubScreen = () => {
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [scannedData, setScannedData] = useState(null);
+    const [eventState, setEventState] = useState(event);
     const navigation = useNavigation();
     const route = useRoute();
     const { event } = route.params;
@@ -26,6 +34,35 @@ const EventHubScreen = () => {
             navigation.navigate('LeaderboardScreen', { eventId: event.id });
         }  
     };
+
+    const handleScanSuccess = async (scannedData) => {
+        setScannedData(scannedData); 
+        console.log(scannedData);
+        // Call the scan API after updating the UI
+        await scanActivity(scannedData);
+    };
+
+    const scanActivity = async (scannedData) => {
+        try {
+            const accessToken = await AsyncStorage.getItem("AccessToken");
+            if(!accessToken) {
+                console.error("no token found");
+                return;
+            }
+            console.log('scannedData in eventhub', scannedData);
+            const response = await apiClient.post(`${baseUrl}/events/activity/check/${event.id}/`, `token=${scannedData}`, {
+                headers: {
+                    "Authorization": `Bearer ${accessToken}`,
+                    "Content-Type": "application/x-www-form-urlencoded",
+
+                },
+            });
+            console.log(response.data.message);
+            //navigation.replace('EventHubScreen', { event });
+        } catch (error) {
+            console.error("Error scanning the QR code", error);
+        }
+    }
 
     return (
         <ImageBackground source={require('../../assets/main-background.png')} style={styles.backgroundImage}>
@@ -62,16 +99,24 @@ const EventHubScreen = () => {
                             <Text style={styles.activityText}>{activity.name}</Text>
                             <Text style={styles.activityPoints}>{activity.points}</Text>
                             <View style={styles.activityStatus}>
-                                <SvgUri
-                                    uri={activity.completed ? blackCircle : circleCheckmark} 
+                            {activity.confirmed ? (
+                                <Image
+                                    source={require('../../assets/icons/greenCheckmark.png')} 
+                                    style={styles.circleImage}
                                 />
+                            ) : (
+                                <SvgUri uri={blackCircle}/>
+                            )}
                             </View>
                         </View>
                         ))
                     )}
                     {event.activities.length !== 0 && 
                         <View style={styles.cameraButtonContainer}>
-                            <TouchableOpacity onPress={() => console.log('Camera pressed')} disabled={event.activities.length === 0}>
+                            <TouchableOpacity 
+                                onPress={() => setIsModalVisible(true)} 
+                                disabled={event.activities.length === 0 || event.activities.every(activity => activity.confirmed)}
+                            >
                                 <SvgUri 
                                     uri={addCameraIcon} 
                                     width="40"
@@ -83,6 +128,13 @@ const EventHubScreen = () => {
                     
                 </ScrollView>
             </View>
+            {isModalVisible && 
+                <QRCodeScannerModal
+                   isVisible={isModalVisible} 
+                   onClose={() => setIsModalVisible(false)}
+                   onScanSuccess={handleScanSuccess}
+                />
+            }
         </ImageBackground>
     );
 };
