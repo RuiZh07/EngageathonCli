@@ -11,7 +11,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
 import apiClient from "../../services/apiClient";
 
-const DiscoverPeople = ({ profilePicture, userID, name, onPress }) => {
+const DiscoverPeople = ({ profilePicture, userID, name, onPress, followingStatus, requestStatus }) => {
     const [clicked, setClicked] = useState(false);
 
     useEffect(() => {
@@ -74,7 +74,13 @@ const DiscoverPeople = ({ profilePicture, userID, name, onPress }) => {
                     <View style={styles.postUser}>
                         <Text style={styles.userNameText} numberOfLines={2}>{name}</Text>
                     </View>
-                    <DiscoverPeopleAddButton onPress={handleButtonPress} title="Add + " clicked={clicked} />
+                    <DiscoverPeopleAddButton 
+                        onPress={handleButtonPress} 
+                        title="Add + " 
+                        followingStatus={followingStatus} 
+                        requestStatus={requestStatus}
+                        clicked={clicked}
+                    />
                 </View>
             </TouchableOpacity>
         </View>
