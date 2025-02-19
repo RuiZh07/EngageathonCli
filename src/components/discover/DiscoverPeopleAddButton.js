@@ -2,16 +2,33 @@ import React from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 import { LinearGradient } from "react-native-linear-gradient";
 
-const DiscoverPeopleAddButton = ({ onPress, title, clicked }) => {
+const DiscoverPeopleAddButton = ({ onPress, title, followingStatus, requestStatus, clicked }) => {
+    let buttonTitle = title;
+    let isButtonDisabled = false;
+
+    if (followingStatus) {
+        buttonTitle = 'Following';
+        isButtonDisabled = true;
+    } else if (requestStatus) {
+        buttonTitle = 'Request Send!';
+        isButtonDisabled = true;
+    } else if (clicked) {
+        buttonTitle = 'Request Send!';
+        isButtonDisabled = true;
+    }
     return (
-        <TouchableOpacity onPress={onPress} style={styles.buttonContainer}>
+        <TouchableOpacity 
+            onPress={onPress} 
+            style={styles.buttonContainer}
+            disabled={isButtonDisabled}
+        >
             <LinearGradient
-                colors={clicked ? ["#2BAB47", "#2BAB47"] : ["#FF8D00", "#FFB900", "#FFE600"]}
+                colors={isButtonDisabled ? ["#2BAB47", "#2BAB47"] : ["#FF8D00", "#FFB900", "#FFE600"]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.button}
             >
-                <Text style={styles.buttonText}>{clicked ? "Request Sent!" : title}</Text>
+                <Text style={styles.buttonText}>{buttonTitle}</Text>
             </LinearGradient>
         </TouchableOpacity>
     );
