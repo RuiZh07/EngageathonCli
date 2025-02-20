@@ -334,6 +334,7 @@ const DiscoverScreen = () => {
                                                             onPress={()=>navigation.navigate('UserProfileScreen', { userID: user.owner })}
                                                             followingStatus={user.followed} 
                                                             requestStatus={user.is_request}
+                                                            privateAccount={user.private}
                                                         />
                                                     ))}
                                                 </ScrollView>
