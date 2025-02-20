@@ -103,7 +103,7 @@ const AccountTypeSignup = () => {
             const response = await authService.signup(
                 userData
             );
-             navigation.navigate("TagCause", { response });
+             navigation.navigate("TagCause", { userData });
         } else {
             navigation.navigate("RegisterScreen", { userData });
         }
