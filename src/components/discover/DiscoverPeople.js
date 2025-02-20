@@ -6,27 +6,33 @@ import {
     Image,
     TouchableOpacity,
 } from "react-native";
-import DiscoverPeopleAddButton from "./DiscoverPeopleAddButton";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
 import apiClient from "../../services/apiClient";
+import LinearGradient from "react-native-linear-gradient";
 
-const DiscoverPeople = ({ profilePicture, userID, name, onPress, followingStatus, requestStatus }) => {
-    const [clicked, setClicked] = useState(false);
+const DiscoverPeople = ({ profilePicture, userID, name, onPress, followingStatus, requestStatus, privateAccount }) => {
+    const [clicked, setClicked] = useState(followingStatus);
+    const [buttonTitle, setButtonTitle] = useState(followingStatus ? 'Following' : 'Add + ');
+    const [buttonChange, setButtonChange] = useState(followingStatus ? true : false);
+    const [buttonDisabled, setButtonDisabled] = useState(false);
 
     useEffect(() => {
-        const fetchClickedState = async () => {
-            try {
-                const savedState = await AsyncStorage.getItem(`buttonClicked_${userID}`);
-                if (savedState === "true") {
-                    setClicked(true);
-                }
-            } catch (error) {
-                console.error("Failed to load button state:", error);
+        const loadButtonState = async () => {
+            const savedStatus = await AsyncStorage.getItem(`followStatus_${userID}`);
+            if (savedStatus !== null) {
+                const status = JSON.parse(savedStatus);
+                setClicked(status);
+                setButtonTitle(status ? 'Following' : 'Add +');
+                setButtonChange(status ? true : false);
+            } else {
+                setClicked(followingStatus);
+                setButtonTitle(followingStatus ? 'Following' : 'Add +');
+                setButtonChange(followingStatus ? true : false);
             }
         };
-        fetchClickedState();
-    }, [userID]);
+        loadButtonState();
+    }, [userID, followingStatus]);
 
     const sendRequest = async (userID) => {
         const token = await AsyncStorage.getItem("AccessToken");
@@ -45,21 +51,35 @@ const DiscoverPeople = ({ profilePicture, userID, name, onPress, followingStatus
             console.log("Response message:", response.data.message);
             return response.data;
         } catch (error) {
-            console.log("Failed to follow user: ", error.message);
+            console.log("Failed to follow/unfollow user: ", error.message);
             throw error;
         }
     };
 
     const handleButtonPress = async () => {
-        setClicked(true);
-        await AsyncStorage.setItem(`buttonClicked_${userID}`, "true");
+        if (clicked) {
+            setButtonTitle('Add +');
+            setButtonChange(false); 
+            setClicked(false);
+        } else {
+            if (privateAccount) {
+                setButtonTitle('Request Sent!');
+                setButtonDisabled(true);
+                setButtonChange(true);
+            } else {
+                setButtonTitle('Following');
+                setClicked(true);
+                setButtonChange(true); 
+            }
+        }
 
-        try {
-            await sendRequest(userID);
-        } catch (error) {
-            console.error("Error during API call:", error.message);
+        const response = await sendRequest(userID);
+        if (response && response.status === 200 && response.data.message === "User followed successfully") {
+            console.log("User followed successfully.");
+            await AsyncStorage.setItem(`followStatus_${userID}`, JSON.stringify(true));
         }
     };
+    
     return(
         <View style={styles.container}>
             <TouchableOpacity onPress={onPress}>
@@ -74,13 +94,20 @@ const DiscoverPeople = ({ profilePicture, userID, name, onPress, followingStatus
                     <View style={styles.postUser}>
                         <Text style={styles.userNameText} numberOfLines={2}>{name}</Text>
                     </View>
-                    <DiscoverPeopleAddButton 
+                    <TouchableOpacity 
                         onPress={handleButtonPress} 
-                        title="Add + " 
-                        followingStatus={followingStatus} 
-                        requestStatus={requestStatus}
-                        clicked={clicked}
-                    />
+                        style={styles.buttonContainer}
+                        disabled={buttonDisabled}
+                    >
+                        <LinearGradient
+                            colors={buttonChange ? ["#2BAB47", "#2BAB47"] : ["#FF8D00", "#FFB900", "#FFE600"]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={styles.button}
+                        >
+                            <Text style={styles.buttonText}>{buttonTitle}</Text>
+                        </LinearGradient>
+                    </TouchableOpacity>
                 </View>
             </TouchableOpacity>
         </View>
@@ -129,5 +156,23 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'Poppins-Medium',
         lineHeight: 19,
+    },
+    buttonContainer: {
+        alignItems: "center",
+        marginHorizontal: 10, 
+        marginVertical: 10, 
+    },
+    button: {
+        width: 110,
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+    },
+    buttonText: {
+        fontFamily: "Poppins-SemiBold",
+        fontSize: 13,
+        lineHeight: 22,
+        letterSpacing: 0.4,
+        color: "#F5F4F4",
     },
   })
