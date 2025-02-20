@@ -26,13 +26,7 @@ const login = async (email, password) => {
         await AsyncStorage.setItem("RefreshToken", refresh);
         const storedAccessToken = await AsyncStorage.getItem("AccessToken");
         const storedRefreshToken = await AsyncStorage.getItem("RefreshToken");
-
-        const isFirstLogin = await AsyncStorage.getItem("isFirstLogin");
-
-        if (isFirstLogin === null) {
-            await updateUserMission(storedAccessToken);
-            await AsyncStorage.setItem("isFirstLogin", "false");
-        }
+        
         return {
             userData: { account_type, email, first_name, last_name, id, profile_photo },
             accessToken: storedAccessToken,
