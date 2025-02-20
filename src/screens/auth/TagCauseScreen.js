@@ -20,7 +20,9 @@ const TagCause = () => {
     const [selectedCauseIds, setSelectedCauseIds] = useState([]);
     const [pressedStates, setPressedStates] = useState({});
     const navigation = useNavigation();
-
+    const route = useRoute();
+    const { userData } = route.params || {};
+    console.log('userdata in tag cuase', userData.email);
     // effect to fetch data from the API 
     useEffect(() => {
         // Fetch cause types and initialize pressedStates based on categoryIdPost
@@ -96,6 +98,30 @@ const TagCause = () => {
         }
     };
     saveSelectedCauses(selectedCauseIds);
+
+    // Update user mission with user email
+    const updateUserMission = async () => {
+        try {
+            const emailLowerCase = userData.email.toLowerCase();
+
+            const data = {
+                "categories": selectedCauseIds,
+            }
+
+            console.log('Data being sent to the server:', data);
+            const response = await axios.put(`${baseUrl}/missions/categories/${emailLowerCase}/`, data, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log('Successfully updated user missions:', response.data);
+    
+        } catch (error) {
+            console.error("Error updating the mission categories:", error.message);
+        }
+    };
+
+    updateUserMission();
 
     // Function to handle button functionality.
     const handlePressShareBtn = async () => {
