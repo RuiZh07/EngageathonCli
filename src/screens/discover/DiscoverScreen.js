@@ -325,7 +325,7 @@ const DiscoverScreen = () => {
                                                             category={category}
                                                             profilePicture={
                                                                 user?.profile_photo_url 
-                                                                ? { uri: `data:image/jpeg;base64,${user.profile_photo_url}` } 
+                                                                ? { uri: user.profile_photo_url } 
                                                                 : require("../../assets/default_profile.png")
                                                             } 
                                                             userID={user.owner} 
