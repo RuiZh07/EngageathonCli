@@ -229,8 +229,6 @@ const HomeScreen = () => {
                     <Text style={styles.loadingText}>Loading...</Text>
                 ) : error ? (
                     <Text style={styles.errorText}>{error}</Text>
-                ) : posts.length === 0 ? (
-                    <Text style={styles.noDataText}>No posts available.</Text>
                 ) : (
                     <ScrollView 
                         style={styles.eventContainer} 
@@ -242,8 +240,12 @@ const HomeScreen = () => {
                                 colors={['#ffffff']}
                                 tintColor="#ffffff"
                             />
-                    }>
-                        {posts.map((post) => (
+                        }
+                    >  
+                        {posts.length === 0 ? (
+                            <Text style={styles.noDataText}>No posts available.</Text>
+                        ) : (
+                            posts.map((post) => (
                             <TouchableWithoutFeedback 
                                 key={`${post.id}-${post.name || post.caption}`} 
                                 onPress={() => setShowFilterDropdown(false)}
@@ -346,7 +348,8 @@ const HomeScreen = () => {
                                     )}
                                 </View>
                             </TouchableWithoutFeedback>
-                        ))}
+                        ))
+                    )}
                     </ScrollView>
                 )}
                 <CommentsModal visible={commentsVisible} onClose={() => setCommentsVisible(false)} postId={selectedPostId} />
