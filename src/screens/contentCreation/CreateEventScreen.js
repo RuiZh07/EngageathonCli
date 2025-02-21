@@ -46,10 +46,12 @@ const CreateEventScreen = () => {
     const [eventDes, setEventDes] = useState("");
     const [recurringEvent, setRecurringEvent] = useState(false);
     const [leaderboards, setLeaderboards] = useState(false);
+    const [membersOnlyEvent, setMembersOnlyEvent] = useState(false);
     const [photoList, setPhotoList] = useState([]);
     const [base64Image, setBase64Image] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [token, setToken] = useState(null);
+    const [accountType, setAccountType] = useState(null);
 
     //const [permission, requestPermission] = useCameraPermissions();
     const [isCameraModalVisible, setIsCameraModalVisible] = useState(false);
@@ -134,8 +136,25 @@ const CreateEventScreen = () => {
         setBase64Image(null); 
         setCategoryId(null);
         setActivities([]);
-        
+        setMembersOnlyEvent(false);
     };
+
+    useEffect (() => {
+        const fetchAccountType = async (token) => {
+            try {
+                const response = await apiClient.get(`${baseUrl}/user-content/?content_types=event&content_types=post`, {
+                    headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                    },
+                });
+                setAccountType(response.data[0].account_type);
+            } catch (error) {
+                console.error('Error fetching account type:', error);
+            }
+        };
+        fetchAccountType(token);
+    }, [])
 
     const createEvent = async (eventData) => {
         if (!token) {
@@ -176,6 +195,7 @@ const CreateEventScreen = () => {
                 description: eventDes,
                 recurring_event: recurringEvent, 
                 leaderboards: leaderboards,
+                is_private: membersOnlyEvent,
                 datetime_start: isoStartDate,
                 datetime_end: isoEndDate,
                 activities: activities,
@@ -234,6 +254,10 @@ const CreateEventScreen = () => {
     const toggleLeaderboards = () => {
         setLeaderboards(previousState => !previousState);
     };
+
+    const toggleMemebersOnlyEvent = () => {
+        setMembersOnlyEvent(previousState => !previousState);
+    };
     
     // Pick photos from photo library
     const pickImage = async () => {
@@ -284,7 +308,7 @@ const CreateEventScreen = () => {
         }
     };
 
-    console.log('photo', photoList);
+    //console.log('photo', photoList);
     // Create a dict from photoList
     // Create a dict prioritizing multiPhotoList if not empty
     const photoDict = (multiPhotoList && multiPhotoList.length > 0 ? multiPhotoList : photoList).reduce(
@@ -303,9 +327,9 @@ const CreateEventScreen = () => {
     }, [photoDict]);
     
     
-    console.log('PhotoDict in createEvent length:', Object.keys(photoDict).length);
-    console.log('Received multiPhotoList in CreateEventScreen:', multiPhotoList);
-    console.log('Length of multiPhotoList:', multiPhotoList ? Object.keys(multiPhotoList).length : 0);
+    //console.log('PhotoDict in createEvent length:', Object.keys(photoDict).length);
+    //console.log('Received multiPhotoList in CreateEventScreen:', multiPhotoList);
+    //console.log('Length of multiPhotoList:', multiPhotoList ? Object.keys(multiPhotoList).length : 0);
     return (
         <ImageBackground
         source={require("../../assets/main-background.png")}
@@ -357,7 +381,7 @@ const CreateEventScreen = () => {
 
                         <View style={styles.pickDate}>
                             <View style={styles.dateContainer}>
-                                <TouchableOpacity onPress={() =>{ setShowPicker(true); setIsStartDate(true); }} style={styles.touchableContainer}>
+                                <TouchableOpacity onPress={() => { setShowPicker(true); setIsStartDate(true); }} style={styles.touchableContainer}>
                                     <TextInput 
                                         style={styles.dateInput}
                                         value={displayStartDate}
@@ -372,7 +396,7 @@ const CreateEventScreen = () => {
                             </View>
                 
                             <View style={styles.dateContainer}>
-                                <TouchableOpacity onPress={() =>{ setShowPicker(true); setIsStartDate(false); }} style={styles.touchableContainer}>
+                                <TouchableOpacity onPress={() => { setShowPicker(true); setIsStartDate(false); }} style={styles.touchableContainer}>
                                     <TextInput 
                                         style={styles.dateInput}
                                         value={displayEndDate}
@@ -404,7 +428,7 @@ const CreateEventScreen = () => {
                                     thumbColor={recurringEvent ? '#ffffff' : "#ffffff"}
                                     onValueChange={toggleRecurringEvent}
                                     value={recurringEvent}
-                                    style={{ transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
+                                    style={{ transform: [{scaleX: 0.7}, {scaleY: 0.7}] }}
                                 />
                             </View>
                             <Text style={styles.recurringEventText}>Recurring Event</Text>
@@ -415,12 +439,27 @@ const CreateEventScreen = () => {
                                     thumbColor={leaderboards ? '#ffffff' : "#ffffff"}
                                     onValueChange={toggleLeaderboards}
                                     value={leaderboards}
-                                    style={{ transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
+                                    style={{ transform: [{scaleX: 0.7}, {scaleY: 0.7}] }}
                                 />
                             </View>
                             <Text style={styles.recurringEventText}>Leaderboards</Text>
                         </View>
-                    
+
+                        {(accountType === 'NO' || accountType === 'CO' || accountType === 'UN') && 
+                            <View style={styles.toggleSwitchContainer}>
+                                <View style={styles.switcher}>
+                                    <Switch 
+                                        trackColor={{ false: "#4d4d4d", true: "#FFA500" }}
+                                        thumbColor={membersOnlyEvent ? '#ffffff' : "#ffffff"}
+                                        onValueChange={toggleMemebersOnlyEvent}
+                                        value={membersOnlyEvent}
+                                        style={{ transform: [{scaleX: 0.7}, {scaleY: 0.7}]}}
+                                    />
+                                </View>
+                                <Text style={styles.recurringEventText}>Members only event</Text>
+                            </View>
+                        }   
+
                         <TextInput
                             style={styles.input}
                             value={location}
@@ -519,7 +558,7 @@ const CreateEventScreen = () => {
                                     </View>
                                 </View>
                             </Modal>
-                                        */}
+                            */}
                         </View>
                     </View>
 
@@ -598,7 +637,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#efefef",
         borderRadius: 20,
         paddingTop: 15,
-        height: 120,
+        height: 100,
         paddingHorizontal: 20,
         marginLeft: 20,
         marginRight: 20,
