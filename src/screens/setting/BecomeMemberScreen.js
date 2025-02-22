@@ -11,18 +11,26 @@ import {
 } from 'react-native';
 import axios from 'axios';
 import { useNavigation } from '@react-navigation/native';
+import { Dropdown } from 'react-native-element-dropdown';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
 import { backArrow, gradientLine } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
 import LinearGradient from "react-native-linear-gradient";
+import MainButton from "../../components/common/MainButton";
+import apiClient from "../../services/apiClient";
 
 const BecomeMemberScreen = () => {
     const [organizationName, setOrganizationName] = useState("");
     const [industry, setIndustry] = useState("");
+    const [organizationType, setOrganizationType] = useState("");
     const [code, setCode] = useState(["", "", "", "", ""]);
     const inputs = useRef([]);
     const navigation = useNavigation();
+
+    const handleEventTypeChange = (item) => {
+        setOrganizationType(item.value);
+    };
 
     const handleCodeChange = (index, value) => {
         if (/^\d$/.test(value)) { // Ensure the value is a digit
@@ -42,6 +50,32 @@ const BecomeMemberScreen = () => {
             }
         }
     };
+    // Handle become a member
+    const handleBecomeMember = async () => {
+        try {
+            const token = await AsyncStorage.getItem("AccessToken");
+            const newCode = code.join("");
+            const response = await apiClient.post(`${baseUrl}/auth/members/`, 
+                `access_code=${newCode}&&organization_type=${organizationType}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+
+            if (response) {
+                console.log("Successfully became a member:", response.data);
+            } else {
+                console.error("Failed to become a member:", response.data);
+            }
+            
+        } catch (error) {
+            console.error("Error becoming a member", error);
+            Alert.alert(error.response.data.error);
+        }
+    };
+
+    console.log(organizationType);
 
     return (
         <ImageBackground
@@ -68,34 +102,61 @@ const BecomeMemberScreen = () => {
                         placeholderTextColor="#ABABAB"
                     />
                 </View>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        value={industry}
-                        onChangeText={setIndustry}
-                        placeholder="Industry"
-                        placeholderTextColor="#ABABAB"
-                    />
-                </View>
+
+                <Dropdown 
+                    style={styles.dropdown}
+                    data={[
+                        {label: "University", value: "UN"},
+                        {label: "Nonprofit", value: "NO"},
+                        {label: "Corporation", value: "CO"},
+                    ]}
+                    labelField="label"
+                    valueField="value"
+                    placeholder="Industry"
+                    value={organizationType}
+                    
+                    onChange={(item) => handleEventTypeChange(item)}
+                    placeholderStyle={{
+                        fontFamily: "Inter-Medium",
+                        color: '#ABABAB',
+                        fontSize: 16,
+                    }}
+                    itemTextStyle={{ 
+                        fontFamily: "Inter-Medium",
+                        color: '#ABABAB',
+                        fontSize: 16, 
+                    }}
+                    containerStyle={{
+                        backgroundColor: '#1E1E1E',
+                        borderRadius: 12,
+                    }}
+                    selectedTextStyle = {{ 
+                        fontFamily: "Inter-Medium",
+                        color: '#FFFFFF',
+                        fontSize: 16, 
+                    }}
+                />
+
                 <Text style={styles.textStyle}>Enter your verification code to gain access to private events for your corporation!</Text>
                 <View style={styles.codeInputContainer}>
-                        {code.map((digit, index) => (
-                            <TextInput
-                                key={index}
-                                style={styles.codeInput}
-                                maxLength={1}
-                                keyboardType="numeric"
-                                value={digit}
-                                onChangeText={(value) => handleCodeChange(index, value)}
-                                ref={ref => inputs.current[index] = ref}
-                                onKeyPress={({ nativeEvent }) => {
-                                    if (nativeEvent.key === 'Backspace' && index > 0 && code[index] === '') {
-                                        inputs.current[index - 1].focus();
-                                    }
-                                }}
-                            />
-                        ))}
-                    </View>
+                    {code.map((digit, index) => (
+                        <TextInput
+                            key={index}
+                            style={styles.codeInput}
+                            maxLength={1}
+                            keyboardType="numeric"
+                            value={digit}
+                            onChangeText={(value) => handleCodeChange(index, value)}
+                            ref={ref => inputs.current[index] = ref}
+                            onKeyPress={({ nativeEvent }) => {
+                                if (nativeEvent.key === 'Backspace' && index > 0 && code[index] === '') {
+                                    inputs.current[index - 1].focus();
+                                }
+                            }}
+                        />
+                    ))}
+                </View>
+                 <MainButton title="Join Now" onPress={() => handleBecomeMember()}/>
             </View>
         </ImageBackground>
     );
@@ -163,6 +224,16 @@ const styles = StyleSheet.create({
         alignSelf: "center",
         marginBottom: 10,
     },
+    dropdown: {
+        backgroundColor: '#1E1E1E',
+        borderWidth:1,
+        borderColor: '#D6D6D6',
+        borderRadius: 12,
+        paddingHorizontal: 25,
+        paddingVertical: 17,
+        width: '90%',
+        marginBottom: 20,
+    },
     codeInputContainer: {
         flexDirection: "row",
         justifyContent: "space-between",
@@ -179,6 +250,7 @@ const styles = StyleSheet.create({
         height: 50, // Adjusted for input height
         marginHorizontal: 10, // Spacing between input boxes
         marginBottom: 50,
+        color: "#FFFFFF"
     },
 });
   
