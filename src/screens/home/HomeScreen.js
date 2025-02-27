@@ -37,7 +37,7 @@ const HomeScreen = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [commentsVisible, setCommentsVisible] = useState(false); // State for modal visibility
-    const [selectedPostId, setSelectedPostId] = useState(null); 
+    const [selectedPost, setSelectedPost] = useState(null); 
     const [isShareModalVisible, setShareModalVisible] = useState(false);
     const [isPinReportVisible, setPinReportVisible] = useState(false);
     const [shareableLink, setShareableLink] = useState('');
@@ -182,8 +182,8 @@ const HomeScreen = () => {
         setShareModalVisible(false);
     };
     
-    const handleCommentPress = (postId) => {
-        setSelectedPostId(postId);
+    const handleCommentPress = (post) => {
+        setSelectedPost(post);
         setCommentsVisible(true);
     };
     
@@ -311,11 +311,11 @@ const HomeScreen = () => {
                                                 {post.likes_count ?? 0}
                                             </Text>
                                         </View>
-                                        {post.event_type && (
-                                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
+                                        {post.content_type === 'EV' && 
+                                            <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post)}>
                                                 <Comment />
                                             </TouchableOpacity>
-                                        )}
+                                        }
                                         <Save postId={post.id} bookmark={post.bookmarked} contentType={post.content_type} />
                                         <View style={styles.shareContainer}>                 
                                             <TouchableOpacity style={styles.interactionButton} onPress={() => handleSharePress(post.id, post.name)}>
@@ -355,7 +355,13 @@ const HomeScreen = () => {
                     )}
                     </ScrollView>
                 )}
-                <CommentsModal visible={commentsVisible} onClose={() => setCommentsVisible(false)} postId={selectedPostId} />
+                {commentsVisible && 
+                    <CommentsModal 
+                        visible={commentsVisible} 
+                        onClose={() => setCommentsVisible(false)} 
+                        post={selectedPost} 
+                    />
+                }
                 {isShareModalVisible && 
                     <ShareModal
                         isVisible={isShareModalVisible}
