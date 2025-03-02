@@ -324,16 +324,18 @@ const HomeScreen = () => {
                                         </View>
                                     </View>
                                     {post.caption && <Text style={styles.caption}>{post.caption}</Text>}
-                                    {post.tagged_users && (
+                                    {post.tagged_users && post.tagged_users.length > 0 && (
                                         <Text style={styles.taggedUsers}>
                                             {post.tagged_users.map(user => `@${user.username}`).join('  ')}
                                         </Text>
                                     )}
-                                    <View style={styles.postDescription}>
-                                        <Text style={styles.postDescriptionText}>
-                                        {post.description}
-                                        </Text>
-                                    </View>
+                                    {post.description && 
+                                        <View style={styles.postDescription}>
+                                            <Text style={styles.postDescriptionText}>
+                                            {post.description}
+                                            </Text>
+                                        </View>
+                                    }
                                     {post.event_type && (
                                         <MainButton 
                                             title={post.attending ? "Attending" : "Attend"}
@@ -399,9 +401,10 @@ const styles = StyleSheet.create({
         marginLeft: 5,
     },
     caption: {
-        fontSize: 14,
+        fontSize: 16,
         marginVertical: 5,
         marginLeft:'5%',
+        marginTop: -3,
         fontFamily: "poppins-Medium",
     },
     taggedUsers: {
@@ -481,7 +484,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 15,
-        marginBottom: 20,
+        marginBottom: 15,
         justifyContent: "space-between", // Distribute space between buttons
     },
     likeSection: {
@@ -518,7 +521,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
     },
     postDescription: {
-         marginBottom: 10,
+        marginBottom: 10,
     },
     postDescriptionText: {
         fontSize: 14,
