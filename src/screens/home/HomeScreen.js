@@ -231,7 +231,8 @@ const HomeScreen = () => {
                     <Text style={styles.errorText}>{error}</Text>
                 ) : (
                     <ScrollView 
-                        style={styles.eventContainer} 
+                        style={styles.eventContainer}
+                        contentContainerStyle={styles.scrollContentContainer} 
                         //scrollEventThrottle={16} 
                         refreshControl={
                             <RefreshControl
@@ -377,16 +378,18 @@ const styles = StyleSheet.create({
         flexGrow: 1,
         position: "relative",
         paddingTop: "15%",
-        paddingBottom: 140,
     },
     backgroundImage: {
         flex: 1,
         width: "100%",
     },
     eventContainer: {
-        flexGrow: 1,
+        flex: 1,
         paddingHorizontal: 16,
-        marginTop: 20,
+    },
+    scrollContentContainer: {
+        flexGrow: 1,
+        paddingBottom: 100,
     },
     location: {
         fontSize: 16,
