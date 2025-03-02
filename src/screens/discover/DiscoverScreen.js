@@ -203,14 +203,18 @@ const DiscoverScreen = () => {
                             onSearchToggle={handleSearchToggle} 
                             onSearchInput={handleSearchInput} 
                         />
-                        <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={
-                            <RefreshControl
-                                refreshing={loading} 
-                                onRefresh={handleRefresh}
-                                colors={['#ffffff']}
-                                tintColor="#ffffff"
-                            />
-                        }>
+                        <ScrollView 
+                            style={styles.eventContainer} 
+                            contentContainerStyle={styles.scrollContentContainer} 
+                            refreshControl={
+                                <RefreshControl
+                                    refreshing={loading} 
+                                    onRefresh={handleRefresh}
+                                    colors={['#ffffff']}
+                                    tintColor="#ffffff"
+                                />
+                            }
+                        >
                             {searchInput ? (
                                 combinedFilteredData.length > 0 ? (
                                     combinedFilteredData.map((item, index) => {
@@ -275,14 +279,18 @@ const DiscoverScreen = () => {
                         {loading ? (
                             <Text style={styles.loadingText}>Loading...</Text>
                         ) : (  
-                            <ScrollView contentContainerStyle={{ flexGrow: 1 }} refreshControl={
-                                <RefreshControl
-                                    refreshing={loading} 
-                                    onRefresh={handleRefresh}
-                                    tintColor="#ffffff"
-                                    colors={['#ffffff']}
-                                />
-                            }>
+                            <ScrollView 
+                                style={styles.peopleContainer} 
+                                contentContainerStyle={styles.scrollContentContainer}
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={loading} 
+                                        onRefresh={handleRefresh}
+                                        tintColor="#ffffff"
+                                        colors={['#ffffff']}
+                                    />
+                                }
+                            >
                                 {currentTab === 'events' ? ( 
                                     recommendedEvent && recommendedEvent.length > 0 ? 
                                         (recommendedEvent.map((event, index) => {
@@ -364,8 +372,18 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         position: "relative",
-        paddingTop: "20%",
-        paddingBottom: 150,
+        paddingTop: "15%",
+    },
+    eventContainer: {
+        flex: 1,
+        paddingHorizontal: 16,
+    },
+    peopleContainer: {
+        flex: 1
+    },
+    scrollContentContainer: {
+        flexGrow: 1,
+        paddingBottom: 100,
     },
     text: {
         fontSize: 20,
