@@ -17,6 +17,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
 import { trophieIcon, hamburgerIcon, dollarIcon } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
+import { useFocusEffect } from '@react-navigation/native';
 import authService from "../../services/authService";
 import baseUrl from "../../utils/api";
 import MainButton from "../../components/common/MainButton";
@@ -76,6 +77,17 @@ export default function ProfileScreen ({ userData }) {
             }).start();
         }
     };
+
+     // Hide sidebar when page loses focus
+     useFocusEffect(
+        React.useCallback(() => {
+            setIsSidebarVisible(false); // Set sidebar to false when screen is not focused
+
+            return () => {
+                setIsSidebarVisible(false); // Also ensure sidebar is hidden when page loses focus
+            };
+        }, [])
+    );
 
     useEffect(() => {
         const unsubscribe = navigation.addListener('focus', () => {
