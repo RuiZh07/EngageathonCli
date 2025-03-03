@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
         position: "absolute",
         backgroundColor: "transparent",
         left: -21,
-        bottom: -180,
+        bottom: -183,
         //left: -11,
         //bottom: -20,
     },
