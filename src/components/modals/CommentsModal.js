@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
     Modal, 
     View, 
@@ -9,38 +9,88 @@ import {
     FlatList, 
     Image, 
     KeyboardAvoidingView, 
-    Platform } from 'react-native';
+    Platform,
+    ActivityIndicator
+ } from 'react-native';
 import baseUrl from '../../utils/api';
 import { cancelGradient, sendGradient } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import apiClient from '../../services/apiClient';
 
-const CommentsModal = ({ postId, visible, onClose }) => {
+const CommentsModal = ({ post, visible, onClose }) => {
+    const [isLoading, setIsLoading] = useState(false);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
 
-    useEffect(() => {
-        const fetchComments = async () => {
-            try {
-                const response = await apiClient.get(`${baseUrl}/comments/EV/${postId}/`);
-                setComments(response.data);
-            } catch (error) {
-                console.error('Error fetching comments:', error);
-            }
-        };
+    // Function to format time
+    const formatTimestamp = (timestamp) => {
+        const now = new Date();
+        const createdAt = new Date(timestamp);
+
+        const diffInSeconds = Math.floor((now - createdAt) / 1000); 
+        const diffInMinutes = Math.floor(diffInSeconds / 60); 
+        const diffInHours = Math.floor(diffInMinutes / 60); 
+        const diffInDays = Math.floor(diffInHours / 24); 
+
+        if (diffInSeconds < 60) {
+            return 'Just now';
+        } else if (diffInMinutes < 60) {
+            return `${diffInMinutes} minute${diffInMinutes > 1 ? 's' : ''} ago`;
+        } else if (diffInHours < 24) {
+            return `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+        } else if (diffInDays < 7) {
+            return `${diffInDays} day${diffInDays > 1 ? 's' : ''} ago`;
+        } else {
+            return createdAt.toLocaleDateString(); 
+        }
+    };
+
+    const fetchComments = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const response = await apiClient.get(`${baseUrl}/comments/EV/${post.id}/`);
+
+            const transformedComments = response.data.map(comment => {
+                return {
+                    text: comment?.content,  
+                    user: {
+                        avatar: `data:image/jpeg;base64, ${comment?.profilephoto_url}`,
+                        name: comment?.user,
+                    },
+                    timestamp: formatTimestamp(comment?.created_at),
+                };
+            });
     
-        if (postId) {
+            setComments(transformedComments);
+        } catch (error) {
+            console.error('Error fetching comments:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, [post.id]);
+
+    useEffect(() => {
+        if (post.id) {
             fetchComments();
         }
-    }, [postId]);
+    }, [post.id, fetchComments]);
 
+    // Handle add new comments
     const handleAddComment = async () => {
         try {
             await apiClient.post(`${baseUrl}/comments/`, {
-                postId,
-                text: newComment,
+                content: newComment,
+                content_type: 'EV',
+                content_object_id: post.id,
             });
-            setComments([...comments, { text: newComment, user: { avatar: '', name: 'You' }, timestamp: 'Just now' }]);
+
+            const newComentObj = {
+                text: newComment,
+                user: { avatar: post.profile_photo_url, name: post.username },
+                timestamp: formatTimestamp(new Date().toISOString()),
+            };
+
+            setComments((prevComments) => [newComentObj, ...prevComments, ]);
             setNewComment('');
         } catch (error) {
             console.error('Error posting comment:', error);
@@ -52,8 +102,9 @@ const CommentsModal = ({ postId, visible, onClose }) => {
             <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
             <View style={styles.commentContent}>
                 <Text style={styles.commentUser}>{item.user.name}</Text>
-                <Text style={styles.commentText}>{item.text}</Text>
                 <Text style={styles.commentTimestamp}>{item.timestamp}</Text>
+                <Text style={styles.commentText}>{item.text}</Text>
+                
             </View>
         </View>
     );
@@ -70,12 +121,20 @@ const CommentsModal = ({ postId, visible, onClose }) => {
                     </TouchableOpacity>
                
                 </View>
-                <FlatList
-                    data={comments}
-                    renderItem={renderComment}
-                    keyExtractor={(item, index) => index.toString()}
-                    contentContainerStyle={styles.commentsContainer}
-                />
+
+                {isLoading ? (
+                    <ActivityIndicator size="large" color="#FF8D00" style={styles.loader} />
+                ) : comments.length === 0 ? (
+                    <Text style={styles.noCommentsText}>Be the first one to comment!</Text>
+                ): (
+                    <FlatList
+                        data={comments}
+                        renderItem={renderComment}
+                        keyExtractor={(item, index) => index.toString()}
+                        contentContainerStyle={styles.commentsContainer}
+                    />
+                )}
+
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
@@ -83,10 +142,9 @@ const CommentsModal = ({ postId, visible, onClose }) => {
                         onChangeText={setNewComment}
                         placeholder="Leave comment here"
                     />
-                    <TouchableOpacity onPress={handleAddComment} style={styles.sendButton}>
+                    <TouchableOpacity onPress={handleAddComment} >
                         <SvgUri uri={sendGradient} />
                     </TouchableOpacity>
-                    
                 </View>
                 </View>
             </KeyboardAvoidingView>
@@ -103,28 +161,30 @@ const styles = StyleSheet.create({
     modalContent: {
         backgroundColor: 'white',
         padding: 16,
-        borderTopLeftRadius: 12,
-        borderTopRightRadius: 12,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
         maxHeight: '80%',
-        flex: 1,  // Ensure it takes up the available space
+        flex: 1,  
     },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginBottom: 8,
+        marginBottom: 15,
     },
     headerText: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 20,
+        fontFamily: "Poppins-Medium",
     },
     commentsContainer: {
+        flexGrow: 1,
         paddingBottom: 8,
     },
     commentContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
         marginBottom: 12,
+        flex: 1,
     },
     avatar: {
         width: 40,
@@ -137,11 +197,13 @@ const styles = StyleSheet.create({
     },
     commentUser: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'Inter-Regular',
     },
     commentText: {
-        fontSize: 16,
+        fontSize: 15,
+        fontFamily: 'Inter-Regular',
         marginVertical: 4,
+        color: '#595959',
     },
     commentTimestamp: {
         fontSize: 12,
@@ -154,6 +216,7 @@ const styles = StyleSheet.create({
         borderTopColor: '#ccc',
         paddingTop: 8,
         backgroundColor: 'white', // Ensures the input area has a solid background
+        justifyContent: "flex-end",
     },
     input: {
         flex: 1,
@@ -171,6 +234,18 @@ const styles = StyleSheet.create({
         height: 40,
         borderRadius: 20,
         backgroundColor: '#FF8D00',
+    },
+    noCommentsText: {
+        fontSize: 16,
+        fontFamily: "Poppins-Regular",
+        marginTop: 20,  
+        alignSelf: 'center',
+        height: '83%',
+    },
+    loader: {
+        marginTop: 20,  
+        alignSelf: 'center',
+        height: '83%',
     },
 });
   
