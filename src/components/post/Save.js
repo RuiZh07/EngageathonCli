@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { TouchableOpacity } from "react-native";
 import { SvgUri } from "react-native-svg";
 import { saveIconFilled, saveIconOutline } from "../../utils/icons";
@@ -9,10 +9,7 @@ import apiClient from "../../services/apiClient";
 const Save = ({ postId, bookmark, contentType }) => {
     const [saved, setSaved] = useState(bookmark);
     
-    useEffect(() => {
-        console.log(`Initial bookmark state for postId ${postId}:`, bookmark);
-    }, [bookmark, postId]);
-
+    // Toggling the bookmark state for a post or event
     const handleBookmarkPress = async () => {
         try {
             const token = await AsyncStorage.getItem('AccessToken');
@@ -21,8 +18,10 @@ const Save = ({ postId, bookmark, contentType }) => {
                 console.error('No token found');
                 return;
             }
-            console.log(`Toggling bookmark for postId ${postId}. Current state:`, saved);
 
+            //console.log(`Toggling bookmark for postId ${postId}. Current state:`, saved);
+
+            // Set the appropriate URL based on the content type
             const url = contentType === 'EV' 
             ? `${baseUrl}/bookmark/EV/${postId}/`  
             : `${baseUrl}/bookmark/PO/${postId}/`;
