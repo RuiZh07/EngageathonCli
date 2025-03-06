@@ -33,7 +33,7 @@ const DiscoverPost = ({
     eventName,
 }) => {
     const [commentsVisible, setCommentsVisible] = useState(false);
-    const [selectedPostId, setSelectedPostId] = useState(null);
+    const [selectedPost, setSelectedPost] = useState(null);
     const navigation = useNavigation();
     const [isShareModalVisible, setShareModalVisible] = useState(false);
 
@@ -113,8 +113,8 @@ const DiscoverPost = ({
         setShareModalVisible(false);
     };
     
-    const handleCommentPress = (postId) => {
-        setSelectedPostId(postId);
+    const handleCommentPress = (post) => {
+        setSelectedPost(post);
         setCommentsVisible(true);
     };
     console.log("post",post);
@@ -157,7 +157,7 @@ const DiscoverPost = ({
                             {post.likes_count ?? 0}
                         </Text>
                     </View>
-                        <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post.id)}>
+                        <TouchableOpacity style={styles.interactionButton} onPress={() => handleCommentPress(post)}>
                             <Comment />
                         </TouchableOpacity>
                         <Save postId={post.id} bookmark={post.bookmarked} contentType={post.content_type} />
@@ -177,7 +177,13 @@ const DiscoverPost = ({
                     onPress={() => handleAttend(post)}
                 />
             </View>
-            <CommentsModal visible={commentsVisible} onClose={() => setCommentsVisible(false)} postId={selectedPostId} />
+            {commentsVisible && 
+                <CommentsModal 
+                    visible={commentsVisible} 
+                    onClose={() => setCommentsVisible(false)} 
+                    post={selectedPost} 
+                />
+            }
         </TouchableOpacity>
     )
 }
