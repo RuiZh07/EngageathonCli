@@ -118,16 +118,19 @@ const PostDetailScreen = ({ route }) => {
                             </TouchableOpacity>
                         </View>
                         {postDetails.caption && <Text style={styles.caption}>{postDetails.caption}</Text>}
-                        {postDetails.tagged_users && (
+                        {postDetails.tagged_users && postDetails.tagged_users.length > 0 && (
                             <Text style={styles.taggedUsers}>
                                 {postDetails.tagged_users.map(user => `@${user.username}`).join('  ')}
                             </Text>
                         )}
-                        <View style={styles.postDescription}>
-                            <Text style={styles.postDescriptionText}>
-                                {postDetails.description}
-                            </Text>
-                        </View>
+
+                        {postDetails.description && 
+                            <View style={styles.postDescription}>
+                                <Text style={styles.postDescriptionText}>
+                                    {postDetails.description}
+                                </Text>
+                            </View>
+                        }
                         {postDetails.activities && postDetails.activities.length > 0 && (
                             <View style={styles.activitiesContainer}>
                                 <Text style={styles.activitiesTitle}>Activities</Text>
@@ -274,15 +277,18 @@ const styles = StyleSheet.create({
         marginLeft: 12,
     },
     caption: {
-        fontSize: 14,
+        fontSize: 16,
         marginVertical: 5,
-        fontFamily: "poppins-medium",
-        marginLeft: 5,
+        marginLeft:'5%',
+        marginTop: -3,
+        fontFamily: "poppins-Medium",
     },
     taggedUsers: {
         fontSize: 12,
         color: '#555',
         marginVertical: 5,
+        marginLeft:'5%',
+        fontFamily: "Inter-Medium",
     },
     postDescription: {
         marginBottom: 10,
