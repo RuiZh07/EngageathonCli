@@ -8,6 +8,7 @@ import {
     ImageBackground,
     KeyboardAvoidingView,
     ActivityIndicator,
+    Platform,
 } from "react-native";
 import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -17,7 +18,7 @@ import { userRoundedIcon, lockIcon, eyeCloseIcon, eyeIcon } from "../../utils/ic
 import { SvgUri } from "react-native-svg";
 import MainButton from "../../components/common/MainButton";
 
-export default function Login(props) {
+export default function Login() {
     const [loginInfo, setLoginInfo] = useState({
         email: "",
         password: "",
@@ -100,11 +101,11 @@ export default function Login(props) {
                         Please login to continue
                     </Text>
                     <View style={styles.inputContainer}>
-                    <SvgUri 
-                        uri={userRoundedIcon} 
-                        width="24"
-                        height="22" 
-                    />
+                        <SvgUri 
+                            uri={userRoundedIcon} 
+                            width="24"
+                            height="22" 
+                        />
                         <TextInput
                             style={styles.input}
                             onChangeText={(e) =>
@@ -206,8 +207,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#D6D6D6",
         borderRadius: 10,
-        paddingVertical: "6%",
-        paddingHorizontal: "5%",
+        paddingVertical: Platform.OS === "android" ? 10 : "6%",
+        paddingHorizontal: Platform.OS === "android" ? 15 : "5%",
         marginBottom: 15,
         width: '95%',
     },
@@ -215,7 +216,6 @@ const styles = StyleSheet.create({
         fontFamily: "Inter-Medium",
         width: "90%",
         paddingLeft: "2%",
-        //color: "#ABABAB",
         color: "#000000",
         fontSize: 15,
     },
@@ -225,8 +225,8 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#D6D6D6",
         borderRadius: 10,
-        paddingVertical: "6%", 
-        paddingHorizontal: "5%",
+        paddingVertical: Platform.OS === "android" ? 10 : "6%",
+        paddingHorizontal: Platform.OS === "android" ? 15 : "5%",
         position: "relative",
         marginBottom: 10,
         width: '95%',
@@ -235,16 +235,8 @@ const styles = StyleSheet.create({
         fontFamily: "Inter-Medium",
         width: "80%",
         paddingLeft: "2%",
-        //color: "#ABABAB",
         color: "#000000",
         fontSize: 15,
-    },
-    eyeIcon: {
-        //paddingTop: 30,
-        position: "absolute",
-        right: 10,
-        top: 25,
-        transform: [{ translateY: -10 }],
     },
     centeredContainer: {
         flexDirection: "row",
@@ -257,14 +249,14 @@ const styles = StyleSheet.create({
         fontSize: 40,
         fontFamily: "Poppins-Bold",
         color: "#FF8D00",
-        marginBottom: 5,
+        marginBottom: Platform.OS === "android" ? 0 : 5,
     },
     subheadingLeft: {
         fontFamily: "Inter-Regular",
         alignSelf: "flex-start",
         fontSize: 16,
         color: "#414141",
-        marginBottom: 40,
+        marginBottom: Platform.OS === "android" ? 20 : 40,
     },
     subheadingCenter: {
         fontFamily: "Inter-Medium",
