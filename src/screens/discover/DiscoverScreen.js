@@ -1,4 +1,3 @@
-//optimze the data format
 import React, { useEffect, useState, useCallback } from "react";
 import {
     View,
@@ -372,7 +371,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         position: "relative",
-        paddingTop: "15%",
+        paddingTop: Platform.OS === "android" ? "6%": "15%",
     },
     eventContainer: {
         flex: 1,
