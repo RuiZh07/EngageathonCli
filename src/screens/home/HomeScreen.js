@@ -11,6 +11,7 @@ import {
     ImageBackground,
     Alert,
     RefreshControl,
+    Platform,
 } from "react-native";
 import HomeHeader from "../../components/home/HomeHeader";
 import Chip from "../../components/post/Chip";
@@ -385,7 +386,7 @@ const styles = StyleSheet.create({
     container: {
         flexGrow: 1,
         position: "relative",
-        paddingTop: "15%",
+        paddingTop: Platform.OS === "android" ? "6%": "15%",
     },
     backgroundImage: {
         flex: 1,
@@ -405,6 +406,7 @@ const styles = StyleSheet.create({
         marginVertical: 5,
         marginBottom: 10,
         marginLeft: 5,
+        color: '#000000',
     },
     caption: {
         fontSize: 16,
@@ -412,6 +414,7 @@ const styles = StyleSheet.create({
         marginLeft:'5%',
         marginTop: -3,
         fontFamily: "poppins-Medium",
+        color: '#000000',
     },
     taggedUsers: {
         fontSize: 12,

@@ -9,6 +9,7 @@ import {
     TextInput,
     KeyboardAvoidingView,
     Alert,
+    Platform,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation } from "@react-navigation/native";
@@ -122,7 +123,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "15%",
+        marginTop: Platform.OS === "android" ? "6%": "15%",
         marginBottom: "4%",
     },
     headerText: {

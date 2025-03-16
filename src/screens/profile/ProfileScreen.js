@@ -11,7 +11,7 @@ import {
     Alert,
     Animated,
     Platform,
-    Dimensions
+    Dimensions,
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from "@react-navigation/native";
@@ -360,7 +360,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "14%",
+        marginTop: Platform.OS === "android" ? "6%": "15%",
         marginBottom: '2%',
         position: "relative",
     },

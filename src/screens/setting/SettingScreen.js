@@ -315,7 +315,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "14%",
+        marginTop: Platform.OS === "android" ? "6%": "15%",
         position: "relative",
     },
     headerText: {

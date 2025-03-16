@@ -4,6 +4,7 @@ import {
     Text,
     View,
     TouchableOpacity,
+    Platform,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { settingWhiteIcon, myActivityIcon, calendarIcon, qrCodeIcon, analyticsIcon } from "../../utils/icons";
@@ -52,13 +53,12 @@ export default HamburgerBar;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        paddingTop: '25%',
+        paddingTop: Platform.OS === "android" ? "6%": "25%",
         backgroundColor: '#404040',
         borderBottomRightRadius: 40,
         width: "100%",
         zIndex: 9999,
-        
-        //height: '100%',
+ 
     },
     separator: {
         height: 1,
