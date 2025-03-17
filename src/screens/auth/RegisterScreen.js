@@ -308,59 +308,59 @@ const RegisterScreen = () => {
             </View>
             <Text style={styles.title}>{title}</Text>
             <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            <View style={styles.inputContainer}>
-                <TextInput 
-                    style={styles.input} 
-                    onChangeText={setName}
-                    value={name}
-                    placeholder={namePlaceholder}
-                    placeholderTextColor="#ABABAB"
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <TextInput 
+                        style={styles.input} 
+                        onChangeText={setName}
+                        value={name}
+                        placeholder={namePlaceholder}
+                        placeholderTextColor="#ABABAB"
+                    />
+                </View>
 
-            {typePlaceholder ? (
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setType}
-                    value={type}
-                    placeholder={typePlaceholder}
-                    placeholderTextColor="#ABABAB"
-                />
-            </View>
-        ) : null}
+                {typePlaceholder ? (
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={setType}
+                        value={type}
+                        placeholder={typePlaceholder}
+                        placeholderTextColor="#ABABAB"
+                    />
+                </View>
+            ) : null}
 
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setGeneral}
-                    value={general}
-                    placeholder={generalPlaceholder}
-                    placeholderTextColor="#ABABAB"
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={setGeneral}
+                        value={general}
+                        placeholder={generalPlaceholder}
+                        placeholderTextColor="#ABABAB"
+                    />
+                </View>
 
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setWebsite}
-                    value={website}
-                    placeholder={websitePlaceholder}
-                    placeholderTextColor="#ABABAB"
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={setWebsite}
+                        value={website}
+                        placeholder={websitePlaceholder}
+                        placeholderTextColor="#ABABAB"
+                    />
+                </View>
 
-            <View style={styles.inputContainer}>
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setContact}
-                    value={contact}
-                    placeholder={contactPlaceholder}
-                    placeholderTextColor="#ABABAB"
-                />
-            </View>
+                <View style={styles.inputContainer}>
+                    <TextInput
+                        style={styles.input}
+                        onChangeText={setContact}
+                        value={contact}
+                        placeholder={contactPlaceholder}
+                        placeholderTextColor="#ABABAB"
+                    />
+                </View>
 
-            <MainButton onPress={handleNext} title="Register" style={styles.mainButton} />
+                <MainButton onPress={handleNext} title="Register" style={styles.mainButton} />
             </ScrollView>
         </View>
         
@@ -407,7 +407,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#414141",
         fontFamily: "Inter-Medium",
-        marginTop: 5, 
+        marginTop: Platform.OS === "android" ? -5 : 5,
         marginBottom: 10,
     },
     inputContainer: {
@@ -417,10 +417,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#D6D6D6",
         borderRadius: 10,
-        paddingVertical: "6%",
-        paddingHorizontal: "5%",
+        paddingVertical: Platform.OS === "android" ? 8 : "6%",
+        paddingHorizontal: Platform.OS === "android" ? 15 : "5%",
         width: "100%",
-        marginBottom: 15,
+        marginBottom: Platform.OS === "android" ? 8 : 15,
     },
     input: {
         width: "90%",

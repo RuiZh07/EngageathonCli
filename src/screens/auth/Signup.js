@@ -11,14 +11,17 @@ import {
     ImageBackground,
     KeyboardAvoidingView,
     ScrollView,
+    Platform,
 } from "react-native";
 import MainButton from "../../components/common/MainButton";
-import authService from "../../services/authService";
 
 export default function Signup () {
     const navigation = useNavigation();
     const [selectedAccountType, setSelectedAccountType] = useState("");
     const [acceptTerms, setAcceptTerms] = useState(false);
+
+    // Handle the registration process
+    // Ensure an account type is selected and terms are accepted before navigating
     const handleRegister = async () => {
         if (!selectedAccountType) {
           alert("Please select an account type");
@@ -36,6 +39,7 @@ export default function Signup () {
         navigation.navigate("Login");
     };
 
+    // Converts the selected account type into a corresponding short code
     const accountTypeInput = (selectedAccountType) => {
         switch (selectedAccountType) {
             case "Individual":
@@ -53,9 +57,8 @@ export default function Signup () {
             default:
                 return "";
         }
-      };
+    };
 
-    //console.log("sel", selectedAccountType);
     return (
         <KeyboardAvoidingView
             style={styles.avoidView}
@@ -158,7 +161,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#414141",
         fontFamily: "Inter-Medium",
-        marginTop: 5, 
+        marginTop: Platform.OS === "android" ? -5 : 5, 
         marginBottom: 30
     },
     selectAccountText: {
@@ -198,11 +201,13 @@ const styles = StyleSheet.create({
         marginLeft: 10,
         fontFamily: "Inter-Regular",
         fontSize: 13,
+        color: '#000000',
     },
     agreeContainer: {
         display: "flex",
         flexDirection: "row",
         marginVertical: 30,
+        alignSelf:'center',
     },
     agreeText: {
         fontSize: 16,

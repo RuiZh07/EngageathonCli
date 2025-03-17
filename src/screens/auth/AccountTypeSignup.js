@@ -10,6 +10,7 @@ import {
     Image,
     Modal,
     ScrollView,
+    Platform,
 } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { backArrow, userRoundedIcon, cameraIcon, lockIcon, eyeCloseIcon, eyeIcon } from '../../utils/icons';
@@ -150,142 +151,141 @@ const AccountTypeSignup = () => {
       
     return (
         <KeyboardAvoidingView
-        style={styles.avoidView}
-        behavior="position"
-    >
-        <ImageBackground
-            source={require("../../assets/signup-bg1.png")}
-            style={{ height: "100%", justifyContent: "flex-end" }}
+            style={styles.avoidView}
+            behavior="position"
         >
-        
-        <View style={styles.container}>
-           
-            <View style={styles.headerContainer}>
-                <TouchableOpacity onPress={() => navigation.goBack()}>
-                    <SvgUri uri={backArrow} />
-                </TouchableOpacity>
-                
-                <Text style={styles.heading}>Sign up</Text>
-            </View>
-            <Text style={styles.title}>{title}</Text>
-            <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            <TouchableOpacity style={styles.pfpContainer} onPress={openCamera}>
-                {selectedImage ? (
-                    <Image 
-                        source={{uri: `data:image/png;base64, ${selectedImage}`}}
-                        style={styles.profileImage}
-                    />
-                ) : (
-                    <SvgUri 
-                        uri={userRoundedIcon} 
-                        width="50"
-                        height="50" 
-                    />
-                )}
-                <View style={styles.cameraIcon}>
-                    <SvgUri uri={cameraIcon} 
-                        width="24"
-                        height="24"
-                    />
+            <ImageBackground
+                source={require("../../assets/signup-bg1.png")}
+                style={{ height: "100%", justifyContent: "flex-end" }}
+            >
+            
+            <View style={styles.container}>
+                <View style={styles.headerContainer}>
+                    <TouchableOpacity onPress={() => navigation.goBack()}>
+                        <SvgUri uri={backArrow} />
+                    </TouchableOpacity>
+                    
+                    <Text style={styles.heading}>Sign up</Text>
                 </View>
-                
-            </TouchableOpacity>
+                <Text style={styles.title}>{title}</Text>
+                <ScrollView contentContainerStyle={styles.scrollViewContent}>
+                    <TouchableOpacity style={styles.pfpContainer} onPress={openCamera}>
+                        {selectedImage ? (
+                            <Image 
+                                source={{uri: `data:image/png;base64, ${selectedImage}`}}
+                                style={styles.profileImage}
+                            />
+                        ) : (
+                            <SvgUri 
+                                uri={userRoundedIcon} 
+                                width="50"
+                                height="50" 
+                            />
+                        )}
+                        <View style={styles.cameraIcon}>
+                            <SvgUri uri={cameraIcon} 
+                                width="24"
+                                height="24"
+                            />
+                        </View>
+                        
+                    </TouchableOpacity>
 
-            <CameraModal
-                isVisible={cameraVisible}
-                onClose={() => setCameraVisible(false)}
-                onPhotoConfirmed={handlePictureTaken}
-            />
-
-            {/* Render the modal conditionally */}
-            <Modal visible={imagePickerVisible} animationType="slide" transparent={true}>
-                <ImagePickerModal onImagePicked={handleImagePicked} onClose={closeImagePicker} />
-            </Modal>
-            <View style={styles.nameContainer}>
-                <View style={styles.nameInputContainer}>
-                    <TextInput 
-                        style={styles.input} 
-                        onChangeText={setFname}
-                        value={fname}
-                        placeholder="First Name"
-                        placeholderTextColor="#ABABAB"
+                    <CameraModal
+                        isVisible={cameraVisible}
+                        onClose={() => setCameraVisible(false)}
+                        onPhotoConfirmed={handlePictureTaken}
                     />
-                </View>
-                <View style={styles.nameInputContainer}>
-                <TextInput 
-                    style={styles.input} 
-                    onChangeText={setLname}
-                    value={lname}
-                    placeholder="Last Name"
-                    placeholderTextColor="#ABABAB"
-                />
-                </View>
-            </View>
-            <View style={styles.inputContainer}>
-                <SvgUri 
-                    uri={userRoundedIcon} 
-                    width="24"
-                    height="22" 
-                />
-                <TextInput 
-                    style={styles.input} 
-                    onChangeText={setEmail}
-                    value={email}
-                    placeholder={placeholder}
-                    placeholderTextColor="#ABABAB"
-                />
-            </View>
 
-            <View style={styles.inputContainer}>
-                <SvgUri 
-                    uri={lockIcon} 
-                    width="24"
-                    height="18" 
-                />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setPassword}
-                    value={password}
-                    placeholder="Enter Password"
-                    placeholderTextColor="#ABABAB"
-                    secureTextEntry={!showNewPassword}
-                />
-                <SvgUri 
-                    uri={showNewPassword ? eyeIcon : eyeCloseIcon}
-                    width="26"
-                    height="20"
-                    onPress={() => setShowNewPassword(!showNewPassword)}
-                />
-            </View>
+                    {/* Render the modal conditionally */}
+                    <Modal visible={imagePickerVisible} animationType="slide" transparent={true}>
+                        <ImagePickerModal onImagePicked={handleImagePicked} onClose={closeImagePicker} />
+                    </Modal>
+                    <View style={styles.nameContainer}>
+                        <View style={styles.nameInputContainer}>
+                            <TextInput 
+                                style={styles.input} 
+                                onChangeText={setFname}
+                                value={fname}
+                                placeholder="First Name"
+                                placeholderTextColor="#ABABAB"
+                            />
+                        </View>
+                        <View style={styles.nameInputContainer}>
+                            <TextInput 
+                                style={styles.input} 
+                                onChangeText={setLname}
+                                value={lname}
+                                placeholder="Last Name"
+                                placeholderTextColor="#ABABAB"
+                            />
+                        </View>
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <SvgUri 
+                            uri={userRoundedIcon} 
+                            width="24"
+                            height="22" 
+                        />
+                        <TextInput 
+                            style={styles.input} 
+                            onChangeText={setEmail}
+                            value={email}
+                            placeholder={placeholder}
+                            placeholderTextColor="#ABABAB"
+                        />
+                    </View>
 
-            <View style={styles.inputContainer}>
-                <SvgUri 
-                    uri={lockIcon} 
-                    width="24"
-                    height="18" 
-                />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={setCPassword}
-                    value={cPassword}
-                    placeholder="Confirm Password"
-                    placeholderTextColor="#ABABAB"
-                    secureTextEntry={!showConfirmPassword}
-                />
-                <SvgUri 
-                    uri={showConfirmPassword ? eyeIcon : eyeCloseIcon}
-                    width="26"
-                    height="20"
-                    onPress={() => setShowConfirmPassword(!showConfirmPassword)}
-                />
-            </View>
-            <MainButton 
-                onPress={handleNext} 
-                title={typeInput === 'IN' ? "Register" : "Next"}
-                style={styles.mainButton} />
+                    <View style={styles.inputContainer}>
+                        <SvgUri 
+                            uri={lockIcon} 
+                            width="24"
+                            height="18" 
+                        />
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={setPassword}
+                            value={password}
+                            placeholder="Enter Password"
+                            placeholderTextColor="#ABABAB"
+                            secureTextEntry={!showNewPassword}
+                        />
+                        <SvgUri 
+                            uri={showNewPassword ? eyeIcon : eyeCloseIcon}
+                            width="26"
+                            height="20"
+                            onPress={() => setShowNewPassword(!showNewPassword)}
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <SvgUri 
+                            uri={lockIcon} 
+                            width="24"
+                            height="18" 
+                        />
+                        <TextInput
+                            style={styles.input}
+                            onChangeText={setCPassword}
+                            value={cPassword}
+                            placeholder="Confirm Password"
+                            placeholderTextColor="#ABABAB"
+                            secureTextEntry={!showConfirmPassword}
+                        />
+                        <SvgUri 
+                            uri={showConfirmPassword ? eyeIcon : eyeCloseIcon}
+                            width="26"
+                            height="20"
+                            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                        />
+                    </View>
+                    <MainButton 
+                        onPress={handleNext} 
+                        title={typeInput === 'IN' ? "Register" : "Next"}
+                        style={styles.mainButton} 
+                    />
                 </ScrollView>
-        </View>
-        
+            </View>
         </ImageBackground>
     </KeyboardAvoidingView>
     );
@@ -329,7 +329,7 @@ const styles = StyleSheet.create({
         fontSize: 15,
         color: "#414141",
         fontFamily: "Inter-Medium",
-        marginTop: 5, 
+        marginTop: Platform.OS === "android" ? -5 : 5,
         marginBottom: 10,
     },
     pfpContainer: {
@@ -356,15 +356,15 @@ const styles = StyleSheet.create({
     nameContainer: {
         flexDirection: "row",
         alignItems: "center",
-        marginBottom: 15,
+        marginBottom: Platform.OS === "android" ? 8 : 15,
         justifyContent: "space-between",
-        width: "95%",
+        width: Platform.OS === "android" ? '99%' : '95%',
     },
     nameInputContainer: {
         borderWidth: 1,
         borderColor: "#D6D6D6",
         borderRadius: 10,
-        paddingVertical: "5.5%",
+        paddingVertical: Platform.OS === "android" ? 4 : "5.5%",
         paddingLeft: "4%",
         width:"49%",
     },
@@ -375,10 +375,10 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: "#D6D6D6",
         borderRadius: 10,
-        paddingVertical: "5.5%",
+        paddingVertical: Platform.OS === "android" ? 8 : "5.5%",
         paddingHorizontal: "5%",
-        width: "95%",
-        marginBottom: 15,
+        width: Platform.OS === "android" ? '99%' : '95%',
+        marginBottom: Platform.OS === "android" ? 8 : 15,
     },
     input: {
         width: "83%",

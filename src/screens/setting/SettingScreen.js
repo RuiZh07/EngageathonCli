@@ -359,7 +359,6 @@ const styles = StyleSheet.create({
         borderRadius: 50, 
         resizeMode: 'cover', 
     },
-
     greenPencilIcon: {
         position: 'absolute',
         bottom: -18,
@@ -410,10 +409,8 @@ const styles = StyleSheet.create({
         fontFamily: "Inter-Regular",
         paddingLeft: 15,
     },
-
     gradientLine: {
         alignSelf: "center",
-        
     },
     deleteAccountButton: {
         flexDirection: 'row',

@@ -5,6 +5,7 @@ import { ImageBackground,
     Text,
     ScrollView,
     TouchableOpacity,
+    Platform
 } from 'react-native';
 import { SvgUri } from "react-native-svg";
 import RenderHTML from 'react-native-render-html';
@@ -114,7 +115,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         alignItems: "center",
-        marginTop: 70,
+        marginTop: Platform.OS === "android" ? "6%": "15%",
         marginLeft: 30,
     },
     headerText: {
