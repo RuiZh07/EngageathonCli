@@ -22,10 +22,10 @@ const CauseTypeBehavior = ({ onPress, isPressed, buttonText }) => {
                     end={{ x: 1, y: 0 }}
                     style={styles.gradientCauseTypeObject}
                 >
-                    <Text>{buttonText}</Text>
+                    <Text style={styles.causeNameText}>{buttonText}</Text>
                 </LinearGradient>
             ) : (
-                <Text>{buttonText}</Text>
+                <Text style={styles.causeNameText}>{buttonText}</Text>
             )}
         </TouchableOpacity>
     );
@@ -51,6 +51,11 @@ const styles = StyleSheet.create({
         marginLeft: 0,
         textAlign: 'center',
         overflow: 'hidden',
+    },
+    causeNameText: {
+        color: '#000000',
+        fontFamily: 'Inter-Regular',
+        fontSize: 13,
     },
 });
 
