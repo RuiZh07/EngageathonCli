@@ -7,15 +7,17 @@ import {
     ImageBackground,
     ScrollView,
     Alert,
+    Platform,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from '../../utils/api';
 import axios from 'axios';
 import CollapsibleSection from '../../components/contentCreation/CollapsibleSection';
-import authService from '../../services/authService';
 import apiClient from '../../services/apiClient';
+import { backArrow  } from '../../utils/icons';
+import { SvgUri } from "react-native-svg";
 
 const UpdateTagCause = () => {
     const [causeTypes, setCauseTypes] = useState({});
@@ -125,6 +127,12 @@ const UpdateTagCause = () => {
                 <View style={styles.header}>
                     {/* Left header objects */}
                     <View style={styles.headerLeft}>
+                        <TouchableOpacity
+                            style={styles.backButton}
+                            onPress={() => navigation.goBack()}
+                        >
+                            <SvgUri uri={backArrow} />
+                        </TouchableOpacity>
                         <View style={styles.innerContainer}>
                             <Text style={styles.heading}>Causes</Text>
                             <Text style={styles.subHeading}>Select Up To 10</Text>
@@ -185,12 +193,13 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         margin: 25,
         marginBottom: 15,
-        marginTop: 60,
+        marginTop: Platform.OS === "android" ? "6%": "15%",
     },
 
     // Header component, left side
     headerLeft: {
         flexDirection: "row",
+        alignItems: 'center',
     },
     button: {
         justifyContent: "center",
@@ -241,19 +250,6 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         margin: 10,
         marginBottom: 10,
-    },
-    causeTypeName: {
-        fontSize: 24,
-        fontWeight: "bold",
-        margin: 20,
-        marginBottom: 10,
-    },
-    causeTypeContent: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        marginTop: 10,
-        marginBottom: 10,
-        paddingBottom: 10,
     },
 });
 
