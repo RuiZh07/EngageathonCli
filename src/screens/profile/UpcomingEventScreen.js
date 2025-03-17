@@ -9,6 +9,7 @@ import {
     ImageBackground,
     ActivityIndicator,
     RefreshControl,
+    Platform,
 } from "react-native";
 import apiClient from "../../services/apiClient";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -224,7 +225,7 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "20%",
+        marginTop: Platform.OS === "android" ? "8%": "20%",
     },
     headerText: {
         color: "#FFE600",

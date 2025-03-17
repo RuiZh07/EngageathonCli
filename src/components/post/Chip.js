@@ -36,7 +36,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
     label: {
-        fontFamily: 'inter-Medium',
+        fontFamily: 'Inter-Medium',
         fontSize: 12,
         color: "#000000",
         textTransform: "capitalize",

@@ -8,7 +8,7 @@ import {
     ImageBackground,
     ActivityIndicator,
     RefreshControl,
-} from 'react-native';  // Added RefreshControl here
+} from 'react-native'; 
 import apiClient from '../../services/apiClient';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';

@@ -311,7 +311,7 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         width: '100%',
         paddingHorizontal: '5%',
-        marginTop: '20%',
+        marginTop: Platform.OS === "android" ? "8%": "20%",
     },
     backButton: {
         marginTop: '-1%',

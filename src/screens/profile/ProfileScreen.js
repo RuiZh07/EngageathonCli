@@ -1,6 +1,5 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import {
-    StatusBar,
     StyleSheet,
     Image,
     Text,
@@ -8,17 +7,14 @@ import {
     ScrollView,
     TouchableOpacity,
     ImageBackground,
-    Alert,
     Animated,
     Platform,
     Dimensions,
 } from "react-native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { trophieIcon, hamburgerIcon, dollarIcon } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
-import { useFocusEffect } from '@react-navigation/native';
-import authService from "../../services/authService";
 import baseUrl from "../../utils/api";
 import MainButton from "../../components/common/MainButton";
 import HamburgerBar from "../../components/profile/HamburgerBar";
@@ -55,10 +51,7 @@ export default function ProfileScreen ({ userData }) {
         setShowAll(false);
         setVisibleCategories(5); // Reset to show only the first 5 categories
     };
-    console.log(eventList);
-    eventList.forEach((event) => {
-        console.log(`${event.id}-${event.name || event.caption}`)
-    })
+
     const toggleSidebar = () => {
         if (isSidebarVisible) {
             // Slide out to the left
@@ -80,23 +73,13 @@ export default function ProfileScreen ({ userData }) {
 
      // Hide sidebar when page loses focus
      useFocusEffect(
-        React.useCallback(() => {
+        useCallback(() => {
             setIsSidebarVisible(false); // Set sidebar to false when screen is not focused
-
             return () => {
                 setIsSidebarVisible(false); // Also ensure sidebar is hidden when page loses focus
             };
         }, [])
     );
-
-    useEffect(() => {
-        const unsubscribe = navigation.addListener('focus', () => {
-          fetchData(); 
-        });
-    
-        return unsubscribe;
-      }, [navigation]);
-
 
     const fetchData = async () => {
         try {
@@ -105,8 +88,8 @@ export default function ProfileScreen ({ userData }) {
                 console.error("No token found");
                 return;
             }
-            setToken(storedToken);
 
+            setToken(storedToken);
             await fetchFollowers(storedToken);
             await fetchFollowing(storedToken);
             await fetchPoints(storedToken);
@@ -117,8 +100,10 @@ export default function ProfileScreen ({ userData }) {
     };
 
     useEffect(() => {
-        fetchData();
-    }, []);
+        if(userContent) {
+            fetchData();
+        }
+    }, [userContent]);
 
     const fetchUserContent = async (token) => {
         try {
@@ -159,7 +144,7 @@ export default function ProfileScreen ({ userData }) {
             });
             setFollowers(response.data.length);
         } catch (error) {
-                console.error("Error fetching followers data", error);
+            console.error("Error fetching followers data", error);
         }
     };
 
@@ -206,10 +191,6 @@ export default function ProfileScreen ({ userData }) {
     const handleImageClick = (postDetails) => {
         navigation.navigate('PostDetailScreen', { postDetails });
     };
-
-    const handleUpdateCauses = async () => {
-        
-    }
 
     return (
         <ImageBackground
@@ -438,7 +419,7 @@ const styles = StyleSheet.create({
     },
       
     circle: {
-        marginTop: "7%",
+        marginTop: Platform.OS === "android" ? "2%": "7%",
         width: 130,
         height: 130,
         borderRadius: 75,

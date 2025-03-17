@@ -9,8 +9,8 @@ import {
     ScrollView,
     Alert,
     Image,
+    Platform,
 } from 'react-native';
-import { Platform } from "react-native";
 import { backArrow, addCameraIcon, blackCircle } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import QRCodeScannerModal from '../../components/common/QRCodeScannerModal';

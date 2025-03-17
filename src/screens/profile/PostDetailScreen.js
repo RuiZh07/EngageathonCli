@@ -1,5 +1,13 @@
 import React from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity, ImageBackground, Platform } from 'react-native';
+import { View, 
+    Text, 
+    Image, 
+    ScrollView, 
+    StyleSheet, 
+    TouchableOpacity, 
+    ImageBackground, 
+    Platform 
+} from 'react-native';
 import Chip from '../../components/post/Chip';
 import Heart from '../../components/post/Heart';
 import Comment from '../../components/post/Comment';
@@ -160,11 +168,6 @@ const styles = StyleSheet.create({
     scrollContentContainer: {
         paddingBottom: 20, // Adjust as needed
     },
-    header: {
-        paddingHorizontal: 16,
-        paddingTop: 10,
-        marginTop:'10%',
-    },
     backButton: {
         padding: 10,
         backgroundColor: 'transparent', // Change this to 'transparent'
@@ -176,7 +179,7 @@ const styles = StyleSheet.create({
         paddingTop: 16,
     },
     post: {
-        marginTop: '14%',
+        marginTop: Platform.OS === "android" ? "6%": "15%",
         backgroundColor: "#fff",
         borderRadius: 20,
         padding: 16,
@@ -205,8 +208,9 @@ const styles = StyleSheet.create({
     },
     userNameText: {
         fontSize: 16,
-        fontFamily: "poppins-bold",
+        fontFamily: "Poppins-Bold",
         color: "#333",
+        marginBottom: Platform.OS === "android" ? -5 : 0, 
     },
     pfpContainer: {
         alignItems: "center",
@@ -227,15 +231,16 @@ const styles = StyleSheet.create({
     },
     userDescriptionText: {
         fontSize: 12,
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Regular",
         color: "#666",
     },
     location: {
         fontSize: 16,
-        fontWeight: 'bold',
+        fontFamily: 'Poppins-SemiBold',
         marginVertical: 5,
         marginTop: 10,
         marginLeft: 8,
+        color: '#000000',
     },
     postTags: {
         flexDirection: "row",
@@ -250,14 +255,13 @@ const styles = StyleSheet.create({
         width: "100%",
         height: 200,
         borderRadius: 10,
-        marginBottom: 10,
         resizeMode: "cover",
     },
     postInteraction: {
         flexDirection: "row",
         alignItems: "center",
         paddingHorizontal: 15,
-        marginBottom: 20,
+        marginBottom: 10,
     },
     likeSection: {
         flexDirection: "row",
@@ -266,7 +270,7 @@ const styles = StyleSheet.create({
     },
     likeCountText: {
         fontSize: 14,
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Regular",
         color: "#333",
         marginLeft: 4,
     },
@@ -278,10 +282,9 @@ const styles = StyleSheet.create({
     },
     caption: {
         fontSize: 16,
-        marginVertical: 5,
         marginLeft:'5%',
-        marginTop: -3,
-        fontFamily: "poppins-Medium",
+        fontFamily: "Poppins-Medium",
+        color: '#000000',
     },
     taggedUsers: {
         fontSize: 12,
@@ -295,23 +298,24 @@ const styles = StyleSheet.create({
     },
     postDescriptionText: {
         fontSize: 14,
-        fontFamily: "poppins-medium",
+        fontFamily: "Poppins-Medium",
         color: "#333",
         marginLeft: 5,
     },
     activitiesContainer: {
-        marginVertical: 10,
+        //marginVertical: 10,
     },
     activitiesTitle: {
         fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 10,
+        fontFamily: "Poppins-Medium",
+        color:'#000000',
     },
     activityContainer: {
         marginBottom: 10,
     },
     activityName: {
         fontSize: 16,
+        color:'#000000',
     },
     activityPoints: {
         fontSize: 14,

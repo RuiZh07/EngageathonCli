@@ -107,91 +107,91 @@ export default function UserProfileScreen({ route }) {
                     <View style={styles.loadingContainer}>
                         <Text style={styles.loadingText}>Loading...</Text>
                     </View>
-                    ) : ( 
+                ) : ( 
                     <>
-                    <View style={styles.circle}>
-                    <Image
-                        source={userInfo?.profile_photo ? { uri: userInfo.profile_photo } : require("../../assets/default_white_profile.png")}
-                        style={styles.pfp}
-                    />
-                    </View>
-            
-                    <Text style={styles.nameText}>{`${userInfo?.first_name ?? ''} ${userInfo?.last_name ?? ''}`}</Text>
-                    <Text style={styles.usernameText}>@{`${userInfo?.username ?? ''}`}</Text>
-            
-                    <View style={styles.rank}>
-                    <Text style={styles.rankText}>{rank}</Text>
-                    </View>
-            
-                    <View style={styles.buttons}>
-                    <TouchableOpacity style={styles.addMessage}>
-                        <Image
-                        source={require("../../assets/add-friend.png")}
-                        style={{ width: 25, height: 25 }}
-                        />
-                    </TouchableOpacity>
-            
-                    <TouchableOpacity style={styles.addMessage}>
-                        <Image
-                        source={require("../../assets/message.png")}
-                        style={{ width: 25, height: 25 }}
-                        />
-                    </TouchableOpacity>
-                    </View>
-            
-                    <View style={styles.categoriesWrapper}>
-                    {categories && categories.length > 0 && (
-                        <View style={styles.categoriesContainer}>
-                        {categories.map((category) => (
-                            <View key={category.id}>
-                            <LinearGradient
-                                colors={["#FF8D00", "#FFBA00", "#FFE600"]}
-                                locations={[0.72, 0.86, 1]}  
-                                start={{ x: 0, y: 0 }}      
-                                end={{ x: 1, y: 0 }}
-                                style={styles.categoryTextContainer}
-                            >
-                            <Text style={styles.categoryText}>{category.name}</Text>
-                            </LinearGradient>
-                            </View>
-                        ))}
+                        <View style={styles.circle}>
+                            <Image
+                                source={userInfo?.profile_photo ? { uri: userInfo.profile_photo } : require("../../assets/default_white_profile.png")}
+                                style={styles.pfp}
+                            />
                         </View>
-                    )}
-                </View>
-        
-                <View style={styles.engagementsInfo}>
-                <View style={[styles.statContainer, { marginLeft: "40%" }]}>
-                    <Text style={styles.statNumber}>{userInfo?.records ?? 0}</Text>
-                    <Text style={styles.statTitle}>E Points</Text>
-                </View>
-                </View>
-            
-                {isPrivate ? (
-                <Text style={styles.privateAccountText}>Private Account: No events available.</Text>
-                ) : (
-                    <View style={styles.gridContainer}>
-                    {eventList && eventList.length > 0 ? (
-                        eventList.map((content) => {
-                        const imageUrl = content.image_urls && content.image_urls[0] ? content.image_urls[0].image_url : null;
-                        return (
-                            <TouchableOpacity
-                                key={content.id}
-                                style={styles.imageItem}
-                                onPress={() => handleImageClick(content)}
-                            >
+                    
+                        <Text style={styles.nameText}>{`${userInfo?.first_name ?? ''} ${userInfo?.last_name ?? ''}`}</Text>
+                        <Text style={styles.usernameText}>@{`${userInfo?.username ?? ''}`}</Text>
+                
+                        <View style={styles.rank}>
+                            <Text style={styles.rankText}>{rank}</Text>
+                        </View>
+                        {/*
+                        <View style={styles.buttons}>
+                            <TouchableOpacity style={styles.addMessage}>
                                 <Image
-                                    source={{ uri: imageUrl }}
-                                    style={styles.gridImage}
+                                source={require("../../assets/add-friend.png")}
+                                style={{ width: 25, height: 25 }}
                                 />
                             </TouchableOpacity>
-                        );
-                        })
-                    ) : (
-                        <Text style={styles.noEventsText}>No events available.</Text>
-                    )}
-                    </View>
-                )}
-                </>
+                    
+                            <TouchableOpacity style={styles.addMessage}>
+                                <Image
+                                source={require("../../assets/message.png")}
+                                style={{ width: 25, height: 25 }}
+                                />
+                            </TouchableOpacity>
+                        </View>
+                        */}
+                        <View style={styles.categoriesWrapper}>
+                            {categories && categories.length > 0 && (
+                                <View style={styles.categoriesContainer}>
+                                    {categories.map((category) => (
+                                        <View key={category.id}>
+                                            <LinearGradient
+                                                colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                                                locations={[0.72, 0.86, 1]}  
+                                                start={{ x: 0, y: 0 }}      
+                                                end={{ x: 1, y: 0 }}
+                                                style={styles.categoryTextContainer}
+                                            >
+                                                <Text style={styles.categoryText}>{category.name}</Text>
+                                            </LinearGradient>
+                                        </View>
+                                    ))}
+                                </View>
+                            )}
+                        </View>
+        
+                        <View style={styles.engagementsInfo}>
+                            <View style={[styles.statContainer, { marginLeft: "40%" }]}>
+                                <Text style={styles.statNumber}>{userInfo?.records ?? 0}</Text>
+                                <Text style={styles.statTitle}>E Points</Text>
+                            </View>
+                        </View>
+            
+                        {isPrivate ? (
+                            <Text style={styles.privateAccountText}>Private Account: No events available.</Text>
+                        ) : (
+                            <View style={styles.gridContainer}>
+                                {eventList && eventList.length > 0 ? (
+                                    eventList.map((content) => {
+                                    const imageUrl = content.image_urls && content.image_urls[0] ? content.image_urls[0].image_url : null;
+                                    return (
+                                        <TouchableOpacity
+                                            key={content.id}
+                                            style={styles.imageItem}
+                                            onPress={() => handleImageClick(content)}
+                                        >
+                                            <Image
+                                                source={{ uri: imageUrl }}
+                                                style={styles.gridImage}
+                                            />
+                                        </TouchableOpacity>
+                                    );
+                                })
+                                ) : (
+                                    <Text style={styles.noEventsText}>No events available.</Text>
+                                )}
+                            </View>
+                        )}
+                    </>
                 )}
             </ScrollView>
         </ImageBackground>
@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     scrollContentContainer: {
         flexGrow: 1,
         alignItems: "center",
-        paddingBottom: 130,
+        paddingBottom: 40,
     },
     header: {
         flexDirection: "row",
@@ -218,7 +218,7 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "10%",
+        marginTop: Platform.OS === "android" ? "3%": "10%",
     },
     loadingText: {
         textAlign: "center",
@@ -235,8 +235,9 @@ const styles = StyleSheet.create({
     headerText: {
         color: "#FFE600",
         fontSize: 30,
-        marginTop: "5%",
+        marginTop: "3%",
         marginBottom: '2%',
+        fontFamily: 'Poppins-Medium'
     },
     container: {
         flex: 1,
@@ -252,12 +253,6 @@ const styles = StyleSheet.create({
         width: '75%',
         height: 150, 
         resizeMode: 'cover',
-    },
-    eventName: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 5,
-        color: "#F5F4F4",
     },
     gridContainer: {
         flexDirection: 'row',
@@ -319,7 +314,7 @@ const styles = StyleSheet.create({
         alignSelf: "flex-start",
     },
     engagementsInfo: {
-        marginVertical: "5%",
+        marginVertical: "3%",
         flexDirection: "row",
         height: 80,
         width: "92%",
@@ -365,7 +360,7 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-start',
     },
     categoryTextContainer: {
-        paddingVertical: 10,
+        paddingVertical: 8,
         paddingHorizontal: 10, 
         margin: 5, 
         alignItems: 'center',
@@ -377,6 +372,7 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         fontSize: 14,
         color: '#FFFFFF',
+        fontFamily: 'Inter-Medium',
     },
     gridContainer: {
         flexDirection: 'row',
@@ -403,8 +399,9 @@ const styles = StyleSheet.create({
     },
     noEventsText:{
         textAlign: "center",
-        marginTop: 20,
+        marginTop: 15,
         fontSize: 18,
         color: "#999",
+        fontFamily: 'Inter-Medium',
     },
 });

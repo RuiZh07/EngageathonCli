@@ -9,6 +9,7 @@ import {
     TouchableOpacity,
     RefreshControl,
     ImageBackground,
+    Platform,
 } from "react-native";
 import { useRoute, useNavigation } from "@react-navigation/native";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -26,29 +27,29 @@ const FollowersFollowingScreen = () => {
     const [refreshing, setRefreshing] = useState(false);
     const [activeTab, setActiveTab] = useState(type);
 
-    useEffect(() => {
-        const fetchFollowersFollowing = async () => {
-            try {
-                const storedToken = await AsyncStorage.getItem("AccessToken");
-                if (!storedToken) {
-                    console.error("No token found");
-                    return;
-                }
-                const response = await apiClient.get(`${baseUrl}/${activeTab}-user/`, {
-                    headers: {
-                        'Authorization': `Bearer ${storedToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                });
-                setData(response.data);
-            } catch (error) {
-                console.error("Error fetching data", error);
-            } finally {
-                setLoading(false);
-                setRefreshing(false);
+    const fetchFollowersFollowing = async () => {
+        try {
+            const storedToken = await AsyncStorage.getItem("AccessToken");
+            if (!storedToken) {
+                console.error("No token found");
+                return;
             }
-        };
+            const response = await apiClient.get(`${baseUrl}/${activeTab}-user/`, {
+                headers: {
+                    'Authorization': `Bearer ${storedToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+            setData(response.data);
+        } catch (error) {
+            console.error("Error fetching data", error);
+        } finally {
+            setLoading(false);
+            setRefreshing(false);
+        }
+    };
 
+    useEffect(() => {
         fetchFollowersFollowing();
     }, [activeTab]);
 
@@ -157,7 +158,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         alignItems: "center",
-        marginTop: "15%",
+        marginTop: Platform.OS === "android" ? "6%": "15%",
         paddingHorizontal: 16,
     },
     backButton: {

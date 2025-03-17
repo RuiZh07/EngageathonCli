@@ -7,18 +7,17 @@ import {
     TouchableOpacity,
     Alert,
     ImageBackground,
+    Platform,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import baseUrl from "../../utils/api";
 import { backArrow, eyeIcon, eyeCloseIcon, lockIcon, gradientLine } from "../../utils/icons";
 import { SvgUri } from "react-native-svg";
-import LinearGradient from "react-native-linear-gradient";
 import MainButton from "../../components/common/MainButton";
 import apiClient from "../../services/apiClient";
 
-const ChangePasswordScreen = ({ route }) => {
-    //const { email } = route.params;
+const ChangePasswordScreen = () => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -179,7 +178,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "15%",
+        marginTop: Platform.OS === "android" ? "6%": "15%",
     },
     headerText: {
         color: "#FFE600",
