@@ -200,8 +200,7 @@ const styles = StyleSheet.create({
     header: {
         flexDirection: "row",
         justifyContent: "space-between",
-        margin: 25,
-        marginBottom: 15,
+        paddingHorizontal: "5%",
         marginTop: Platform.OS === "android" ? "6%": "13%",
     },
     // Header component, left side
@@ -211,18 +210,11 @@ const styles = StyleSheet.create({
     button: {
         justifyContent: "center",
     },
-    innerContainer: {
-        marginLeft: 10,
-    },
     heading: {
-        fontSize: 24,
-        fontWeight: "500",
+        fontSize: 26,
+        fontFamily: "Poppins-Regular",
         color: "#FFE600",
-    },
-    subHeading: {
-        fontSize: 14,
-        fontWeight: "400",
-        color: "#FFFFFF",
+        paddingLeft: 20,
     },
     // Header component, right side
     headerRight: {
@@ -242,7 +234,7 @@ const styles = StyleSheet.create({
     shareButtonText: {
         color: "#FFFFFF",
         fontSize: 13,
-        fontWeight: "600",
+        fontFamily: "Poppins-SemiBold",
     },
     causeContainer: {
         marginBottom: 70,

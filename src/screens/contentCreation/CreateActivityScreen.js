@@ -13,6 +13,8 @@ import MainButton from "../../components/common/MainButton";
 import { useNavigation } from "@react-navigation/native";
 import ProgressBar from '../../components/contentCreation/ProgressBar';
 import { CategoryContext } from '../../components/contentCreation/CategoryContext';
+import { backArrow } from '../../utils/icons';
+import { SvgUri } from "react-native-svg";
 
 const CreateActivityScreen = () => {
     const [viewState, setViewState] = useState('noActivity');
@@ -94,14 +96,8 @@ const CreateActivityScreen = () => {
             style={styles.container}
         >
             <View style={styles.header}>
-                <TouchableOpacity style={styles.headerLeft} onPress={navToCreateEvent}>
-                    <Svg width={10} height={43} viewBox="0 0 10 18" fill="none" 
-                        style={{ transform: [{ scale: 1.2 }] }}>
-                        <Path
-                            d="M10 2.57143L3.75 9L10 15.4286L8.75 18L0 9L8.75 0L10 2.57143Z"
-                            fill="orange"
-                        />
-                    </Svg>
+                <TouchableOpacity onPress={navToCreateEvent}>
+                    <SvgUri uri={backArrow} />
                 </TouchableOpacity>
                 <Text style={styles.headerText}>Create Event</Text>
             </View>
@@ -188,17 +184,13 @@ const styles = StyleSheet.create({
         width: "100%",
         paddingHorizontal: "5%",
         marginTop: Platform.OS === "android" ? "5%": "12%",
-    },  
-    headerLeft: {
-        marginTop: 13, 
-        marginLeft: 10,
-    },  
+    },   
     headerText: {
         color: "#FFE600",
         fontSize: 26,
         fontFamily: "Poppins-Regular",
         paddingLeft: 20,
-        paddingTop: 12,
+        //paddingTop: 12,
     },
     activityText: {
         color: "#FFE600",

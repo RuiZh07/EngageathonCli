@@ -338,7 +338,7 @@ const CreatePostScreen = () => {
                                 ) : (
                                 <View style={styles.photoContainer}>
                                      <SvgUri uri={addCameraIcon} size={70} color="black" style={{ marginTop: -12, marginBottom: 10 }}/>
-                                    <Text>Add Media + </Text>
+                                    <Text style={styles.addCoverPhotoText}>Add Media + </Text>
                                 </View>
                             )}
                         </TouchableOpacity>
@@ -430,7 +430,7 @@ const CreatePostScreen = () => {
                     </View>
 
                     <View style={styles.addLocationContainer}>
-                        <Text style={{ marginBottom: 10 }}>Add location</Text>
+                        <Text style={styles.addLocationText}>Add location</Text>
                             <View style={styles.searchBar}>
                                 {/*
                                 <SvgUri
@@ -483,8 +483,12 @@ const styles = StyleSheet.create({
     headerText: {
         color: "#FFE600",
         fontSize: 26,
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Regular",
         paddingLeft: 20,
+    },
+    addCoverPhotoText: {
+        fontFamily: 'Inter-Medium',
+        color: '#000000',
     },
     title: {
         marginTop: "7%",
@@ -495,7 +499,7 @@ const styles = StyleSheet.create({
     box: {
         borderWidth: 1,
         borderRadius: 30,
-        marginTop: 30,
+        marginTop: 15,
         margin: 20,
         marginBottom: 5,
         backgroundColor: "#ffffff",
@@ -507,7 +511,9 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         backgroundColor: '#E9E9E9',
         paddingVertical: 15,
-        paddingHorizontal: 10,
+        paddingHorizontal: 20,
+        fontFamily: "Inter-Medium",
+        color: '#000000',
     },
     photoContainer: {
         alignItems: 'center',
@@ -581,33 +587,6 @@ const styles = StyleSheet.create({
         backgroundColor: 'white',
         marginVertical: 10,
     },
-    takePhotoContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 15,
-        marginVertical: 60,
-    },
-    permissionContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      },
-    fullScreenCamera: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        borderRadius: 30,
-        overflow: 'hidden',
-        position: 'relative',
-    },
-    buttonContainer: {
-        position: 'absolute',
-        width: '100%',
-        height: '100%',
-        justifyContent: 'space-between',
-        paddingHorizontal: 10,
-    },
     cancelButton: {
         paddingTop: 10
     },
@@ -632,6 +611,7 @@ const styles = StyleSheet.create({
     tagPeopleText: {
         fontSize: 18,
         color: '#2BAB47',
+        fontFamily: "Poppins-Medium",
     },
     tagPeopleInput: {
         //marginLeft: 20,
@@ -703,6 +683,11 @@ const styles = StyleSheet.create({
     addLocationContainer: {
         marginLeft: 20,
         marginBottom: 10,
+    },
+    addLocationText: {
+        fontFamily: "Poppins-Regular",
+        color: '#000000',
+        marginBottom: 6,
     },
     searchBar: {
         flexDirection: 'row',
