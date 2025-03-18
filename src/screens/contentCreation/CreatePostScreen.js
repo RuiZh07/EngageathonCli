@@ -478,7 +478,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "13%",
+        marginTop: Platform.OS === "android" ? "6%": "13%",
     },  
     headerText: {
         color: "#FFE600",

@@ -136,11 +136,11 @@ const TagCausePost = () => {
                     {/* Left header objects */}
                     <View style={styles.headerLeft}>
                         <TouchableOpacity
-                style={styles.button}
-                onPress={() => navigation.goBack()}
-            >
-                <SvgUri uri={backArrow} />
-            </TouchableOpacity>
+                            style={styles.button}
+                            onPress={() => navigation.goBack()}
+                        >
+                            <SvgUri uri={backArrow} />
+                        </TouchableOpacity>
                         <View style={styles.innerContainer}>
                             <Text style={styles.heading}>Tag A Cause</Text>
                         </View>
@@ -149,8 +149,9 @@ const TagCausePost = () => {
                     {/* Right header objects */}
                     <View style={styles.headerRight}>
                         <LinearGradient
-                            colors={["#FF8D00", "#FFE600"]}
-                            start={{ x: 0, y: 0 }}
+                            colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                            locations={[0.72, 0.86, 1]}  
+                            start={{ x: 0, y: 0 }}      
                             end={{ x: 1, y: 0 }}
                             style={styles.shareButtonGradient}
                         >
@@ -178,55 +179,12 @@ const TagCausePost = () => {
                         />
                     ))}
                 </View>
-
             </ScrollView>
         </ImageBackground>
     );
 };
 
 const styles = StyleSheet.create({
-    causeTypeHeader: {
-        flexDirection: 'row',
-        //justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 5,
-        borderBottomWidth: 1,
-        borderBottomColor: '#D3D3D3',
-        backgroundColor: '#FFFFFF',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-    },
-    causeTypeName: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    causeTypeContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginLeft: 20,
-        marginBottom: 10,
-    },
-    causeTypeObject: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 16,
-        margin: 5,
-        paddingBottom: 10,
-        textAlign: 'center',
-        overflow: 'hidden',
-    },
-    eachContainer: {
-        backgroundColor: "#FFFFFF",
-        height: "auto",
-        borderRadius: 30,
-        margin: 10,
-        marginBottom: 10,
-    },
-    iconButton: {
-        alignItems: 'center',
-        paddingBottom: 10,
-    },
     // Component main styles
     scrollView: {
         flex: 1,
@@ -244,9 +202,8 @@ const styles = StyleSheet.create({
         justifyContent: "space-between",
         margin: 25,
         marginBottom: 15,
-        marginTop: 45,
+        marginTop: Platform.OS === "android" ? "6%": "13%",
     },
-
     // Header component, left side
     headerLeft: {
         flexDirection: "row",
@@ -267,7 +224,6 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         color: "#FFFFFF",
     },
-
     // Header component, right side
     headerRight: {
         alignItems: "center",
@@ -288,31 +244,8 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: "600",
     },
-
-    // Main content objects, under header
-    // Each different interest type containers
     causeContainer: {
         marginBottom: 70,
-    },
-    causeType: {
-        backgroundColor: "#FFFFFF",
-        height: "auto",
-        borderRadius: 30,
-        margin: 10,
-        marginBottom: 10,
-    },
-    causeTypeName: {
-        fontSize: 24,
-        fontWeight: "bold",
-        margin: 20,
-        marginBottom: 10,
-    },
-    causeTypeContent: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        marginTop: 10,
-        marginBottom: 10,
-        paddingBottom: 10,
     },
 });
 

@@ -145,20 +145,20 @@ const CreateActivityScreen = () => {
                     ) : (
                         <View style={styles.activityList}>
                             <ScrollView style={styles.activityListScroll}>
-                            {activities.map((activity, index) => (
-                                <View key={index} style={styles.singleActivity}>
-                                    <View style={styles.activityNameStyle}>
-                                        <Text style={styles.activityName}>{activity.name}</Text>
-                                    </View>
-                                    <View style={styles.pointsEarned}>
-                                        <Text style={styles.points}>{activity.points}</Text>
-                                        <View style={styles.pointsTextContainer}>
-                                            <Text style={styles.pointsText}>Points</Text>
-                                            <Text style={styles.earnedText}>Earned</Text>
+                                {activities.map((activity, index) => (
+                                    <View key={index} style={styles.singleActivity}>
+                                        <View style={styles.activityNameStyle}>
+                                            <Text style={styles.activityName}>{activity.name}</Text>
+                                        </View>
+                                        <View style={styles.pointsEarned}>
+                                            <Text style={styles.points}>{activity.points}</Text>
+                                            <View style={styles.pointsTextContainer}>
+                                                <Text style={styles.pointsText}>Points</Text>
+                                                <Text style={styles.earnedText}>Earned</Text>
+                                            </View>
                                         </View>
                                     </View>
-                                </View>
-                            ))}
+                                ))}
                             </ScrollView>
                             <TouchableOpacity style={styles.createNewButton} onPress={handleCreateNew}>
                                 <Text style={styles.createNewText}>Create New</Text>
@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "12%",
+        marginTop: Platform.OS === "android" ? "5%": "12%",
     },  
     headerLeft: {
         marginTop: 13, 
@@ -196,7 +196,7 @@ const styles = StyleSheet.create({
     headerText: {
         color: "#FFE600",
         fontSize: 26,
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Regular",
         paddingLeft: 20,
         paddingTop: 12,
     },
@@ -205,7 +205,7 @@ const styles = StyleSheet.create({
         fontSize: 20,
         marginTop: 15,
         marginLeft: 30,
-        fontFamily: "poppins-semibold",
+        fontFamily: "Poppins-SemiBold",
     },
     activityContainer: {
         flex: 1,
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
         color: "#897A7A",
         textAlign: 'center',
         marginTop: "40%",
-        fontFamily: "poppins-semibold",
+        fontFamily: "Poppins-SemiBold",
     },
     createNewButton: {
         borderRadius: 10,
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#2BAB47",
     },
     createNewText: {
-        fontFamily: "poppins-semibold",
+        fontFamily: "Poppins-SemiBold",
         color: 'white',
     },
     createActivity: {
@@ -248,6 +248,8 @@ const styles = StyleSheet.create({
         paddingLeft: 17,
         marginHorizontal: 20,
         marginTop: 40,
+        fontFamily: "Inter-Medium",
+        fontSize: 16,
     },
     enterPointValue: {
         backgroundColor: "#efefef",
@@ -256,6 +258,8 @@ const styles = StyleSheet.create({
         paddingLeft: 17,
         marginHorizontal: 20,
         marginVertical: 10,
+        fontFamily: "Inter-Medium",
+        fontSize: 16,
     },
     cancelButton: {
         borderRadius: 10,
@@ -267,7 +271,7 @@ const styles = StyleSheet.create({
         backgroundColor: "#AB2B2B",
     },
     cancelText: {
-        fontFamily: "poppins-semibold",
+        fontFamily: "Poppins-SemiBold",
         color: 'white',
     },
     activityListScroll: {
@@ -289,7 +293,7 @@ const styles = StyleSheet.create({
     activityName: {
         color: 'grey',
         fontSize: 18,
-        fontFamily: "poppins-semibold",
+        fontFamily: "Poppins-SemiBold",
         flexWrap: 'wrap',
         alignSelf: 'left',
     },
@@ -299,7 +303,7 @@ const styles = StyleSheet.create({
     },
     points: {
         fontSize: 24,
-        fontFamily: "poppins-semibold",
+        fontFamily: "Poppins-SemiBold",
         marginRight: 6,
         color: 'orange',
         flexWrap: 'wrap',
@@ -311,9 +315,13 @@ const styles = StyleSheet.create({
     },
     pointsText: {
         fontSize: 10,
+        fontFamily: 'Inter-Regular',
+        color: '#000000',
     },
     earnedText: {
         fontSize: 10,
+        fontFamily: 'Inter-Regular',
+        color: '#000000',
     },
     activityNameStyle: {
         width: '60%',

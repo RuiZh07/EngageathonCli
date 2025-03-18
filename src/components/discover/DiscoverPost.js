@@ -221,7 +221,7 @@ const styles = StyleSheet.create({
     },
     likeCountText: {
         fontSize: 14,
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Regular",
         color: "#333",
         marginLeft: 4,
     },
@@ -241,27 +241,33 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     dateText: {
-        fontFamily: "Inter-Semibold",
+        fontFamily: "Inter-Bold",
         fontSize: 13,
+        color: '#000000',
     },
     descriptionText: {
-        fontFamily: "inter",
+        fontFamily: "Inter-Medium",
+        color: '#3A3D3F',
         paddingTop: 5,
+        fontSize: 16,
     },
     locationText: {
-        fontFamily: "Inter",
-        paddingTop: 10,
+        fontFamily: "Inter-Medium",
+        paddingTop: 3,
+        color: '#3A3D3F',
+        fontSize: 15,
     },
     eventNameContainer: {
         paddingBottom: 2,
         paddingLeft: 24,
     },
     eventName: {
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Medium",
         fontSize: 22,
         fontWeight: "500",
         letterSpacing: 0.4,
         textAlign: "left",
+        color: '#000000',
     },
     postHeader: {
         paddingHorizontal: 20,
@@ -278,7 +284,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         alignItems: 'center',
         justifyContent: 'center',
-
     },
     pfp: {
         width: 32, 
@@ -304,21 +309,20 @@ const styles = StyleSheet.create({
         alignItems: "center",
     },
     userNameText: {
-        fontFamily: "poppins-regular",
+        fontFamily: "Poppins-Medium",
         fontSize: 15,
-        fontWeight: "500",
         lineHeight: 23,
         letterSpacing: 0.4,
         textAlign: "left",
         color: 'black',
     },
     userDescriptionText: {
-        fontFamily: "inter",
+        fontFamily: "Inter-Regular",
         fontSize: 12,
-        fontWeight: "400",
         lineHeight: 16,
         letterSpacing: 0,
         textAlign: "left",
         color: "rgba(163, 163, 163, 1);\n",
+
     },
 })

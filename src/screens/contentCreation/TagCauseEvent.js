@@ -8,7 +8,7 @@ import {
     ImageBackground,
     ScrollView,
     Alert,
-    Animated,
+    Platform,
 } from "react-native";
 import LinearGradient from "react-native-linear-gradient";
 import { useNavigation, useRoute } from "@react-navigation/native";
@@ -153,8 +153,9 @@ const TagCauseEvent = () => {
                     {/* Right header objects */}
                     <View style={styles.headerRight}>
                         <LinearGradient
-                            colors={["#FF8D00", "#FFE600"]}
-                            start={{ x: 0, y: 0 }}
+                            colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                            locations={[0.72, 0.86, 1]}  
+                            start={{ x: 0, y: 0 }}      
                             end={{ x: 1, y: 0 }}
                             style={styles.shareButtonGradient}
                         >
@@ -189,49 +190,6 @@ const TagCauseEvent = () => {
 };
 
 const styles = StyleSheet.create({
-    causeTypeHeader: {
-        flexDirection: 'row',
-        //justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 5,
-        borderBottomWidth: 1,
-        borderBottomColor: '#D3D3D3',
-        backgroundColor: '#FFFFFF',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
-    },
-    causeTypeName: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        color: '#000',
-    },
-    causeTypeContainer: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        marginLeft: 20,
-        marginBottom: 10,
-    },
-    causeTypeObject: {
-        paddingVertical: 6,
-        paddingHorizontal: 12,
-        borderRadius: 16,
-        margin: 5,
-        paddingBottom: 10,
-        textAlign: 'center',
-        overflow: 'hidden',
-    },
-    eachContainer: {
-        backgroundColor: "#FFFFFF",
-        height: "auto",
-        borderRadius: 30,
-        margin: 10,
-        marginBottom: 10,
-    },
-    iconButton: {
-        alignItems: 'center',
-        padding: 10,
-    },
-    // Component main styles
     scrollView: {
         flex: 1,
         width: "100%",
@@ -247,7 +205,7 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         paddingHorizontal: "5%",
-        marginTop: "13%",
+        marginTop: Platform.OS === "android" ? "6%": "13%",
     },
     // Header component, left side
     headerLeft: {
@@ -290,9 +248,6 @@ const styles = StyleSheet.create({
         fontSize: 13,
         fontWeight: "600",
     },
-
-    // Main content objects, under header
-    // Each different interest type containers
     causeContainer: {
         marginBottom: 70,
     },
@@ -302,19 +257,6 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         margin: 10,
         marginBottom: 10,
-    },
-    causeTypeName: {
-        fontSize: 24,
-        fontWeight: "bold",
-        margin: 20,
-        marginBottom: 10,
-    },
-    causeTypeContent: {
-        flexDirection: "row",
-        flexWrap: "wrap",
-        marginTop: 10,
-        marginBottom: 10,
-        paddingBottom: 10,
     },
 });
 

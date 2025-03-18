@@ -374,9 +374,9 @@ const CreateEventScreen = () => {
                             placeholder="Type of Event"
                             value={eventType}
                             onChange={(item) => handleEventTypeChange(item)}
-                            placeholderStyle={{ fontSize: 14 }}
-                            itemTextStyle={{ fontSize: 14 }}
-                            selectedTextStyle = {{ fontSize: 14 }}
+                            placeholderStyle={{ fontSize: 14, color:'#000000' }}
+                            itemTextStyle={{ fontSize: 14, color:'#000000' }}
+                            selectedTextStyle = {{ fontSize: 14, color:'#000000' }}
                         />
 
                         <View style={styles.pickDate}>
@@ -409,16 +409,15 @@ const CreateEventScreen = () => {
                                 </TouchableOpacity>
                             </View>    
                             
-                                <DateTimePickerModal
-                                    isVisible={showPicker}
-                                    mode="datetime"
-                                    onConfirm={handleConfirmDateTime}
-                                    onCancel={() => setShowPicker(false)}
-                                    is24Hour={true}
-                                    textColor="black"
-                                    isDarkModeEnabled={false}
-                                />
-                            
+                            <DateTimePickerModal
+                                isVisible={showPicker}
+                                mode="datetime"
+                                onConfirm={handleConfirmDateTime}
+                                onCancel={() => setShowPicker(false)}
+                                is24Hour={true}
+                                textColor="black"
+                                isDarkModeEnabled={false}
+                            />
                         </View>
                     
                         <View style={styles.toggleSwitchContainer}>
@@ -487,7 +486,7 @@ const CreateEventScreen = () => {
                                     ) : (
                                     <View style={styles.photoContainer}>
                                         <SvgUri uri={addCameraIcon} size={70} color="black" style={{ marginTop: -12, marginBottom: 10 }}/>
-                                        <Text>Add cover photo + </Text>
+                                        <Text style={styles.addCoverPhotoText}>Add cover photo + </Text>
                                     </View>
                                 )}
                             </TouchableOpacity>
@@ -531,34 +530,6 @@ const CreateEventScreen = () => {
                                 onClose={() => setIsCameraModalVisible(false)}
                             />
                         )}
-                            {/*
-                            <Modal 
-                                animationType="slide"
-                                visible={cameraVisible}
-                                onRequestClose={() => setCameraVisible(false)}
-                                transparent={true}
-                            >
-                                <View style={styles.takePhotoContainer}>
-                                    <View style={styles.fullScreenCamera}>
-                                        <CameraView
-                                            style={styles.camera}
-                                            ref={cameraRef}
-                                            onCameraReady={() => setIsCameraReady(true)}
-                                            ratio="16:9"
-                                        >
-                                            <View style={styles.buttonContainer}>
-                                                <TouchableOpacity style={styles.cancelButton} onPress={() => setCameraVisible(false)}>
-                                                    <SvgUri uri={cameraCancel} size={40} color='white'/>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity style={styles.captureButton} onPress={takePicture}>
-                                                    <CustomCameraIcon size={40} />
-                                                </TouchableOpacity>
-                                            </View>
-                                        </CameraView>
-                                    </View>
-                                </View>
-                            </Modal>
-                            */}
                         </View>
                     </View>
 
@@ -590,15 +561,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         width: "100%",
         paddingHorizontal: "5%",
-        marginTop: "13%",
+        marginTop: Platform.OS === "android" ? "6%": "13%",
     },  
- 
     headerText: {
         color: "#FFE600",
         fontSize: 26,
-        fontFamily: "Poppins-regular",
+        fontFamily: "Poppins-Regular",
         paddingLeft: 20,
-
     },
     title: {
         marginTop: "7%",
@@ -632,6 +601,7 @@ const styles = StyleSheet.create({
         marginLeft: 20,
         marginRight: 20,
         marginTop: 12,
+        fontFamily: 'Inter-Medium',
     },
     desInput: {
         backgroundColor: "#efefef",
@@ -644,12 +614,11 @@ const styles = StyleSheet.create({
         marginTop: 12,
         textAlign: 'center',
         textAlignVertical: 'top',
+        fontFamily: 'Inter-Medium',
     },
-    timeInput: {
-        backgroundColor: "#efefef",
-        borderRadius: 20,
-        padding: 12,
-        margin: 20,
+    addCoverPhotoText: {
+        fontFamily: 'Inter-Medium',
+        color: '#000000',
     },
     pickDate: {
         flexDirection: 'row',
@@ -669,10 +638,10 @@ const styles = StyleSheet.create({
     dateInput: {
         fontSize: 12,
         paddingLeft: 0,
-        paddingTop: 10,
-        paddingTop: -5,
-        color: 'black',
-        fontWeight: '600',
+        paddingVertical: 3,
+        color: '#000000',
+        fontFamily: 'Inter-SemiBold',
+        width: '80%',
     },
     touchableContainer: {
         flexDirection: 'row',
@@ -688,6 +657,8 @@ const styles = StyleSheet.create({
     recurringEventText: {
         marginLeft: 2,
         fontSize: 12,
+        color: '#000000',
+        fontFamily: 'Inter-Medium',
     },
     photoContainer: {
         alignItems: 'center',
@@ -723,9 +694,6 @@ const styles = StyleSheet.create({
         borderStyle: 'dashed',
         resizeMode: 'cover',
     },
-    camera: {
-        flex: 1,
-    },
     modalOverlay: {
         flex: 1,
         justifyContent: 'center',
@@ -746,7 +714,6 @@ const styles = StyleSheet.create({
     modalButtonText: {
         fontSize: 16,
         color: 'black',
-
     },
     modalCancelButtonText: {
         fontSize: 15,
@@ -766,35 +733,8 @@ const styles = StyleSheet.create({
         width: '70%',
         alignItems: 'center',
     },
-
     closeButton: {
         marginTop: 10,
-    },
-    takePhotoContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginHorizontal: 15,
-        marginVertical: 60,
-    },
-    permissionContainer: {
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-      },
-    camera: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        borderRadius: 20,
-    },
-    fullScreenCamera: {
-        flex: 1,
-        width: '100%',
-        height: '100%',
-        borderRadius: 30,
-        overflow: 'hidden',
-        position: 'relative',
     },
     buttonContainer: {
         position: 'absolute',
