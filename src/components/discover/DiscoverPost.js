@@ -205,7 +205,8 @@ const styles = StyleSheet.create({
         borderRadius: 30,
         paddingBottom: 30,
         paddingTop: 20,
-        margin: 20,
+        marginHorizontal: 20,
+        marginBottom: 20,
     },
     postInteraction: {
         flexDirection: "row",
