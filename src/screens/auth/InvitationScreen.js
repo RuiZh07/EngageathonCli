@@ -19,7 +19,6 @@ const InvitationScreen = ({ route }) => {
     const { userEmail, userData } = route.params;
     const [email, setEmail] = useState("");
 
-    console.log("user data in invitation", userData);
     const handleInvite = async () => {
         try {
             if (!email) {
@@ -44,8 +43,7 @@ const InvitationScreen = ({ route }) => {
                 source={require("../../assets/main-background.png")}
                 style={styles.backgroundImage}
             >                
-
-            <View style={styles.invitationMainComponent}>
+                <View style={styles.invitationMainComponent}>
                     <Text style={styles.invitationText}>Would you like to invite others to sign up and join ENGAGEATHON?</Text>
                     <Image
                         style={{ width: 127, height: 127, marginVertical: 45 }}
@@ -61,8 +59,9 @@ const InvitationScreen = ({ route }) => {
                         />
 
                         <LinearGradient
-                            colors={["#FF8D00", "#FFE600"]}
-                            start={{ x: 0, y: 0 }}
+                            colors={["#FF8D00", "#FFBA00", "#FFE600"]}
+                            locations={[0.72, 0.86, 1]}  
+                            start={{ x: 0, y: 0 }}      
                             end={{ x: 1, y: 0 }}
                             style={styles.inviteButtonGradient}
                         >
@@ -137,7 +136,7 @@ const styles = StyleSheet.create({
     },
     submitText: {
         color: "white",
-        fontWeight: "bold",
+        fontFamily: "Poppins-SemiBold",
     },
     skipButton: {
         marginTop: 24,
