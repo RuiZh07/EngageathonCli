@@ -14,7 +14,7 @@ import {
  } from 'react-native';
 import baseUrl from '../../utils/api';
 import Heart from '../post/Heart';
-import { cancelGradient, sendGradient, reply } from '../../utils/icons';
+import { cancelGradient, sendGradient, reply, yellowTriangle } from '../../utils/icons';
 import { SvgUri } from "react-native-svg";
 import apiClient from '../../services/apiClient';
 
@@ -22,10 +22,7 @@ const CommentsModal = ({ post, visible, onClose }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
-    const [replies, setReplies] = useState([]);
-    const [activeCommentId, setActiveCommentId] = useState(null);
-    const [newReply, setNewReply] = useState('');
-    const [selectedCommentId, setSelectedCommentId] = useState(null);
+
     console.log('post',post.id);
     // Function to format time
     const formatTimestamp = (timestamp) => {
@@ -54,45 +51,8 @@ const CommentsModal = ({ post, visible, onClose }) => {
         setIsLoading(true);
         try {
             const response = await apiClient.get(`${baseUrl}/comments/EV/${post.id}/`);
-            console.log('responsedata', response.data);
-            const transformedComments = response.data.map(comment => ({
-                id: comment?.id,
-                text: comment?.content,  
-                user: {
-                    avatar: `data:image/jpeg;base64, ${comment?.profilephoto_url}`,
-                    name: comment?.user,
-                },
-                timestamp: formatTimestamp(comment?.created_at),
-
-                replies: comment?.replies?.map(reply => ({
-                    id: reply?.id,
-                    text: reply?.content,
-                    user: {
-                        avatar: `data:image/jpeg;base64, ${reply?.profilephoto_url}`,
-                        name: reply?.user,
-                    },
-                    timestamp: formatTimestamp(reply?.created_at),
-                    parentId: comment?.id
-                })) || []
-                
-            }));
-
-            const allReplies = response.data.flatMap(comment =>
-                comment?.replies?.map(reply => ({
-                    id: reply?.id,
-                    text: reply?.content,
-                    user: {
-                        avatar: `data:image/jpeg;base64, ${reply?.profilephoto_url}`,
-                        name: reply?.user,
-                    },
-                    timestamp: formatTimestamp(reply?.created_at),
-                    parentId: comment?.id
-                })) || []
-            );
-
-            setComments(transformedComments);
-            setReplies(allReplies);
-            console.log('allreplies',allReplies);
+            setComments(response.data);
+        
         } catch (error) {
             console.error('Error fetching comments and replies:', error);
         } finally {
@@ -108,16 +68,19 @@ const CommentsModal = ({ post, visible, onClose }) => {
     // Handle add new comments
     const handleAddComment = async () => {
         try {
-            await apiClient.post(`${baseUrl}/comments/`, {
+            const response = await apiClient.post(`${baseUrl}/comments/`, {
                 content: newComment,
                 content_type: 'EV',
                 content_object_id: post.id,
             });
            
             const newComentObj = {
-                text: newComment,
-                user: { avatar: post.profile_photo_url, name: post.username },
-                timestamp: formatTimestamp(new Date().toISOString()),
+                id: response.data.id,
+                content: response.data.content,
+                profilephoto_url: response.data.profilephoto_url,
+                user: response.data.user,
+                created_at: formatTimestamp(response.data.created_at),
+                replies:[]
             };
 
             setComments((prevComments) => [newComentObj, ...prevComments]);
@@ -132,7 +95,7 @@ const CommentsModal = ({ post, visible, onClose }) => {
         if (!replyText.trim()) return;
 
         try {
-            await apiClient.post(`${baseUrl}/comments/`, {
+            const response = await apiClient.post(`${baseUrl}/comments/`, {
                 parent: parentId,
                 content: replyText,
                 content_type: 'EV',
@@ -140,19 +103,27 @@ const CommentsModal = ({ post, visible, onClose }) => {
             });
 
             const newReplyObj = {
-                text: replyText,
-                user: { avatar: post.profile_photo_url, name: post.username },
-                timestamp: formatTimestamp(new Date().toISOString()),
+                id: response.data.id,
+                content: response.data.content,
+                profilephoto_url: response.data.profilephoto_url,
+                user: response.data.user,
+                created_at: response.data.created_at,
                 parentId: parentId,
+                replies: []
             };
 
-            setComments(prevComments =>
-                prevComments.map(comment =>
-                    comment.id === parentId
-                        ? { ...comment, replies: [...comment.replies, newReplyObj] }
-                        : comment
-                )
-            );
+            const addReplyRecursively = (comments) => {
+                return comments.map(comment => {
+                    if (comment.id === parentId) {
+                        return { ...comment, replies: [...comment.replies, newReplyObj] };
+                    } else if (comment.replies.length > 0) {
+                        return { ...comment, replies: addReplyRecursively(comment.replies) };
+                    }
+                    return comment;
+                });
+            };
+    
+            setComments(prevComments => addReplyRecursively(prevComments));
     
         } catch (error) {
             console.error('Error posting Reply:', error);
@@ -160,7 +131,7 @@ const CommentsModal = ({ post, visible, onClose }) => {
     };
     
     // Comm
-    const CommentItem = ({ item, comments }) => {
+    const CommentItem = ({ item }) => {
         const [isReplying, setIsReplying] = useState(false);
         const [showReplies, setShowReplies] = useState(false);
         const [replyText, setReplyText] = useState('');
@@ -172,11 +143,14 @@ const CommentsModal = ({ post, visible, onClose }) => {
         }
         return (
             <View style={styles.commentContainer}>
-                <Image source={{ uri: item.user.avatar }} style={styles.avatar} />
+                <Image 
+                    source={{ uri: `data:image/jpeg;base64,${item.profilephoto_url}` }}  
+                    style={styles.avatar} 
+                />
                 <View style={styles.commentContent}>
-                    <Text style={styles.commentUser}>{item.user.name}</Text>
-                    <Text style={styles.commentTimestamp}>{item.timestamp}</Text>
-                    <Text style={styles.commentText}>{item.text}</Text>
+                    <Text style={styles.commentUser}>{item.user}</Text>
+                    <Text style={styles.commentTimestamp}>{formatTimestamp(item.created_at)}</Text>
+                    <Text style={styles.commentText}>{item.content}</Text>
                     <View style={styles.iconsContainer}>
                         {/*like*/}
                         <TouchableOpacity onPress={handleReplyPress}>
@@ -192,8 +166,6 @@ const CommentsModal = ({ post, visible, onClose }) => {
                             </TouchableOpacity>
                         )}
                     </View>
-
-                    {showReplies && <RepliesList parentId={item.id} replies={item.replies} comments={comments} />}
 
                     {isReplying && (
                         <TextInput 
@@ -212,12 +184,16 @@ const CommentsModal = ({ post, visible, onClose }) => {
                         />
                     )}
 
+                    {showReplies && <RepliesList parentUser={item.user} replies={item.replies} />}
+
                 </View>
             </View>
         );
     }
 
-    const ReplyItem = ({ replyItem, commentItem }) => {
+    const ReplyItem = ({ replyItem, parentUser }) => {
+        console.log('replyItems', replyItem);
+        console.log('commentItem', parentUser);
         const [isReplying, setIsReplying] = useState(false);
         const [replyText, setReplyText] = useState('');
         const replyInputRef = useRef(null);
@@ -225,16 +201,24 @@ const CommentsModal = ({ post, visible, onClose }) => {
         const handleReplyPress= () => {
             setIsReplying(true);
             setTimeout(() => replyInputRef.current?.focus(), 100);
-        }
+        };
+
         return (
             <View style={styles.commentContainer}>
-                <Image source={{ uri: replyItem.user.avatar }} style={styles.avatar} />
-                <View style={styles.commentContent}>
-                    <Text style={styles.commentUser}>{replyItem.user.name} replied to {commentItem?.user.name}</Text>
-                    <Text style={styles.commentTimestamp}>{replyItem.timestamp}</Text>
-                    <Text style={styles.commentText}>{replyItem.text}</Text>
-                
+                <Image 
+                    source={{ uri: `data:image/jpeg;base64,${replyItem.profilephoto_url}` }} 
+                    style={styles.avatar} 
+                />
 
+                <View style={styles.commentContent}>
+                    <View style={styles.replyUsernameContainer}>
+                        <Text style={styles.commentUser}>{replyItem.user}</Text>
+                        <SvgUri uri={yellowTriangle} />
+                        <Text style={styles.commentUser}>{parentUser}</Text>
+                    </View>
+                    <Text style={styles.commentTimestamp}>{formatTimestamp(replyItem.created_at)}</Text>
+                    <Text style={styles.commentText}>{replyItem.content}</Text>
+                
                     <View style={styles.iconsContainer}>
                         {/*like*/}
                         <TouchableOpacity onPress={handleReplyPress}>
@@ -255,43 +239,40 @@ const CommentsModal = ({ post, visible, onClose }) => {
                                     setReplyText('');  
                                     setTimeout(() => replyInputRef.current?.focus(), 100);  
                                 }
-                            }}
-                            
+                            }}  
+                            onBlur={() => setIsReplying(false)}
                         />
                     )}
 
-                    {replyItem.replies?.length > 0 && (
-                        <View style={styles.nestedRepliesContainer}>
-                            {replyItem.replies.map((nestedReply) => (
-                                <View key={nestedReply.id}>{renderReply({ replyItem: nestedReply, commentItem })}</View>
-                            ))}
-                        </View>
-                    )}
+                    {/* Recursively Render Replies */}
+                    {replyItem.replies.length > 0 && <RepliesList replies={replyItem.replies} parentUser={parentUser} />}
                 </View>
             </View>
 
         );
     }
 
-    const RepliesList = ({ parentId, replies, comments }) => {
-        const [visibleReplies, setVisibleReplies] = useState(5);
-        const filteredReplies = replies.filter(reply => reply.parentId === parentId);
-        const commentItem = comments.find(comment => comment.id === parentId);
+    const RepliesList = ({ parentUser, replies }) => {
+        console.log('repliesList', replies);
+        const [visibleReplies, setVisibleReplies] = useState(3);
 
         const handleShowMore = () => {
-            setVisibleReplies((prev) => (prev + 5));
+            setVisibleReplies((prev) => (prev + 3));
         };
 
         return (
             <View>
-                {filteredReplies.length > 0 && (
+                {replies.length > 0 && (
                     <View style={styles.replyListContainer}>
                         <FlatList
-                            data={filteredReplies.slice(0, visibleReplies)} 
+                            data={replies.slice(0, visibleReplies)} 
                             keyExtractor={(item) => String(item.id)}
-                            renderItem={({ item }) => <ReplyItem replyItem={item} commentItem={commentItem} />}
+                            renderItem={({ item }) => {
+                                console.log('renderitem in relieslist',item);
+                                return <ReplyItem replyItem={item} parentUser={parentUser} />;
+                            }}
                         />
-                        {filteredReplies.length > visibleReplies && (
+                        {replies.length > visibleReplies && (
                         <TouchableOpacity onPress={handleShowMore}>
                             <Text>-- Show more</Text>
                         </TouchableOpacity>
@@ -322,7 +303,7 @@ const CommentsModal = ({ post, visible, onClose }) => {
                 ): (
                     <FlatList
                         data={comments}
-                        renderItem={({ item }) => <CommentItem item={item} comments={comments} />}
+                        renderItem={({ item }) => <CommentItem item={item} />}
                         keyExtractor={(item, index) => String(item.id)}
                         contentContainerStyle={styles.commentsContainer}
                     />
@@ -389,7 +370,7 @@ const styles = StyleSheet.create({
         flex: 1,
     },
     commentUser: {
-        fontSize: 16,
+        fontSize: 14,
         fontFamily: 'Inter-Regular',
         color: '#000000',
     },
@@ -408,7 +389,11 @@ const styles = StyleSheet.create({
     totalReplies: {
         marginTop: 3,
     },
-
+    replyUsernameContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+    },
     commentTimestamp: {
         fontSize: 12,
         color: 'gray',
