@@ -70,3 +70,4 @@ export const commentGradient = `${BaseUrl}comment-gradient.svg`;
 export const whiteRightArrow = `${BaseUrl}white-right-arrow.svg`;
 export const whiteLeftArrow = `${BaseUrl}white-left-arrow.svg`;
 export const reply = `${BaseUrl}reply.svg`;
+export const yellowTriangle =  `${BaseUrl}yellow-triangle.svg`;
