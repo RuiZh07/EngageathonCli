@@ -9,7 +9,6 @@ import {
     ImageBackground,
     KeyboardAvoidingView
 } from "react-native";
-import apiClient from "../../services/apiClient";
 import { useNavigation } from "@react-navigation/native";
 import MainButton from "../../components/common/MainButton";
 import baseUrl from "../../utils/api";
@@ -84,6 +83,7 @@ const CodeVerificationScreen = ({ route }) => {
             inputs.current[0].focus(); // Focus the first input
         }
     };
+
     const handleResendCode = async () => {
         try {
             await authService.resetPassword(email);
@@ -92,7 +92,6 @@ const CodeVerificationScreen = ({ route }) => {
             Alert.alert("Error", "Failed to resend code. Please try again.");
         }
     }
-
     
     return (
         <KeyboardAvoidingView
@@ -172,7 +171,7 @@ const styles = StyleSheet.create({
         fontFamily: "Inter-Medium"
     },
     boldText: {
-        fontWeight: 'bold',
+        fontFamily: 'Inter-Bold',
     },
     codeInputContainer: {
         flexDirection: "row",
@@ -189,7 +188,6 @@ const styles = StyleSheet.create({
         height: 50, // Adjusted for input height
         marginHorizontal: 5, // Spacing between input boxes
         marginBottom: 50,
-
     },
     resendContainer: {
         flexDirection: 'row',

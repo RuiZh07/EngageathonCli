@@ -9,7 +9,6 @@ import {
     ImageBackground,
     KeyboardAvoidingView
 } from "react-native";
-import apiClient from "../../services/apiClient";
 import { useNavigation } from "@react-navigation/native";
 import baseUrl from "../../utils/api";
 import { eyeCloseIcon, eyeIcon, lockIcon } from "../../utils/icons";
@@ -165,7 +164,7 @@ const styles = StyleSheet.create({
     subheading: {
         fontSize: 13,
         color: "#414141",
-        marginBottom: 20,
+        marginBottom: 40,
         textAlign: "left",
         //width: "80%",
         fontFamily: "Inter-Medium",
