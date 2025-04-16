@@ -53,7 +53,19 @@ import YourActivityScreen from "./src/screens/setting/YourActivityScreen";
 import LikedEventScreen from "./src/screens/setting/LikedEventScreen";
 import BookmarkedEventScreen from "./src/screens/setting/BookmarkedEvent";
 import EventDetailScreen from "./src/screens/setting/EventDetailScreen";
+import MessageScreen from "./src/screens/message/MessageScreen";
+
 const Stack = createNativeStackNavigator();
+
+const linking = {
+  prefixed: ['engageathon://', 'https://app.engageathon.com'],
+  config: {
+    screens: {
+      Login: 'login',
+      PostDetailScreen: 'event/:eventId',
+    }
+  }
+}
 
 const App = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -70,7 +82,7 @@ const App = () => {
 
   return (
     <CategoryProvider>
-    <NavigationContainer>
+    <NavigationContainer linking={linking}>
 {/*
       <Stack.Navigator initialRouteName="InviteContactScreen">
        
@@ -126,6 +138,8 @@ const App = () => {
         <Stack.Screen name="LikedEventScreen" component={LikedEventScreen} options={{ headerShown: false }} />
         <Stack.Screen name="BookmarkedEventScreen" component={BookmarkedEventScreen} options={{ headerShown: false }} />
         <Stack.Screen name="EventDetailScreen" component={EventDetailScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="MessageScreen" component={MessageScreen} options={{ headerShown: false }} />
+
       </Stack.Navigator>
     </NavigationContainer>
     </CategoryProvider>
